@@ -1,0 +1,6 @@
+EXPORTS
+rar_unpack          @1 NONAME
+rar_init_filters    @2 NONAME
+rarvm_free          @3 NONAME
+ppm_constructor     @4 NONAME
+ppm_destructor      @5 NONAME

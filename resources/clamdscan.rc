@@ -1,0 +1,3 @@
+#define __MODULE__	"clamdscan.exe"
+#define __ICON__	"clamav.ico"
+#include <clamav.rc>

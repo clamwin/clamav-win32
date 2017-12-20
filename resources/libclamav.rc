@@ -1,0 +1,2 @@
+#define __MODULE__	"libclamav.dll"
+#include <clamav.rc>

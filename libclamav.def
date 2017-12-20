@@ -1,0 +1,289 @@
+EXPORTS
+
+; Engine management
+cl_engine_addref
+cl_engine_compile
+cl_engine_free
+cl_engine_get_num
+cl_engine_get_str
+cl_engine_new
+cl_engine_set_clcb_hash
+cl_engine_set_clcb_meta
+cl_engine_set_clcb_post_scan
+cl_engine_set_clcb_pre_cache
+cl_engine_set_clcb_pre_scan
+cl_engine_set_clcb_progress
+cl_engine_set_clcb_sigload
+cl_engine_set_clcb_stats_get_hostid
+cl_engine_set_clcb_stats_submit
+cl_engine_set_clcb_virus_found
+cl_engine_set_num
+cl_engine_set_str
+cl_engine_settings_apply
+cl_engine_settings_copy
+cl_engine_settings_free
+cl_engine_stats_enable
+cl_init
+cl_load
+cl_retdbdir
+cl_scandesc_callback
+cl_scanfile_callback
+cl_set_clcb_msg
+
+; hash
+cl_always_gen_section_hash
+cl_finish_hash
+cl_hash_data
+cl_hash_destroy
+cl_hash_init
+cl_initialize_crypto
+cl_cleanup_crypto
+cl_sha1
+cl_update_hash
+
+; Scanning
+cl_scandesc
+cl_scanfile
+
+; Versions
+cl_retflevel
+cl_retver
+
+; CVD handlers
+cl_cvdhead
+cl_cvdparse
+cl_cvdverify
+cl_cvdfree
+
+; Database stat functions
+cl_statinidir
+cl_statchkdir
+cl_statfree
+
+; Logging functions
+cl_debug
+cl_strerror
+
+; ClamWin specific
+cw_init
+cw_normalizepath
+cw_stat
+cw_rmdirs
+cw_iswow64
+cw_disablefsredir
+cw_revertfsredir
+cw_movefile
+cw_movefileex
+cw_unlink
+cw_strerror
+cw_perror
+cw_rename
+cw_getaddrinfo
+cw_freeaddrinfo
+cw_gai_strerror
+
+; Win32 Native API
+CWInit
+CWFree
+CWFreeBuffer
+CWLoadDB_A
+CWLoadDB_W
+CWScanHandle_A
+CWScanHandle_W
+CWScanHandle2_A
+CWScanHandle2_W
+CWScanFile_A
+CWScanFile_W
+CWStrError_A
+CWStrError_W
+
+; clamwin internals @ 50
+cw_async_noalert                    @50 NONAME
+cw_leerrno                          @51 NONAME
+cw_wseterrno                        @52 NONAME
+cw_get_currentfile                  @53 NONAME
+cw_set_currentfile                  @54 NONAME
+cw_sigcheck                         @55 NONAME
+
+; stdcall vision of exports is different between
+; msvc and mingw, and why not? mingw64 is different from both :)
+; using NONAME here will probably not work depending of binutils version
+cw_stop_ctrl_handler                            @57
+_cw_stop_ctrl_handler@4 = cw_stop_ctrl_handler  @58
+cw_stop_ctrl_handler@4  = cw_stop_ctrl_handler  @59
+
+cw_platform                         @60 NONAME DATA
+cw_helpers                          @61 NONAME DATA
+
+; win32 portability layer @ 70
+opendir                             @70 NONAME
+closedir                            @71 NONAME
+readdir                             @72 NONAME
+mkstemp                             @73 NONAME
+tcgetattr                           @74 NONAME
+tcsetattr                           @75 NONAME
+basename                            @76 NONAME
+
+; gnulib @ 90
+gnulib_snprintf                     @90 NONAME
+gnulib_vsnprintf                    @91 NONAME
+strptime                            @92 NONAME
+ftruncate                           @93 NONAME
+
+; Internals @ 100
+cli_ac_chklsig                      @100 NONAME
+cli_calloc                          @101 NONAME
+cli_checkfp_pe                      @102 NONAME
+cli_chomp                           @103 NONAME
+cli_ctime                           @104 NONAME
+cli_cvdunpack                       @105 NONAME
+cli_filecopy                        @106 NONAME
+cli_filetype2                       @107 NONAME
+cli_fmap_scandesc                   @108 NONAME
+cli_ftw                             @109 NONAME
+cli_genhash_pe						@110 NONAME
+cli_gentemp                         @111 NONAME
+cli_gentempfd                       @112 NONAME
+cli_gettmpdir                       @113 NONAME
+cli_hashfile                        @114 NONAME
+cli_hashset_destroy                 @115 NONAME
+cli_hashstream                      @116 NONAME
+cli_hex2str                         @117 NONAME
+cli_hex2ui                          @118 NONAME
+cli_initroots                       @119 NONAME
+cli_isnumber                        @120 NONAME
+cli_ldbtokenize                     @121 NONAME
+cli_malloc                          @122 NONAME
+cli_matchregex                      @123 NONAME
+cli_ole2_extract                    @124 NONAME
+cli_parse_add                       @125 NONAME
+cli_pcre_perf_events_destroy        @126 NONAME
+cli_pcre_perf_print                 @127 NONAME
+cli_ppt_vba_read                    @128 NONAME
+cli_readn                           @129 NONAME
+cli_regcomp                         @130 NONAME
+cli_regexec                         @131 NONAME
+cli_regfree                         @132 NONAME
+cli_rndnum                          @133 NONAME
+cli_scancpio_newc                   @134 NONAME
+cli_scancpio_odc                    @135 NONAME
+cli_scancpio_old                    @136 NONAME
+cli_scanmacho                       @137 NONAME
+cli_sigperf_events_destroy          @138 NONAME
+cli_sigperf_print                   @139 NONAME
+cli_str2hex                         @140 NONAME
+cli_strbcasestr                     @141 NONAME
+cli_strdup                          @142 NONAME
+cli_strerror                        @143 NONAME
+cli_strtok                          @144 NONAME
+cli_strtokenize                     @145 NONAME
+cli_utf16toascii                    @146 NONAME
+cli_vba_inflate                     @147 NONAME
+cli_vba_readdir                     @148 NONAME
+cli_versig2                         @149 NONAME
+cli_wm_decrypt_macro                @150 NONAME
+cli_wm_readdir                      @151 NONAME
+cli_writen                          @152 NONAME
+
+html_normalise_map                  @160 NONAME
+text_normalize_init                 @161 NONAME
+text_normalize_reset                @162 NONAME
+text_normalize_map                  @163 NONAME
+uniq_get                            @164 NONAME
+fmap                                @165 NONAME
+
+; optparser
+optget                              @170 NONAME
+optparse                            @171 NONAME
+optfree                             @172 NONAME
+
+clam_options                        @173 NONAME DATA
+DATADIR                             @174 NONAME DATA
+CONFDIR                             @175 NONAME DATA
+CONFDIR_CLAMD                       @176 NONAME DATA
+CONFDIR_FRESHCLAM                   @177 NONAME DATA
+CONFDIR_MILTER                      @178 NONAME DATA
+
+; mpool
+mpool_getstats                      @179 NONAME
+
+; Pthreads-win32 @ 200
+pthread_attr_destroy                @200 NONAME
+pthread_attr_init                   @201 NONAME
+pthread_attr_setdetachstate         @202 NONAME
+pthread_cond_broadcast              @203 NONAME
+pthread_cond_destroy                @204 NONAME
+pthread_cond_init                   @205 NONAME
+pthread_cond_signal                 @206 NONAME
+pthread_cond_timedwait              @207 NONAME
+pthread_cond_wait                   @208 NONAME
+pthread_create                      @209 NONAME
+pthread_getspecific                 @210 NONAME
+pthread_key_create                  @211 NONAME
+pthread_mutex_destroy               @212 NONAME
+pthread_mutex_init                  @213 NONAME
+pthread_mutex_lock                  @214 NONAME
+pthread_mutex_unlock                @215 NONAME
+pthread_once                        @216 NONAME
+pthread_setspecific                 @217 NONAME
+pthread_join                        @218 NONAME
+
+; zlib @ 250
+gzclose                             @250 NONAME
+gzdopen                             @251 NONAME
+gzgets                              @252 NONAME
+gzopen                              @253 NONAME
+gzwrite                             @254 NONAME
+
+; openssl @260
+EVP_DigestFinal_ex                  @260 NONAME
+EVP_DigestInit_ex                   @261 NONAME
+EVP_DigestUpdate                    @262 NONAME
+EVP_MD_CTX_create                   @263 NONAME
+EVP_MD_CTX_destroy                  @264 NONAME
+EVP_sha256                          @265 NONAME
+
+; LLVM
+cli_debug_flag                      @300 NONAME DATA
+cli_errmsg                          @301 NONAME
+cli_warnmsg                         @302 NONAME
+cli_dbgmsg_internal                 @303 NONAME
+
+cli_apicall_maxapi                  @310 NONAME DATA
+cli_apicall_maxglobal               @311 NONAME DATA
+cli_apicall_maxtypes                @312 NONAME DATA
+cli_apicall_types                   @313 NONAME DATA
+cli_apicalls                        @314 NONAME DATA
+cli_apicalls0                       @315 NONAME DATA
+cli_apicalls1                       @316 NONAME DATA
+cli_apicalls2                       @317 NONAME DATA
+cli_apicalls3                       @318 NONAME DATA
+cli_apicalls4                       @319 NONAME DATA
+cli_apicalls5                       @320 NONAME DATA
+cli_apicalls6                       @321 NONAME DATA
+cli_apicalls7                       @322 NONAME DATA
+cli_apicalls8                       @323 NONAME DATA
+cli_apicalls9                       @324 NONAME DATA
+cli_globals                         @325 NONAME DATA
+
+; clambc
+cli_bytecode_context_alloc          @350 NONAME
+cli_bytecode_context_destroy        @351 NONAME
+cli_bytecode_context_getresult_int  @352 NONAME
+cli_bytecode_context_set_trace      @353 NONAME
+cli_bytecode_context_setfile        @354 NONAME
+cli_bytecode_context_setfuncid      @355 NONAME
+cli_bytecode_context_setparam_int   @356 NONAME
+cli_bytecode_debug                  @357 NONAME
+cli_bytecode_debug_printsrc         @358 NONAME
+cli_bytecode_describe               @359 NONAME
+cli_bytecode_destroy                @360 NONAME
+cli_bytecode_done                   @361 NONAME
+cli_bytecode_init                   @362 NONAME
+cli_bytecode_load                   @363 NONAME
+cli_bytecode_prepare2               @364 NONAME
+cli_bytecode_printversion           @365 NONAME
+cli_bytecode_run                    @366 NONAME
+cli_bytefunc_describe               @367 NONAME
+cli_bytetype_describe               @368 NONAME
+cli_bytevalue_describe              @369 NONAME

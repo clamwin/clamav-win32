@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="clamav"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="&quot;$(SolutionDir)..\include&quot;;&quot;$(3rdparty)\gnulib&quot;;&quot;$(3rdparty)\json-c&quot;;&quot;$(3rdparty)\openssl\include&quot;;&quot;$(clamav)&quot;;&quot;$(clamav)\shared&quot;;&quot;$(clamav)\libclamav&quot;;&quot;$(clamav)\libclamav\libmspack-0.5alpha\mspack&quot;;&quot;$(3rdparty_clamav)\pthreads&quot;;&quot;$(3rdparty_clamav)\zlib&quot;;&quot;$(3rdparty_clamav)\pcre&quot;;&quot;$(3rdparty_clamav)\bzip2&quot;"
+		PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;WIN32_LEAN_AND_MEAN;CLAMWIN;HAVE_CONFIG_H;PTW32_STATIC_LIB;PCRE_STATIC"
+	/>
+	<UserMacro
+		Name="clamav"
+		Value="$(SolutionDir)..\clamav"
+	/>
+	<UserMacro
+		Name="3rdparty"
+		Value="$(SolutionDir)..\3rdparty"
+	/>
+	<UserMacro
+		Name="3rdparty_clamav"
+		Value="$(clamav)\win32\3rdparty"
+	/>
+	<UserMacro
+		Name="libssl"
+		Value="$(3rdparty)\openssl\lib\$(PlatformName)\libeay32.lib $(3rdparty)\openssl\lib\$(PlatformName)\ssleay32.lib"
+	/>
+</VisualStudioPropertySheet>

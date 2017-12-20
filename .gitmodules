@@ -1,0 +1,7 @@
+[submodule "3rdparty/openssl"]
+	path = 3rdparty/openssl
+	url = ../openssl.git
+[submodule "clamav"]
+	path = clamav
+	url = ../clamav.git
+	branch = 0.99.3

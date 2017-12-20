@@ -1,0 +1,3 @@
+#define __MODULE__	"unscrambler.exe"
+#define __DESC__	"ClamWin Antivirus Dump File Unscrambler"
+#include <tools.rc>

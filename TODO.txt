@@ -1,0 +1,7 @@
+[Todo list / Scratchbox]
+- on WIN64 SOCKET is 64bit while all socket functions suppose it to be an int
+- check for compatibility issues on WIN64
+
+Output directories for vc8/9:
+$(SolutionDir)$(ConfigurationName)\$(PlatformName)
+$(SolutionDir)$(ConfigurationName)\$(PlatformName)\$(ProjectName)

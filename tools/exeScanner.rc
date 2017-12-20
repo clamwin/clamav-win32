@@ -1,0 +1,3 @@
+#define __MODULE__	"exeScanner.exe"
+#define __DESC__	"Executables Detection Tools"
+#include <tools.rc>
