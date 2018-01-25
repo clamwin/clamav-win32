@@ -420,7 +420,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\clamav\libclamav\cab.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\clamav\libclamav\cache.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\chmunpack.c"
 				>
 			</File>
 			<File
@@ -552,10 +560,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\libclamav\libmspack.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\clamav\libclamav\line.c"
 				>
 			</File>
@@ -616,6 +620,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\clamav\libclamav\mspack.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\clamav\libclamav\msxml.c"
 				>
 			</File>
@@ -641,10 +649,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\clamav\libclamav\pdf.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\clamav\libclamav\pdfdecode.c"
 				>
 			</File>
 			<File
@@ -1447,18 +1451,6 @@
 					>
 				</File>
 			</Filter>
-			<Filter
-				Name="lzw"
-				>
-				<File
-					RelativePath="..\..\..\clamav\libclamav\lzw\lzwdec.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\libclamav\lzw\lzwdec.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -1542,7 +1534,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\clamav\libclamav\cab.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\clamav\libclamav\cache.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\chmunpack.h"
 				>
 			</File>
 			<File
@@ -1726,10 +1726,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\libclamav\libmspack.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\clamav\libclamav\line.h"
 				>
 			</File>
@@ -1790,6 +1786,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\clamav\libclamav\mspack.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\clamav\libclamav\msxml.h"
 				>
 			</File>
@@ -1815,10 +1815,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\clamav\libclamav\pdf.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\clamav\libclamav\pdfdecode.h"
 				>
 			</File>
 			<File

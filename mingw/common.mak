@@ -6,7 +6,6 @@ CFLAGS=-I$(top)/include -I$(3rdparty)/gnulib -I$(3rdparty)/json-c -I$(3rdparty)/
 CFLAGS+=-I$(clamav) -I$(clamav)/shared -I$(clamav)/libclamav -I$(clamav)/libclamav/nsis
 CFLAGS+=-I$(clamav)/win32/3rdparty/bzip2 -I$(clamav)/win32/3rdparty/pthreads
 CFLAGS+=-I$(clamav)/win32/3rdparty/zlib -I$(clamav)/win32/3rdparty/pcre
-CFLAGS+=-I$(clamav)/libclamav/libmspack-0.5alpha/mspack
 CFLAGS+=-DCLAMWIN -DHAVE_CONFIG_H -DNDEBUG -DWIN32_LEAN_AND_MEAN -DPCRE_STATIC
 CFLAGS+=-Wall -Wno-unused -Wno-format -Wno-uninitialized -Wno-attributes -Wno-switch
 CFLAGS+=-pipe -fno-strict-aliasing -mno-ms-bitfields

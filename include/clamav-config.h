@@ -387,15 +387,6 @@
 /* Define to 1 if you have the `strlcpy' function. */
 #undef HAVE_STRLCPY
 
-/* Define to 1 if you have the `strndup' function. */
-#undef HAVE_STRNDUP
-
-/* using internal strn functions */
-#undef HAVE_STRNI
-
-/* Define to 1 if you have the `strnlen' function. */
-#undef HAVE_STRNLEN
-
 /* Define to 1 if sysconf(_SC_PAGESIZE) is available */
 #undef HAVE_SYSCONF_SC_PAGESIZE
 
@@ -404,9 +395,6 @@
 
 /* systemd is supported */
 #undef HAVE_SYSTEMD
-
-/* Use private fts() implementation which is LFS safe */
-#undef HAVE_SYSTEM_LFS_FTS
 
 /* Define to 1 if you have the <sys/cdefs.h> header file. */
 #undef HAVE_SYS_CDEFS_H
@@ -542,12 +530,6 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Libprelude support enabled */
-#undef PRELUDE
-
-/* Define whether application use libtool >= 2.0 */
-#undef PRELUDE_APPLICATION_USE_LIBTOOL2
-
 /* scan buffer size */
 #define SCANBUFF 131072
 
@@ -611,7 +593,7 @@
 #undef USING_PCRE2
 
 /* Stable releases tag */
-#define CLAMWIN_RELEASE "0.99.3-beta2"
+#define CLAMWIN_RELEASE "0.99.3"
 
 /* Version number of package */
 #ifdef CLAMWIN_RELEASE
@@ -643,19 +625,8 @@
    `char[]'. */
 #undef YYTEXT_POINTER
 
-/* Enable large inode numbers on Mac OS X 10.5.  */
-#ifndef _DARWIN_USE_64_BIT_INODE
-# define _DARWIN_USE_64_BIT_INODE 1
-#endif
-
-/* Number of bits in a file offset, on hosts where this is settable. */
-#undef _FILE_OFFSET_BITS
-
 /* Define to 1 to make fseeko visible on some hosts (e.g. glibc 2.2). */
 #undef _LARGEFILE_SOURCE
-
-/* Define for large files, on AIX-style hosts. */
-#undef _LARGE_FILES
 
 /* Define to 1 if on MINIX. */
 #undef _MINIX

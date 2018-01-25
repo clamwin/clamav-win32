@@ -448,10 +448,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\shared\idmef_logging.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\clamav\shared\misc.c"
 				>
 			</File>
