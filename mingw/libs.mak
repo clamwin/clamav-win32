@@ -45,7 +45,7 @@ libclamav_SOURCES:=$(subst $(clamav)/libclamav/tomsfastmath/misc/fp_ident.c,,$(l
 libclamav_OBJECTS=$(libclamav_SOURCES:.c=.o)
 libclamav_OBJECTS+=$(top)/resources/libclamav-rc.o
 libclamav.dll: $(libclamav_OBJECTS) $(gnulib_OBJECTS) $(json_c_OBJECTS)
-	$(DLLWRAP) $(LDFLAGS) --def $(top)/libclamav.def --implib $@.a -o $@ $^ -L$(openssl)/lib/mingw32 -lssl -lcrypto -lws2_32 -lgdi32
+	$(DLLWRAP) $(LDFLAGS) --def $(top)/libclamav.def --implib $@.a -o $@ $^ -L$(3rdparty)/openssl/lib/mingw32 -lssl -lcrypto -lws2_32 -lgdi32
 
 # LLVM
 include llvm.mak
