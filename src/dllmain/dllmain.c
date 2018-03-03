@@ -367,9 +367,12 @@ static void cwi_processattach(void)
 
     if (cw_helpers.k32.HeapSetInformation && !IsDebuggerPresent())
     {
-        if (!cw_helpers.k32.HeapSetInformation(GetProcessHeap(), HeapCompatibilityInformation, &HeapFragValue, sizeof(HeapFragValue))
-            && (GetLastError() != ERROR_NOT_SUPPORTED))
-            fprintf(stderr, "[DllMain] Error setting up low-fragmentation heap: %d\n", GetLastError());
+        if (!cw_helpers.k32.HeapSetInformation(GetProcessHeap(), HeapCompatibilityInformation, &HeapFragValue, sizeof(HeapFragValue)))
+        {
+            DWORD le = GetLastError();
+            if ((le != ERROR_NOT_SUPPORTED) && (le != ERROR_CALL_NOT_IMPLEMENTED))
+                fprintf(stderr, "[DllMain] Error setting up low-fragmentation heap: le=%d\n", le);
+        }
     }
 
     if (WSAStartup(MAKEWORD(2,2), &wsaData) != NO_ERROR)
