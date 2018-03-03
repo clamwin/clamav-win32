@@ -387,6 +387,15 @@
 /* Define to 1 if you have the `strlcpy' function. */
 #undef HAVE_STRLCPY
 
+/* Define to 1 if you have the `strndup' function. */
+#undef HAVE_STRNDUP
+
+/* using internal strn functions */
+#undef HAVE_STRNI
+
+/* Define to 1 if you have the `strnlen' function. */
+#undef HAVE_STRNLEN
+
 /* Define to 1 if sysconf(_SC_PAGESIZE) is available */
 #undef HAVE_SYSCONF_SC_PAGESIZE
 
@@ -593,7 +602,7 @@
 #undef USING_PCRE2
 
 /* Stable releases tag */
-#define CLAMWIN_RELEASE "0.99.3"
+#define CLAMWIN_RELEASE "0.99.4"
 
 /* Version number of package */
 #ifdef CLAMWIN_RELEASE
