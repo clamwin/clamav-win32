@@ -1,0 +1,9 @@
+./gnulib-tool \
+    --no-libtool \
+    --create-testdir \
+    --dir=gnulib-clamwin \
+    --without-tests \
+    --lgpl=2 \
+    snprintf vsnprintf vasprintf strptime ftruncate strtoll strtok_r
+
+CC=cl LD=link CFLAGS=-I`pwd`/../clamav-win32/include ./configure

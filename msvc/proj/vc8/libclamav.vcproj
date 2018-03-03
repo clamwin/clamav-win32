@@ -2119,6 +2119,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\include\stdbool.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\include\target.h"
 					>
 				</File>
@@ -2219,10 +2223,6 @@
 				Name="gnulib"
 				>
 				<File
-					RelativePath="..\..\..\3rdparty\gnulib\alloca.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\3rdparty\gnulib\asnprintf.c"
 					>
 				</File>
@@ -2239,15 +2239,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\3rdparty\gnulib\msvc-inval.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\3rdparty\gnulib\printf-args.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\gnulib\printf-args.h"
 					>
 				</File>
 				<File
@@ -2255,15 +2247,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\3rdparty\gnulib\printf-parse.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\3rdparty\gnulib\snprintf.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\gnulib\stdbool.h"
 					>
 				</File>
 				<File
@@ -2275,6 +2259,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\3rdparty\gnulib\strtoll.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\3rdparty\gnulib\time_r.c"
 					>
 				</File>
@@ -2283,19 +2271,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\3rdparty\gnulib\vasnprintf.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\gnulib\verify.h"
+					RelativePath="..\..\..\3rdparty\gnulib\vasprintf.c"
 					>
 				</File>
 				<File
 					RelativePath="..\..\..\3rdparty\gnulib\vsnprintf.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\gnulib\xsize.h"
 					>
 				</File>
 			</Filter>
@@ -2531,6 +2511,18 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\3rdparty\json-c\json.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\json-c\json_c_version.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\json-c\json_c_version.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\3rdparty\json-c\json_config.h"
 					>
 				</File>
@@ -2547,7 +2539,23 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\3rdparty\json-c\json_object_iterator.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\json-c\json_object_iterator.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\3rdparty\json-c\json_object_private.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\json-c\json_pointer.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\json-c\json_pointer.h"
 					>
 				</File>
 				<File
@@ -2564,6 +2572,14 @@
 				</File>
 				<File
 					RelativePath="..\..\..\3rdparty\json-c\json_util.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\json-c\json_visit.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\json-c\json_visit.h"
 					>
 				</File>
 				<File
@@ -2588,6 +2604,34 @@
 				</File>
 				<File
 					RelativePath="..\..\..\3rdparty\json-c\random_seed.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\json-c\random_seed.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\json-c\snprintf_compat.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\json-c\strdup_compat.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\json-c\strerror_override.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\json-c\strerror_override.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\json-c\strerror_override_private.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\json-c\vasprintf_compat.h"
 					>
 				</File>
 			</Filter>

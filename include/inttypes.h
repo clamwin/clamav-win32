@@ -1,7 +1,7 @@
 /*
  * Clamav Native Windows Port: inttypes.h for msvc
  *
- * Copyright (c) 2008 Gianluigi Tiesi <sherpya@netfarm.it>
+ * Copyright (c) 2008-2018 Gianluigi Tiesi <sherpya@netfarm.it>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -18,14 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef _INTTYPES_H_
-#define _INTTYPES_H_
-#include <sys/stat.h>
-
 #ifdef __GNUC__
 #include <stdint.h>
+#include_next <inttypes.h>
 #else
-
+#ifndef _INTTYPES_H_
+#define _INTTYPES_H_
 typedef unsigned __int64 uint64_t;
 typedef signed   __int64 int64_t;
 
@@ -78,6 +76,13 @@ typedef int ssize_t;
 #endif
 #endif
 
-#endif /* __GNUC__ */
+#define PRId64 		"I64d"
+#define SCNd64 		"I64d"
+
+#define INT32_MIN	(-2147483647i32 - 1)
+#define INT64_MIN	(-9223372036854775807i64 - 1)
+#define INT32_MAX	2147483647i32
+#define INT64_MAX	9223372036854775807i64
 
 #endif /* _INTTYPES_H */
+#endif /* __GNUC__ */

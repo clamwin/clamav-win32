@@ -1,5 +1,5 @@
 /* Formatted output to strings.
-   Copyright (C) 1999, 2002, 2006, 2009-2018 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2002, 2006-2018 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,18 +17,34 @@
 #include <config.h>
 
 /* Specification.  */
+#ifdef IN_LIBASPRINTF
+# include "vasprintf.h"
+#else
+# include <stdio.h>
+#endif
+
+#include <errno.h>
+#include <limits.h>
+#include <stdlib.h>
+
 #include "vasnprintf.h"
 
-#include <stdarg.h>
-
-char *
-asnprintf (char *resultbuf, size_t *lengthp, const char *format, ...)
+int
+vasprintf (char **resultp, const char *format, va_list args)
 {
-  va_list args;
-  char *result;
+  size_t length;
+  char *result = vasnprintf (NULL, &length, format, args);
+  if (result == NULL)
+    return -1;
 
-  va_start (args, format);
-  result = vasnprintf (resultbuf, lengthp, format, args);
-  va_end (args);
-  return result;
+  if (length > INT_MAX)
+    {
+      free (result);
+      errno = EOVERFLOW;
+      return -1;
+    }
+
+  *resultp = result;
+  /* Return the number of resulting bytes, excluding the trailing NUL.  */
+  return length;
 }

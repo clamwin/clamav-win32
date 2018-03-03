@@ -1,5 +1,5 @@
 /* Invalid parameter handler for MSVC runtime libraries.
-   Copyright (C) 2011 Free Software Foundation, Inc.
+   Copyright (C) 2011-2018 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License along
-   with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _MSVC_INVAL_H
 #define _MSVC_INVAL_H
@@ -96,7 +95,7 @@ extern void gl_msvc_inval_ensure_handler (void);
 
 /* Gnulib can define its own status codes, as described in the page
    "Raising Software Exceptions" on microsoft.com
-   <http://msdn.microsoft.com/en-us/library/het71c37.aspx>.
+   <https://msdn.microsoft.com/en-us/library/het71c37.aspx>.
    Our status codes are composed of
      - 0xE0000000, mandatory for all user-defined status codes,
      - 0x474E550, a API identifier ("GNU"),
@@ -107,7 +106,7 @@ extern void gl_msvc_inval_ensure_handler (void);
 #  if defined _MSC_VER
 /* A compiler that supports __try/__except, as described in the page
    "try-except statement" on microsoft.com
-   <http://msdn.microsoft.com/en-us/library/s58ftw19.aspx>.
+   <https://msdn.microsoft.com/en-us/library/s58ftw19.aspx>.
    With __try/__except, we can use the multithread-safe exception handling.  */
 
 #   ifdef __cplusplus
@@ -207,7 +206,7 @@ extern struct gl_msvc_inval_per_thread *gl_msvc_inval_current (void);
    or when SANE_LIBRARY_HANDLING is desired.  */
 
 /* The braces here avoid GCC warnings like
-   "warning: suggest explicit braces to avoid ambiguous `else'".  */
+   "warning: suggest explicit braces to avoid ambiguous 'else'".  */
 # define TRY_MSVC_INVAL \
     do                                                                         \
       {                                                                        \
