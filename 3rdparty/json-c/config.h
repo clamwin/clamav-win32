@@ -221,8 +221,9 @@
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
 
-/* Use snprintf and vsnprintf from gnulib, win32 crt has broken a snprintf */
+/* Use snprintf and vasprintf from gnulib */
 #include <stdlib.h>
 #define snprintf gnulib_snprintf
+#define vasprintf rpl_vasprintf
 extern int gnulib_snprintf(char *str, size_t size, const char *format, ...);
-extern int vasprintf (char **resultp, const char *format, ...);
+extern int rpl_vasprintf (char **resultp, const char *format, ...);

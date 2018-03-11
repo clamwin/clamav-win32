@@ -66,6 +66,7 @@ extern "C" {
 #if REPLACE_VASNPRINTF
 # define asnprintf rpl_asnprintf
 # define vasnprintf rpl_vasnprintf
+# define vasprintf rpl_vasprintf
 #endif
 extern char * asnprintf (char *resultbuf, size_t *lengthp, const char *format, ...)
        _GL_ATTRIBUTE_FORMAT ((__printf__, 3, 4));
