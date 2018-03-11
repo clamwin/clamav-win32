@@ -9,9 +9,9 @@ CFLAGS+=-I$(clamav)/win32/3rdparty/zlib -I$(clamav)/win32/3rdparty/pcre
 CFLAGS+=-DCLAMWIN -DHAVE_CONFIG_H -DNDEBUG -DWIN32_LEAN_AND_MEAN -DPCRE_STATIC
 CFLAGS+=-Wall -Wno-unused -Wno-format -Wno-uninitialized -Wno-attributes -Wno-switch
 CFLAGS+=-pipe -fno-strict-aliasing -mno-ms-bitfields
-CFLAGS+=-O2 -mtune=generic -fomit-frame-pointer
+CFLAGS+=-O2 -mtune=generic -fomit-frame-pointer -flto
 
-LDFLAGS=-Wl,--enable-stdcall-fixup
+LDFLAGS=-Wl,--enable-stdcall-fixup -flto
 
 LLVM=-I$(clamav)/libclamav/c++ -I$(clamav)/libclamav/c++/llvm/include
 LLVM+=-I$(clamav)/libclamav/c++/llvm/lib/Target/X86 -I$(top)/include/llvmbuild
