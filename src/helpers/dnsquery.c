@@ -20,11 +20,13 @@
 
 #include <platform.h>
 #include <osdeps.h>
-#include <iphlpapi.h>
+#include <iptypes.h>
 #include <inttypes.h>
 
 #include "others.h"
 #include "shared/output.h"
+
+DWORD WINAPI GetNetworkParams (PFIXED_INFO pFixedInfo, PULONG pOutBufLen);
 
 #define TCPIP_PARAMS "SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters"
 
