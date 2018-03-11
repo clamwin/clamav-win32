@@ -17,12 +17,12 @@ LLVM=-I$(clamav)/libclamav/c++ -I$(clamav)/libclamav/c++/llvm/include
 LLVM+=-I$(clamav)/libclamav/c++/llvm/lib/Target/X86 -I$(top)/include/llvmbuild
 LLVM+=-D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
 
-CC=$(MINGW32_CROSS_PREFIX)gcc
-CXX=$(MINGW32_CROSS_PREFIX)g++
-WINDRES=$(MINGW32_CROSS_PREFIX)windres
-DLLWRAP=$(MINGW32_CROSS_PREFIX)dllwrap
-AR=$(MINGW32_CROSS_PREFIX)ar
-RANLIB=$(MINGW32_CROSS_PREFIX)ranlib
+CC=$(CROSS_PREFIX)gcc
+CXX=$(CROSS_PREFIX)g++
+WINDRES=$(CROSS_PREFIX)windres
+DLLWRAP=$(CROSS_PREFIX)dllwrap
+AR=$(CROSS_PREFIX)ar
+RANLIB=$(CROSS_PREFIX)ranlib
 
 ifneq (,$(findstring x86_64,$(shell $(CC) -dumpmachine)))
 CFLAGS+=-D_TIMESPEC_DEFINED -D_TIMEZONE_DEFINED
