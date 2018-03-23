@@ -62,6 +62,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libclamav_llvm", "proj\vc8\
 		{0E45E0DC-F9DB-4F31-A58C-1515EDE2A95B} = {0E45E0DC-F9DB-4F31-A58C-1515EDE2A95B}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmspack", "proj\vc8\libmspack.vcproj", "{314D6352-EEAB-42A7-9224-17137AC6DFA1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -178,6 +180,14 @@ Global
 		{2F22753C-7D09-4A1A-B638-0CA93BAEAF4D}.Release|Win32.Build.0 = Release|Win32
 		{2F22753C-7D09-4A1A-B638-0CA93BAEAF4D}.Release|x64.ActiveCfg = Release|x64
 		{2F22753C-7D09-4A1A-B638-0CA93BAEAF4D}.Release|x64.Build.0 = Release|x64
+		{314D6352-EEAB-42A7-9224-17137AC6DFA1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{314D6352-EEAB-42A7-9224-17137AC6DFA1}.Debug|Win32.Build.0 = Debug|Win32
+		{314D6352-EEAB-42A7-9224-17137AC6DFA1}.Debug|x64.ActiveCfg = Debug|x64
+		{314D6352-EEAB-42A7-9224-17137AC6DFA1}.Debug|x64.Build.0 = Debug|x64
+		{314D6352-EEAB-42A7-9224-17137AC6DFA1}.Release|Win32.ActiveCfg = Release|Win32
+		{314D6352-EEAB-42A7-9224-17137AC6DFA1}.Release|Win32.Build.0 = Release|Win32
+		{314D6352-EEAB-42A7-9224-17137AC6DFA1}.Release|x64.ActiveCfg = Release|x64
+		{314D6352-EEAB-42A7-9224-17137AC6DFA1}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

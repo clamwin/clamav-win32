@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="clamd"
-	ProjectGUID="{BFCA69AA-B89D-4171-92A5-6E39D8DEB54D}"
-	RootNamespace="clamd"
+	Name="libmspack"
+	ProjectGUID="{314D6352-EEAB-42A7-9224-17137AC6DFA1}"
+	RootNamespace="libmspack"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -22,9 +22,9 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)\$(PlatformName)"
 			IntermediateDirectory="$(SolutionDir)$(ConfigurationName)\$(PlatformName)\$(ProjectName)"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			InheritedPropertySheets=".\clamav.vsprops"
-			CharacterSet="0"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -44,7 +44,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="&quot;$(3rdparty)\libmspack&quot;;&quot;$(clamav)\libclamav\libclamav\libmspack-0.5alpha\mspack&quot;"
+				PreprocessorDefinitions="HAVE_CONFIG_H"
 				MinimalRebuild="false"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -64,19 +65,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib"
-				LinkIncremental="2"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				SetChecksum="false"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -88,12 +80,6 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -101,9 +87,9 @@
 			Name="Debug|x64"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)\$(PlatformName)"
 			IntermediateDirectory="$(SolutionDir)$(ConfigurationName)\$(PlatformName)\$(ProjectName)"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			InheritedPropertySheets=".\clamav.vsprops"
-			CharacterSet="0"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -124,7 +110,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="&quot;$(3rdparty)\libmspack&quot;;&quot;$(clamav)\libclamav\libclamav\libmspack-0.5alpha\mspack&quot;"
+				PreprocessorDefinitions="HAVE_CONFIG_H"
 				MinimalRebuild="false"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -144,19 +131,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib"
-				LinkIncremental="2"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				SetChecksum="false"
-				TargetMachine="17"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -168,12 +146,6 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -181,9 +153,9 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)\$(PlatformName)"
 			IntermediateDirectory="$(SolutionDir)$(ConfigurationName)\$(PlatformName)\$(ProjectName)"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			InheritedPropertySheets=".\clamav.vsprops"
-			CharacterSet="0"
+			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -203,7 +175,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;_CONSOLE"
+				AdditionalIncludeDirectories="&quot;$(3rdparty)\libmspack&quot;;&quot;$(clamav)\libclamav\libclamav\libmspack-0.5alpha\mspack&quot;"
+				PreprocessorDefinitions="HAVE_CONFIG_H"
+				MinimalRebuild="false"
 				ExceptionHandling="0"
 				SmallerTypeCheck="false"
 				RuntimeLibrary="2"
@@ -221,20 +195,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib"
-				LinkIncremental="1"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				OptimizeReferences="2"
-				SetChecksum="true"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -246,12 +210,6 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -259,9 +217,9 @@
 			Name="Release|x64"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)\$(PlatformName)"
 			IntermediateDirectory="$(SolutionDir)$(ConfigurationName)\$(PlatformName)\$(ProjectName)"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			InheritedPropertySheets=".\clamav.vsprops"
-			CharacterSet="0"
+			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -282,7 +240,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;_CONSOLE"
+				AdditionalIncludeDirectories="&quot;$(3rdparty)\libmspack&quot;;&quot;$(clamav)\libclamav\libclamav\libmspack-0.5alpha\mspack&quot;"
+				PreprocessorDefinitions="HAVE_CONFIG_H"
+				MinimalRebuild="false"
 				ExceptionHandling="0"
 				SmallerTypeCheck="false"
 				RuntimeLibrary="2"
@@ -300,20 +260,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib"
-				LinkIncremental="1"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				OptimizeReferences="2"
-				SetChecksum="true"
-				TargetMachine="17"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -323,12 +273,6 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -344,31 +288,91 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\clamav\clamd\clamd.c"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\cabc.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\clamd\others.c"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\cabd.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\clamd\scanner.c"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\chmc.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\clamd\server-th.c"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\chmd.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\clamd\session.c"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\crc32.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\clamd\tcpserver.c"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\hlpc.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\clamd\thrmgr.c"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\hlpd.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\kwajc.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\kwajd.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\litc.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\litd.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\lzssd.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\lzxc.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\lzxd.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\mszipc.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\mszipd.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\oabc.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\oabd.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\qtmd.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\system.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\szddc.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\szddd.c"
 				>
 			</File>
 		</Filter>
@@ -378,85 +382,79 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\clamav\clamd\others.h"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\cab.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\clamd\scanner.h"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\chm.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\clamd\server.h"
+				RelativePath="..\..\..\3rdparty\libmspack\config.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\clamd\session.h"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\crc32.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\clamd\shared.h"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\des.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\clamd\tcpserver.h"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\hlp.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\clamd\thrmgr.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-			<File
-				RelativePath="..\..\..\resources\clamd.rc"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Win32 Files"
-			>
-			<File
-				RelativePath="..\..\..\src\helpers\crashdump.c"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\kwaj.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\helpers\cw_main.c"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\lit.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\helpers\service.c"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\lzss.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\helpers\win32poll.c"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Shared"
-			>
-			<File
-				RelativePath="..\..\..\clamav\shared\clamdcom.c"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\lzx.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\shared\getopt.c"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\mspack.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\shared\idmef_logging.c"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\mszip.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\shared\misc.c"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\oab.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\shared\output.c"
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\qtm.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\readbits.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\readhuff.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\sha.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\system.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\libmspack-0.5alpha\mspack\szdd.h"
 				>
 			</File>
 		</Filter>

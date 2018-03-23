@@ -183,6 +183,8 @@ cli_versig2                         @148 NONAME
 cli_wm_decrypt_macro                @149 NONAME
 cli_wm_readdir                      @150 NONAME
 cli_writen                          @151 NONAME
+; 0.100
+cli_genhash_pe                      @152 NONAME
 
 html_normalise_map                  @160 NONAME
 text_normalize_init                 @161 NONAME

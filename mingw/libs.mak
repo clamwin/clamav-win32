@@ -7,6 +7,12 @@ gnulib_OBJECTS=$(gnulib_SOURCES:.c=.o)
 json_c_SOURCES=$(wildcard $(3rdparty)/json-c/*.c)
 json_c_OBJECTS=$(json_c_SOURCES:.c=.o)
 
+libmspack_SOURCES=$(wildcard $(clamav)/libclamav/libmspack-0.5alpha/mspack/*.c)
+libmspack_OBJECTS=$(libmspack_SOURCES:.c=.o)
+libmspack.a: CFLAGS=-I$(3rdparty)/libmspack -I$(clamav)/libclamav/libmspack-0.5alpha/mspack -DHAVE_CONFIG_H
+libmspack.a: $(libmspack_OBJECTS)
+	$(AR) cru $@ $^
+
 libclamunrar_SOURCES=$(wildcard $(clamav)/libclamunrar/*.c)
 libclamunrar_OBJECTS=$(libclamunrar_SOURCES:.c=.o)
 libclamunrar_OBJECTS+=$(top)/resources/libclamunrar-rc.o
@@ -44,7 +50,7 @@ libclamav_SOURCES:=$(subst $(clamav)/libclamav/tomsfastmath/misc/fp_ident.c,,$(l
 
 libclamav_OBJECTS=$(libclamav_SOURCES:.c=.o)
 libclamav_OBJECTS+=$(top)/resources/libclamav-rc.o
-libclamav.dll: $(libclamav_OBJECTS) $(gnulib_OBJECTS) $(json_c_OBJECTS)
+libclamav.dll: $(libclamav_OBJECTS) $(gnulib_OBJECTS) $(json_c_OBJECTS) libmspack.a
 	$(DLLWRAP) $(LDFLAGS) --def $(top)/libclamav.def --implib $@.a -o $@ $^ -L$(3rdparty)/openssl/lib/mingw32 -lssl -lcrypto -lws2_32 -lgdi32
 
 # LLVM
@@ -65,5 +71,5 @@ llvm-clean:
 clean:
 	@rm -f libclamav.dll libclamav.dll.a
 	@rm -f $(CLAMAV_LIBS) $(addsuffix .a,$(CLAMAV_LIBS))
-	@rm -f $(gnulib_OBJECTS) $(json_c_OBJECTS) $(libclamunrar_OBJECTS) $(libclamunrar_iface_OBJECTS) $(libclamav_OBJECTS)
+	@rm -f $(gnulib_OBJECTS) $(json_c_OBJECTS) $(libclamunrar_OBJECTS) $(libclamunrar_iface_OBJECTS) $(libclamav_OBJECTS) $(libmspack_OBJECTS) libmspack.a
 	@echo Project cleaned

@@ -292,7 +292,7 @@
 /* Define to 1 if you have the `opendir' function. */
 #define HAVE_OPENDIR 1
 
-/* Define to 1 if you have the 'libpcre' library (-lpcre). */
+/* Define to 1 if you have a pcre library (-lpcre). */
 #define HAVE_PCRE 1
 
 /* Define to 1 if you have the `poll' function. */
@@ -405,6 +405,9 @@
 /* systemd is supported */
 #undef HAVE_SYSTEMD
 
+/* Use private fts() implementation which is LFS safe */
+#undef HAVE_SYSTEM_LFS_FTS
+
 /* Define to 1 if you have the <sys/cdefs.h> header file. */
 #undef HAVE_SYS_CDEFS_H
 
@@ -497,14 +500,12 @@
    module search path. */
 #undef LT_MODULE_PATH_VAR
 
-/* Define to the sub-directory where libtool stores uninstalled libraries. */
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
 #undef LT_OBJDIR
 
 /* Define to the shared library suffix, say, ".dylib". */
 #undef LT_SHARED_EXT
-
-/* Define to the shared archive member specification, say "(shr.o)". */
-#undef LT_SHARED_LIB_MEMBER
 
 /* disable assertions */
 /* #undef NDEBUG */ /* NOTE: don't undef */
@@ -538,6 +539,12 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
+
+/* Libprelude support enabled */
+#undef PRELUDE
+
+/* Define whether application use libtool >= 2.0 */
+#undef PRELUDE_APPLICATION_USE_LIBTOOL2
 
 /* scan buffer size */
 #define SCANBUFF 131072
@@ -602,7 +609,7 @@
 #undef USING_PCRE2
 
 /* Stable releases tag */
-#define CLAMWIN_RELEASE "0.99.4"
+#define CLAMWIN_RELEASE "0.100.0-rc"
 
 /* Version number of package */
 #ifdef CLAMWIN_RELEASE
@@ -634,8 +641,19 @@
    `char[]'. */
 #undef YYTEXT_POINTER
 
+/* Enable large inode numbers on Mac OS X 10.5.  */
+#ifndef _DARWIN_USE_64_BIT_INODE
+# define _DARWIN_USE_64_BIT_INODE 1
+#endif
+
+/* Number of bits in a file offset, on hosts where this is settable. */
+#undef _FILE_OFFSET_BITS
+
 /* Define to 1 to make fseeko visible on some hosts (e.g. glibc 2.2). */
 #undef _LARGEFILE_SOURCE
+
+/* Define for large files, on AIX-style hosts. */
+#undef _LARGE_FILES
 
 /* Define to 1 if on MINIX. */
 #undef _MINIX
@@ -662,7 +680,7 @@
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
 
-/* Define to a type to use for 'error_t' if it is not otherwise available. */
+/* Define to a type to use for `error_t' if it is not otherwise available. */
 #undef error_t
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
