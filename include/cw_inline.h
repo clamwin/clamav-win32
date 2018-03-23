@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/timeb.h>
-#include <inttypes.h>
+#include <stdint.h>
 #include <io.h>
 
 #ifndef _TIMEZONE_DEFINED

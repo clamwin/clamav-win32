@@ -18,7 +18,9 @@
 
 #define QUAD    1
 
+#if defined(__GNUC__) || (defined(_MSC_VER) && (_MSC_VER < 1900))
 #include <strtol.c>
+#endif
 
 #ifdef _LIBC
 # ifdef SHARED

@@ -6,7 +6,7 @@
 	>
 	<Tool
 		Name="VCCLCompilerTool"
-		AdditionalIncludeDirectories="&quot;$(SolutionDir)..\include&quot;;&quot;$(3rdparty)\gnulib&quot;;&quot;$(3rdparty)\json-c&quot;;&quot;$(3rdparty)\openssl\include&quot;;&quot;$(clamav)&quot;;&quot;$(clamav)\shared&quot;;&quot;$(clamav)\libclamav&quot;;&quot;$(3rdparty_clamav)\pthreads&quot;;&quot;$(3rdparty_clamav)\zlib&quot;;&quot;$(3rdparty_clamav)\pcre&quot;;&quot;$(3rdparty_clamav)\bzip2&quot;"
+		AdditionalIncludeDirectories="&quot;$(SolutionDir)..\include&quot;;&quot;$(thirdparty)\gnulib&quot;;&quot;$(thirdparty)\json-c&quot;;&quot;$(thirdparty)\openssl\include&quot;;&quot;$(clamav)&quot;;&quot;$(clamav)\shared&quot;;&quot;$(clamav)\libclamav&quot;;&quot;$(clamav)\libclamav\libmspack-0.5alpha\mspack&quot;;&quot;$(thirdparty_clamav)\pthreads&quot;;&quot;$(thirdparty_clamav)\zlib&quot;;&quot;$(thirdparty_clamav)\pcre&quot;;&quot;$(thirdparty_clamav)\bzip2&quot;"
 		PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;WIN32_LEAN_AND_MEAN;CLAMWIN;HAVE_CONFIG_H;PTW32_STATIC_LIB;PCRE_STATIC"
 	/>
 	<UserMacro
@@ -14,15 +14,19 @@
 		Value="$(SolutionDir)..\clamav"
 	/>
 	<UserMacro
-		Name="3rdparty"
+		Name="thirdparty"
 		Value="$(SolutionDir)..\3rdparty"
 	/>
 	<UserMacro
-		Name="3rdparty_clamav"
+		Name="thirdparty_clamav"
 		Value="$(clamav)\win32\3rdparty"
 	/>
 	<UserMacro
-		Name="libssl"
-		Value="$(3rdparty)\openssl\lib\$(PlatformName)\libeay32.lib $(3rdparty)\openssl\lib\$(PlatformName)\ssleay32.lib"
+		Name="libeay32"
+		Value="$(thirdparty)\openssl\lib\$(PlatformName)\libeay32.lib"
+	/>
+	<UserMacro
+		Name="ssleay32"
+		Value="$(thirdparty)\openssl\lib\$(PlatformName)\ssleay32.lib"
 	/>
 </VisualStudioPropertySheet>

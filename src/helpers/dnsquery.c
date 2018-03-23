@@ -21,7 +21,7 @@
 #include <platform.h>
 #include <osdeps.h>
 #include <iptypes.h>
-#include <inttypes.h>
+#include <stdint.h>
 
 #include "others.h"
 #include "shared/output.h"

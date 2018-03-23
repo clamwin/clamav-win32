@@ -18,24 +18,24 @@
 
 /* Define to 1 if you have the declaration of `INFINITY', and to 0 if you
    don't. */
-#ifdef __GNUC__
+#if !(defined(_MSC_VER) && (_MSC_VER < 1800))
 #define HAVE_DECL_INFINITY 1
 #endif
 
 /* Define to 1 if you have the declaration of `isinf', and to 0 if you don't.
    */
-#ifdef __GNUC__
+#if !(defined(_MSC_VER) && (_MSC_VER < 1800))
 #define HAVE_DECL_ISINF 1
 #endif
 
 /* Define to 1 if you have the declaration of `isnan', and to 0 if you don't.
    */
-#ifdef __GNUC__
+#if !(defined(_MSC_VER) && (_MSC_VER < 1800))
 #define HAVE_DECL_ISNAN 1
 #endif
 
 /* Define to 1 if you have the declaration of `nan', and to 0 if you don't. */
-#ifdef __GNUC__
+#if !(defined(_MSC_VER) && (_MSC_VER < 1800))
 #define HAVE_DECL_NAN 1
 #endif
 
@@ -222,6 +222,7 @@
 /* #undef size_t */
 
 /* Use snprintf and vasprintf from gnulib */
+#include <stdio.h>
 #include <stdlib.h>
 #define snprintf gnulib_snprintf
 #define vasprintf rpl_vasprintf
