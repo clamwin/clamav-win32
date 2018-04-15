@@ -27,6 +27,12 @@
 #define THIS_FUNCTION_IS_DEPRECATED(func) func
 #endif
 
+#ifdef __GNUC__
+#define JSON_C_CONST_FUNCTION(func) func __attribute__((const))
+#else
+#define JSON_C_CONST_FUNCTION(func) func
+#endif
+
 #if defined(_MSC_VER) 
 #define JSON_EXPORT __declspec(dllexport)
 #else
@@ -392,6 +398,11 @@ JSON_EXPORT struct lh_table* json_object_get_object(const struct json_object *ob
  */
 JSON_EXPORT int json_object_object_length(const struct json_object* obj);
 
+/** Get the sizeof (struct json_object).
+ * @returns a size_t with the sizeof (struct json_object)
+ */
+JSON_C_CONST_FUNCTION(JSON_EXPORT size_t json_c_object_sizeof(void));
+
 /** Add an object field to a json_object of type json_type_object
  *
  * The reference count will *not* be incremented. This is to make adding
@@ -518,8 +529,8 @@ JSON_EXPORT void json_object_object_del(struct json_object* obj, const char *key
 #else /* ANSI C or MSC */
 
 # define json_object_object_foreach(obj,key,val) \
-	char *key;\
-	struct json_object *val; \
+	char *key = NULL;\
+	struct json_object *val = NULL; \
 	struct lh_entry *entry ## key; \
 	struct lh_entry *entry_next ## key = NULL; \
 	for(entry ## key = json_object_get_object(obj)->head; \
