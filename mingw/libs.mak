@@ -34,7 +34,7 @@ libclamav_SOURCES+=$(wildcard $(clamav)/libclamav/regex/*.c)
 libclamav_SOURCES+=$(wildcard $(clamav)/libclamav/tomsfastmath/*/*.c)
 libclamav_SOURCES+=$(wildcard $(clamav)/win32/3rdparty/pcre/*.c)
 libclamav_SOURCES+=$(clamav)/libclamav/jsparse/js-norm.c
-libclamav_SOURCES+=$(clamav)/win32/3rdparty/pthreads/pthread.c
+libclamav_SOURCES+=$(top)/src/dllmain/pthread-mingw.c
 libclamav_SOURCES+=$(addprefix $(clamav)/win32/3rdparty/bzip2/,blocksort.c bzlib.c compress.c \
 	crctable.c decompress.c huffman.c randtable.c)
 libclamav_SOURCES+=$(addprefix $(clamav)/win32/3rdparty/zlib/,adler32.c compress.c crc32.c \
