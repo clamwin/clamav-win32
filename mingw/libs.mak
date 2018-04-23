@@ -1,5 +1,4 @@
 include common.mak
-CFLAGS+=-DPTW32_STATIC_LIB -D_WINDLL
 
 gnulib_SOURCES=$(wildcard $(3rdparty)/gnulib/*.c)
 gnulib_OBJECTS=$(gnulib_SOURCES:.c=.o)
