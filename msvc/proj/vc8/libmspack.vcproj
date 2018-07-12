@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(3rdparty)\libmspack&quot;;&quot;$(clamav)\libclamav\libclamav\libmspack-0.5alpha\mspack&quot;"
+				AdditionalIncludeDirectories="&quot;$(thirdparty)\libmspack&quot;;&quot;$(clamav)\libclamav\libclamav\libmspack-0.5alpha\mspack&quot;"
 				PreprocessorDefinitions="HAVE_CONFIG_H"
 				MinimalRebuild="false"
 				ExceptionHandling="0"
@@ -110,7 +110,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(3rdparty)\libmspack&quot;;&quot;$(clamav)\libclamav\libclamav\libmspack-0.5alpha\mspack&quot;"
+				AdditionalIncludeDirectories="&quot;$(thirdparty)\libmspack&quot;;&quot;$(clamav)\libclamav\libclamav\libmspack-0.5alpha\mspack&quot;"
 				PreprocessorDefinitions="HAVE_CONFIG_H"
 				MinimalRebuild="false"
 				ExceptionHandling="0"
@@ -175,7 +175,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(3rdparty)\libmspack&quot;;&quot;$(clamav)\libclamav\libclamav\libmspack-0.5alpha\mspack&quot;"
+				AdditionalIncludeDirectories="&quot;$(thirdparty)\libmspack&quot;;&quot;$(clamav)\libclamav\libclamav\libmspack-0.5alpha\mspack&quot;"
 				PreprocessorDefinitions="HAVE_CONFIG_H"
 				MinimalRebuild="false"
 				ExceptionHandling="0"
@@ -240,7 +240,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(3rdparty)\libmspack&quot;;&quot;$(clamav)\libclamav\libclamav\libmspack-0.5alpha\mspack&quot;"
+				AdditionalIncludeDirectories="&quot;$(thirdparty)\libmspack&quot;;&quot;$(clamav)\libclamav\libclamav\libmspack-0.5alpha\mspack&quot;"
 				PreprocessorDefinitions="HAVE_CONFIG_H"
 				MinimalRebuild="false"
 				ExceptionHandling="0"
