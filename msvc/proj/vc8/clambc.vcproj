@@ -375,6 +375,10 @@
 				RelativePath="..\..\..\src\helpers\cw_main.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\src\helpers\cw_sch.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Shared"

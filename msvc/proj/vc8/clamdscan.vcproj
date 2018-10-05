@@ -388,6 +388,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\helpers\cw_sch.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\shared\win32actions.c"
 				>
 			</File>

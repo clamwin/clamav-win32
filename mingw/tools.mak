@@ -18,6 +18,7 @@ clamd.exe: libclamav.dll $(clamd_OBJECTS) $(shared_OBJECTS)
 
 clamdscan_SOURCES=$(wildcard $(clamav)/clamdscan/*.c)
 clamdscan_SOURCES+=$(top)/src/helpers/cw_main.c
+clamdscan_SOURCES+=$(top)/src/helpers/cw_sch.c
 clamdscan_SOURCES+=$(top)/src/helpers/dresult.c
 clamdscan_OBJECTS=$(clamdscan_SOURCES:.c=.o)
 clamdscan_OBJECTS+=$(top)/resources/clamdscan-rc.o
@@ -45,6 +46,7 @@ freshclam.exe: libclamav.dll $(freshclam_OBJECTS) $(shared_OBJECTS)
 
 sigtool_SOURCES=$(wildcard $(clamav)/sigtool/*.c)
 sigtool_SOURCES+=$(top)/src/helpers/cw_main.c
+sigtool_SOURCES+=$(top)/src/helpers/cw_sch.c
 sigtool_OBJECTS=$(sigtool_SOURCES:.c=.o)
 sigtool_OBJECTS+=$(top)/resources/sigtool-rc.o
 sigtool.exe: libclamav.dll $(sigtool_OBJECTS) $(shared_OBJECTS)
@@ -52,6 +54,7 @@ sigtool.exe: libclamav.dll $(sigtool_OBJECTS) $(shared_OBJECTS)
 
 clambc_SOURCES=$(wildcard $(clamav)/clambc/*.c)
 clambc_SOURCES+=$(top)/src/helpers/cw_main.c
+clambc_SOURCES+=$(top)/src/helpers/cw_sch.c
 clambc_OBJECTS=$(clambc_SOURCES:.c=.o)
 clambc_OBJECTS+=$(top)/resources/clambc-rc.o
 clambc.exe: libclamav.dll $(clambc_OBJECTS) $(shared_OBJECTS)

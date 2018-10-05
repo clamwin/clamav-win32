@@ -435,15 +435,3 @@ void cw_srand(unsigned int seed)
 {
     next = seed;
 }
-
-/* default stop control handler */
-BOOL WINAPI cw_stop_ctrl_handler(DWORD CtrlType)
-{
-    if (CtrlType == CTRL_C_EVENT)
-    {
-        SetConsoleCtrlHandler(cw_stop_ctrl_handler, FALSE);
-        fprintf(stderr, "Control+C pressed, aborting...\n");
-        exit(0);
-    }
-    return TRUE;
-}
