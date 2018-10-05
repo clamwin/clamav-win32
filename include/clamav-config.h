@@ -611,7 +611,7 @@
 #undef USING_PCRE2
 
 /* Stable releases tag */
-#define CLAMWIN_RELEASE "0.100.1"
+#define CLAMWIN_RELEASE "0.100.2"
 
 /* Version number of package */
 #ifdef CLAMWIN_RELEASE

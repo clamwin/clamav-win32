@@ -34,6 +34,7 @@ clamscan_OBJECTS+=$(top)/resources/clamscan-rc.o
 clamscan.exe: libclamav.dll $(clamscan_OBJECTS) $(shared_OBJECTS)
 	$(CC) $(LDFLAGS) $^ -o $@ libclamav.dll.a -lws2_32
 
+$(clamav)/freshclam/mirman.o: CFLAGS+=-fno-strict-aliasing
 freshclam_SOURCES=$(wildcard $(clamav)/freshclam/*.c)
 freshclam_SOURCES+=$(top)/src/helpers/cw_main.c
 freshclam_SOURCES+=$(top)/src/helpers/service.c

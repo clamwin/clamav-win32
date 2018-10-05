@@ -83,6 +83,8 @@ typedef int ssize_t;
 #define INT32_MAX	2147483647i32
 #define INT64_MAX	9223372036854775807i64
 
+#define UINT32_MAX  0xffffffffU  /* 4294967295U */
+
 #ifdef _WIN64
 #define PTRDIFF_MAX	INT64_MAX
 #else

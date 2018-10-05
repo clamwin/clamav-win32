@@ -10,7 +10,7 @@ CFLAGS+=-I$(clamav)/libclamav/libmspack-0.5alpha/mspack
 CFLAGS+=-DCLAMWIN -DHAVE_CONFIG_H -DNDEBUG -DWIN32_LEAN_AND_MEAN -DPCRE_STATIC
 CFLAGS+=-DPTW32_STATIC_LIB -D_WINDLL
 CFLAGS+=-Wall -Wno-unused -Wno-format -Wno-uninitialized -Wno-attributes -Wno-switch
-CFLAGS+=-pipe -fno-strict-aliasing -mno-ms-bitfields
+CFLAGS+=-pipe -mno-ms-bitfields
 CFLAGS+=-O2 -mtune=generic -fomit-frame-pointer -flto
 
 LDFLAGS=-flto
