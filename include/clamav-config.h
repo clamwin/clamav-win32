@@ -608,10 +608,10 @@
 
 
 /* Define to 1 if you using the pcre2 library. */
-#undef USING_PCRE2
+#define USING_PCRE2 1
 
 /* Stable releases tag */
-#define CLAMWIN_RELEASE "0.100.2"
+#define CLAMWIN_RELEASE "0.101.0"
 
 /* Version number of package */
 #ifdef CLAMWIN_RELEASE
@@ -711,10 +711,6 @@
 /* Define to "int" if <sys/socket.h> does not define. */
 #undef socklen_t
 
-#ifdef __cplusplus
-#include <windows.h>
-#else
 #include <platform.h>
-#endif
 
 #define LLVM_VERSION 28

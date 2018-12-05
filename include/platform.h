@@ -70,10 +70,12 @@ extern int svc_uninstall(const char *name, int verbose);
 extern BOOL WINAPI cw_stop_ctrl_handler(DWORD CtrlType);
 
 /* gnulib entries */
+#ifndef __cplusplus
 extern char *strtok_r(char *s, const char *delim, char **save_ptr);
 extern struct tm *localtime_r(time_t const *t, struct tm *tp);
 extern char *strptime (const char *buf, const char *format, struct tm *tm);
 extern long long int strtoll(const char *nptr, char **endptr, int base);
+#endif
 
 /* Re_routing */
 extern int cw_stat(const char *path, struct stat *buf);
@@ -94,8 +96,12 @@ extern int cw_rename(const char *oldname, const char *newname);
 /* random */
 extern int cw_rand(void);
 extern void cw_srand(unsigned int seed);
+
+/* avoid redefining std::rand */
+#ifndef __cplusplus
 #define rand cw_rand
 #define srand cw_srand
+#endif
 
 #define mkdir(a, b) mkdir(a)
 
@@ -172,11 +178,14 @@ typedef unsigned int in_addr_t;
 #define LIBCLAMAV_API __declspec(dllimport)
 #endif
 
+/* win32 headers have DATADIR enum */
+#ifndef __cplusplus
 LIBCLAMAV_API extern const char *DATADIR;
 LIBCLAMAV_API extern const char *CONFDIR;
 LIBCLAMAV_API extern const char *CONFDIR_CLAMD;
 LIBCLAMAV_API extern const char *CONFDIR_FRESHCLAM;
 LIBCLAMAV_API extern const char *CONFDIR_MILTER;
+#endif
 
 #define cli_to_utf8_maybe_alloc(x) (x)
 #define cli_strdup_to_utf8(x) strdup(x)

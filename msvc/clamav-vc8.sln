@@ -57,7 +57,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libclamav_llvm", "proj\vc8\
 		{0E45E0DC-F9DB-4F31-A58C-1515EDE2A95B} = {0E45E0DC-F9DB-4F31-A58C-1515EDE2A95B}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmspack", "proj\vc8\libmspack.vcproj", "{314D6352-EEAB-42A7-9224-17137AC6DFA1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libclammspack", "proj\vc8\libclammspack.vcproj", "{314D6352-EEAB-42A7-9224-17137AC6DFA1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

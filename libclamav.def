@@ -218,8 +218,8 @@ gzwrite                             @254 NONAME
 EVP_DigestFinal_ex                  @260 NONAME
 EVP_DigestInit_ex                   @261 NONAME
 EVP_DigestUpdate                    @262 NONAME
-EVP_MD_CTX_create                   @263 NONAME
-EVP_MD_CTX_destroy                  @264 NONAME
+EVP_MD_CTX_free                     @263 NONAME
+EVP_MD_CTX_new                      @264 NONAME
 EVP_sha256                          @265 NONAME
 
 ; LLVM

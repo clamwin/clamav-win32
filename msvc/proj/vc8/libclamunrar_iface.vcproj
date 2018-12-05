@@ -344,7 +344,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\clamav\libclamunrar_iface\unrar_iface.c"
+				RelativePath="..\..\..\clamav\libclamunrar_iface\unrar_iface.cpp"
 				>
 			</File>
 		</Filter>
@@ -364,26 +364,6 @@
 			>
 			<File
 				RelativePath="..\..\..\resources\libclamunrar_iface.rc"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="gnulib"
-			>
-			<File
-				RelativePath="..\..\..\3rdparty\gnulib\printf-args.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\3rdparty\gnulib\printf-parse.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\3rdparty\gnulib\snprintf.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\3rdparty\gnulib\vasnprintf.c"
 				>
 			</File>
 		</Filter>
