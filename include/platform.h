@@ -25,9 +25,8 @@
 /* RegisterWaitForSingleObject 0x0500 */
 /* UnregisterWaitEx 0x0500 */
 /* HeapCompatibilityInformation 0x0501 */
-#ifndef _WIN32_WINNT
+#undef _WIN32_WINNT
 #define _WIN32_WINNT 0x0501
-#endif
 
 #include <cwdefs.h>
 #include <winsock2.h>
@@ -74,6 +73,7 @@ extern BOOL WINAPI cw_stop_ctrl_handler(DWORD CtrlType);
 extern char *strtok_r(char *s, const char *delim, char **save_ptr);
 extern struct tm *localtime_r(time_t const *t, struct tm *tp);
 extern char *strptime (const char *buf, const char *format, struct tm *tm);
+extern long long int strtoll(const char *nptr, char **endptr, int base);
 
 /* Re_routing */
 extern int cw_stat(const char *path, struct stat *buf);
