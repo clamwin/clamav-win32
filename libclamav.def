@@ -82,21 +82,6 @@ cw_getaddrinfo
 cw_freeaddrinfo
 cw_gai_strerror
 
-; Win32 Native API
-CWInit
-CWFree
-CWFreeBuffer
-CWLoadDB_A
-CWLoadDB_W
-CWScanHandle_A
-CWScanHandle_W
-CWScanHandle2_A
-CWScanHandle2_W
-CWScanFile_A
-CWScanFile_W
-CWStrError_A
-CWStrError_W
-
 ; clamwin internals @ 50
 cw_async_noalert                    @50 NONAME
 cw_leerrno                          @51 NONAME
