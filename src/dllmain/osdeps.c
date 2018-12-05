@@ -435,3 +435,30 @@ void cw_srand(unsigned int seed)
 {
     next = seed;
 }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+static inline int _vsnprintf(char *outBuf, size_t size, const char *format, va_list ap)
+{
+    int count = -1;
+
+    if (size != 0)
+        count = _vsnprintf_s(outBuf, size, _TRUNCATE, format, ap);
+    if (count == -1)
+        count = _vscprintf(format, ap);
+
+    return count;
+}
+
+#undef snprintf
+int snprintf(char *outBuf, size_t size, const char *format, ...)
+{
+    int count;
+    va_list ap;
+
+    va_start(ap, format);
+    count = _vsnprintf(outBuf, size, format, ap);
+    va_end(ap);
+
+    return count;
+}
+#endif /* _MSC_VER && _MSC_VER < 1900 */
