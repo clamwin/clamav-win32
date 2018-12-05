@@ -1,3 +1,0 @@
-#define __MODULE__	"profiler.exe"
-#define __DESC__	"ClamWin libClamAV profiler"
-#include <tools.rc>
