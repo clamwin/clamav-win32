@@ -78,12 +78,29 @@ typedef int ssize_t;
 #define PRId64 		"I64d"
 #define SCNd64 		"I64d"
 
+#ifndef INT32_MIN
 #define INT32_MIN	(-2147483647i32 - 1)
-#define INT64_MIN	(-9223372036854775807i64 - 1)
-#define INT32_MAX	2147483647i32
-#define INT64_MAX	9223372036854775807i64
+#endif
 
+#ifndef INT64_MIN
+#define INT64_MIN	(-9223372036854775807i64 - 1)
+#endif
+
+#ifndef INT32_MAX
+#define INT32_MAX	2147483647i32
+#endif
+
+#ifndef INT64_MAX
+#define INT64_MAX	9223372036854775807i64
+#endif
+
+#ifndef UINT16_MAX
+#define UINT16_MAX  0xffffU      /* 65535U */
+#endif
+
+#ifndef UINT32_MAX
 #define UINT32_MAX  0xffffffffU  /* 4294967295U */
+#endif
 
 #ifdef _WIN64
 #define PTRDIFF_MAX	INT64_MAX
