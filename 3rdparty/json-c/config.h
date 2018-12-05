@@ -136,7 +136,7 @@
 #undef HAVE_USELOCALE
 
 /* Define to 1 if you have the `vasprintf' function. */
-#define HAVE_VASPRINTF 1
+#undef HAVE_VASPRINTF
 
 /* Define to 1 if you have the `vprintf' function. */
 #define HAVE_VPRINTF 1
@@ -158,28 +158,28 @@
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
-#define LT_OBJDIR ""
+#undef LT_OBJDIR
 
 /* Name of package */
-#define PACKAGE "json-c"
+#undef PACKAGE
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT ""
+#undef PACKAGE_BUGREPORT
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "json-c"
+#undef PACKAGE_NAME
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "json-c 0.13.1"
+#undef PACKAGE_STRING
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "json-c"
+#undef PACKAGE_TARNAME
 
 /* Define to the home page for this package. */
-#define PACKAGE_URL ""
+#undef PACKAGE_URL
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.13.1"
+#undef PACKAGE_VERSION
 
 /* The number of bytes in type int */
 #define SIZEOF_INT 4
@@ -211,18 +211,10 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.13.1"
+#undef VERSION
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
-
-/* Use snprintf and vasprintf from gnulib */
-#include <stdio.h>
-#include <stdlib.h>
-#define snprintf gnulib_snprintf
-#define vasprintf rpl_vasprintf
-extern int gnulib_snprintf(char *str, size_t size, const char *format, ...);
-extern int rpl_vasprintf (char **resultp, const char *format, ...);
