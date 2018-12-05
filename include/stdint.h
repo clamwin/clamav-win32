@@ -64,6 +64,7 @@ typedef unsigned long long uint_fast64_t;
 #endif
 
 #ifndef __cplusplus
+#undef mode_t
 typedef uint32_t mode_t;
 #endif
 
