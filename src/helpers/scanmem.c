@@ -118,7 +118,7 @@ typedef struct _scanmem_data_t
     /* ClamAV Specific */
     struct cl_engine *engine;
     const struct optstruct *opts;
-    int options;
+    struct cl_scan_options *options;
 } scanmem_data;
 
 /* Needed to Scan System Processes */
@@ -616,7 +616,7 @@ int cw_scanfile(const char *filename, scanmem_data *scan_data)
         lseek(fd, 0, SEEK_SET);
     }
 
-    ret = cl_scandesc(fd, &virname, &info.blocks, scan_data->engine, scan_data->options);
+    ret = cl_scandesc(fd, NULL, &virname, &info.blocks, scan_data->engine, scan_data->options);
     if (ret == CL_VIRUS)
     {
         logg("~%s: %s FOUND\n", filename, virname);
@@ -715,7 +715,7 @@ int scanmem_cb(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void *data)
     return rc;
 }
 
-int scanmem(struct cl_engine *engine, const struct optstruct *opts, int options)
+int scanmem(struct cl_engine *engine, const struct optstruct *opts, struct cl_scan_options *options)
 {
     scanmem_data data;
     cb_data_t cbdata;
