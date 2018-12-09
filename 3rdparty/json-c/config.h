@@ -136,7 +136,7 @@
 #undef HAVE_USELOCALE
 
 /* Define to 1 if you have the `vasprintf' function. */
-#undef HAVE_VASPRINTF
+#define HAVE_VASPRINTF 1
 
 /* Define to 1 if you have the `vprintf' function. */
 #define HAVE_VPRINTF 1

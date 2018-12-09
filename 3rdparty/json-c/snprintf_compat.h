@@ -13,6 +13,9 @@
 
 #include <stdarg.h>
 
+#define snprintf gnulib_snprintf
+extern int gnulib_snprintf(char *str, size_t size, const char *format, ...);
+
 #if !defined(HAVE_SNPRINTF) && defined(_MSC_VER)
 static int json_c_vsnprintf(char *str, size_t size, const char *format, va_list ap)
 {

@@ -6,7 +6,10 @@
  * @brief Do not use, json-c internal, may be changed or removed at any time.
  */
 
+/* sherpya: vasprintf from gnulib */
 #include "snprintf_compat.h"
+#define vasprintf rpl_vasprintf
+extern int rpl_vasprintf (char **resultp, const char *format, ...);
 
 #if !defined(HAVE_VASPRINTF)
 /* CAW: compliant version of vasprintf */
