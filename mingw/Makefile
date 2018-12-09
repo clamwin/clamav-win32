@@ -7,13 +7,12 @@ OPTS=-O2 -mtune=generic -fomit-frame-pointer # -flto
 COMMON_FLAGS=$(WARNINGS) $(OPTS) -pipe -mno-ms-bitfields -Wno-unknown-pragmas
 COMMON_FLAGS+=-DCLAMWIN -DHAVE_CONFIG_H -DNDEBUG
 COMMON_FLAGS+=-I$(top)/include -I$(clamav) -I$(clamav)/win32/3rdparty/pcre2
-COMMON_FLAGS+=-I$(3rdparty)/json-c -I$(3rdparty)/openssl/include
+COMMON_FLAGS+=-I$(3rdparty)/json-c -I$(3rdparty)/openssl/include -I$(clamav)/win32/3rdparty/zlib
 
 CFLAGS=$(COMMON_FLAGS) -I$(clamav)/libclamav
 CFLAGS+=-I$(3rdparty)/gnulib
 CFLAGS+=-I$(clamav)/shared -I$(clamav)/libclamav/nsis
 CFLAGS+=-I$(clamav)/win32/3rdparty/bzip2 -I$(clamav)/win32/3rdparty/pthreads
-CFLAGS+=-I$(clamav)/win32/3rdparty/zlib
 CFLAGS+=-I$(clamav)/libclammspack/mspack
 CFLAGS+=-DWIN32_LEAN_AND_MEAN -DPCRE2_STATIC -DPTW32_STATIC_LIB -D_WINDLL
 CFLAGS+=-Wno-pointer-sign
@@ -51,15 +50,15 @@ libclammspack.a: CFLAGS=-I$(top)/include -I$(clamav)/libclammspack/mspack -DHAVE
 libclammspack.a: $(libclammspack_OBJECTS)
 	$(AR) cru $@ $^
 
-libclamunrar_SOURCES=$(top)/src/helpers/extinfo.cpp $(addprefix $(clamav)/libclamunrar/,\
+libclamunrar_SOURCES=$(top)/src/unrar/extinfo.cpp $(top)/src/unrar/system.cpp \
+	$(addprefix $(clamav)/libclamunrar/,\
 	archive.cpp arcread.cpp blake2s.cpp cmddata.cpp consio.cpp crc.cpp crypt.cpp dll.cpp encname.cpp \
 	errhnd.cpp extract.cpp filcreat.cpp file.cpp filefn.cpp filestr.cpp find.cpp getbits.cpp global.cpp \
 	hash.cpp headers.cpp isnt.cpp match.cpp options.cpp pathfn.cpp qopen.cpp rar.cpp rarpch.cpp rarvm.cpp \
 	rawread.cpp rdwrfn.cpp rijndael.cpp scantree.cpp secpassword.cpp sha1.cpp sha256.cpp smallfn.cpp \
-	strfn.cpp strlist.cpp system.cpp threadpool.cpp timefn.cpp ui.cpp unicode.cpp unpack.cpp volume.cpp)
+	strfn.cpp strlist.cpp threadpool.cpp timefn.cpp ui.cpp unicode.cpp unpack.cpp volume.cpp)
 libclamunrar_OBJECTS=$(libclamunrar_SOURCES:.cpp=.o) $(top)/resources/libclamunrar-rc.o
-$(clamav)/libclamunrar/%.o: CXXFLAGS+=-DRARDLL
-libclamunrar.dll: CXXFLAGS+=-DRARDLL
+libclamunrar.dll: CXXFLAGS+=-DRARDLL -DUNICODE -D_UNICODE
 libclamunrar.dll: $(libclamunrar_OBJECTS)
 	$(DLLWRAP) --driver-name=$(CXX) $(LDFLAGS) \
 		-Wl,--enable-stdcall-fixup \
@@ -107,7 +106,10 @@ libclamav_SOURCES:=$(filter-out $(clamav)/win32/3rdparty/pcre2/pcre2_printint.c,
 
 libclamav_OBJECTS=$(libclamav_SOURCES:.c=.o) $(top)/resources/libclamav-rc.o
 libclamav.dll: $(libclamav_OBJECTS) $(gnulib_OBJECTS) $(json_c_OBJECTS) libclammspack.a
-	$(DLLWRAP) $(LDFLAGS) --def $(top)/libclamav.def --implib $@.a -o $@ $^ -L$(3rdparty)/openssl/lib/mingw32 -lssl -lcrypto -lws2_32 -lgdi32
+	$(DLLWRAP) $(LDFLAGS) \
+		--def $(top)/libclamav.def \
+		--implib $@.a -o $@ $^ \
+		-L$(3rdparty)/openssl/lib/mingw32 -lssl -lcrypto -lws2_32 -lgdi32
 
 libclamav.dll.a: libclamav.dll
 

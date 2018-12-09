@@ -502,10 +502,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\libclamunrar\system.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\clamav\libclamunrar\threadpool.cpp"
 				>
 			</File>
@@ -561,7 +557,11 @@
 			Name="Win32 Files"
 			>
 			<File
-				RelativePath="..\..\..\src\helpers\extinfo.cpp"
+				RelativePath="..\..\..\src\unrar\extinfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\unrar\system.cpp"
 				>
 			</File>
 		</Filter>
