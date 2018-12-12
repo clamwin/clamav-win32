@@ -329,7 +329,7 @@ cl_error_t cw_postscan_check(int fd, int result, const char *virname, void *cont
 
 int cw_sig_init(void)
 {
-    if (!cw_helpers.wt.ok)
+    if (!cw_helpers.wt.ok || isWin9x()) /* wintrust stuff is b0rk3d on win9x */
         return 1;
 
     if (!cw_helpers.wt.CryptCATAdminAcquireContext(&cw_helpers.wt.hCatAdmin, NULL, 0))
