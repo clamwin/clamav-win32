@@ -62,7 +62,7 @@ libclamunrar.dll: CXXFLAGS+=-DRARDLL -DUNICODE -D_UNICODE
 libclamunrar.dll: $(libclamunrar_OBJECTS)
 	$(DLLWRAP) --driver-name=$(CXX) $(LDFLAGS) \
 		-Wl,--enable-stdcall-fixup \
-		-static --def $(top)/libclamunrar.def --implib $@.a -o $@ $^
+		-static --def $(top)/libclamunrar.def --implib $@.a -o $@ $^ -L$(3rdparty)/libunicows -lunicows
 
 libclamunrar_iface_SOURCES=$(clamav)/libclamunrar_iface/unrar_iface.cpp
 libclamunrar_iface_OBJECTS=$(libclamunrar_iface_SOURCES:.cpp=.o) $(top)/resources/libclamunrar_iface-rc.o

@@ -46,4 +46,7 @@ git clone --recursive https://github.com/clamwin/clamav-win32.git
   For more info about this refer to the relative msdn-page.
   You can also download the redist package directly from Microsoft.
 
+* libclamunrar needs unicows.dll when used on Windows 9x, it's bundled
+  in the archive, you can safely remove it if not using Windows 9x
+
 - Please report bugs to sherpya@netfarm.it and not to bugs@clamav.net -

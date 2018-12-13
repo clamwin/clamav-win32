@@ -29,4 +29,8 @@
 		Name="libcrypto"
 		Value="$(thirdparty)\openssl\lib\$(PlatformName)\libcrypto.lib"
 	/>
+	<UserMacro
+		Name="libunicows"
+		Value="$(thirdparty)\libunicows\libunicows.lib"
+	/>
 </VisualStudioPropertySheet>

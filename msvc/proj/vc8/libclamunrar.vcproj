@@ -65,6 +65,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="$(libunicows)"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="2"
 				ModuleDefinitionFile="$(SolutionDir)..\$(ProjectName).def"
@@ -227,6 +228,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="$(libunicows)"
 				LinkIncremental="1"
 				ModuleDefinitionFile="$(SolutionDir)..\$(ProjectName).def"
 				GenerateDebugInformation="true"
