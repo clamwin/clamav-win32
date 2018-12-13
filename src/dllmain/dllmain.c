@@ -158,6 +158,9 @@ static void dynLoad(void)
         /* Win2k + */
         IMPORT_FUNC(k32, HeapSetInformation);
 
+        /* Vista */
+        IMPORT_FUNC(k32, GetFinalPathNameByHandleA);
+
         /* Win64 WoW from 32 applications */
         cw_helpers.k32.wow64 = TRUE;
         IMPORT_FUNC_OR_DISABLE(k32, IsWow64Process, wow64);
@@ -235,6 +238,7 @@ static void dynLoad(void)
         IMPORT_FUNC_OR_FAIL(psapi, GetModuleFileNameExA);
         IMPORT_FUNC_OR_FAIL(psapi, GetModuleFileNameExW);
         IMPORT_FUNC_OR_FAIL(psapi, GetModuleInformation);
+        IMPORT_FUNC_OR_FAIL(psapi, GetMappedFileNameA);
         IMPORT_FUNC_OR_FAIL(psapi, GetMappedFileNameW);
     }
 

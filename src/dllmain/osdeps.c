@@ -422,6 +422,95 @@ int cw_rename(const char *oldname, const char *newname)
     return rename(oldname, newname);
 }
 
+#ifndef VOLUME_NAME_NT
+#define VOLUME_NAME_NT 0x2
+#endif
+
+static inline int cw_gfff_vista(int desc, char **filepath)
+{
+    DWORD dwRet;
+    HANDLE hFile = (HANDLE) _get_osfhandle(desc);
+
+    if (!(dwRet = cw_helpers.k32.GetFinalPathNameByHandleA(hFile, NULL, 0, VOLUME_NAME_NT)))
+    {
+        cli_errmsg("cw_gfff_vista: Failed to resolve filename for descriptor %d\n", desc);
+        return CL_EOPEN;
+    }
+
+    ;
+    if (!(*filepath = calloc(dwRet + 1, 1)))
+    {
+        cli_errmsg("cw_gfff_vista: Failed to allocate %u bytes to store filename\n", dwRet + 1);
+        return CL_EMEM;
+    }
+
+    if (!cw_helpers.k32.GetFinalPathNameByHandleA(hFile, *filepath, dwRet + 1, VOLUME_NAME_NT))
+    {
+        cli_errmsg("cw_gfff_vista: Failed to resolve filename for descriptor %d\n", desc);
+        free(*filepath);
+        *filepath = NULL;
+        return CL_EOPEN;
+    }
+
+    return CL_SUCCESS;
+}
+
+static inline int cw_gfff_xp(int desc, char **filepath)
+{
+    DWORD dwRet;
+    int status = CL_SUCCESS;
+    HANDLE hFileMap = NULL;
+    HANDLE hFile = (HANDLE) _get_osfhandle(desc);
+    char filename[MAX_PATH + 1];
+    void *pMem;
+
+    DWORD dwFileSizeHi = 0;
+    DWORD dwFileSizeLo = GetFileSize(hFile, &dwFileSizeHi); 
+
+    if ((dwFileSizeLo == 0) && (dwFileSizeHi == 0))
+    {
+        cli_errmsg("cw_gfff_xp: Cannot map a file with a length of zero\n");
+        return CL_EOPEN;
+    }
+
+    if (!(hFileMap = CreateFileMappingA(hFile, NULL, PAGE_READONLY, 0,  1, NULL)))
+    {
+        cli_errmsg("cw_gfff_xp: CreateFileMapping() failed with %lu\n", GetLastError());
+        return CL_EOPEN;
+    }
+
+    if (!(pMem = MapViewOfFile(hFileMap, FILE_MAP_READ, 0, 0, 1)))
+    {
+        cli_errmsg("cw_gfff_xp: MapViewOfFile() failed with %lu\n", GetLastError());
+        status = CL_EMEM;
+        goto done;
+    }
+
+    if (cw_helpers.psapi.GetMappedFileNameA(GetCurrentProcess(), pMem, filename, MAX_PATH))
+        *filepath = cli_strdup(filename);
+    else
+    {
+        cli_errmsg("cw_gfff_xp: GetMappedFileNameA() failed with %lu\n", GetLastError());
+        status = CL_EOPEN;
+    }
+
+done:
+    if (pMem)
+        UnmapViewOfFile(pMem);
+    if (hFileMap)
+        CloseHandle(hFileMap);
+    return status;
+}
+
+int cw_get_filepath_from_filedesc(int desc, char **filepath)
+{
+    if (cw_helpers.k32.GetFinalPathNameByHandleA)
+        return cw_gfff_vista(desc, filepath);
+    else if (cw_helpers.psapi.ok)
+        return cw_gfff_xp(desc, filepath);
+    return CL_EOPEN;
+}
+
 /* A non TLS based and non thread safe canonical rand() implementation */
 /* aCaB <acab@clamav.net> */
 static unsigned long next = 1;

@@ -37,6 +37,8 @@ typedef BOOL (WINAPI *imp_Module32Next)(HANDLE, MODULEENTRY32 *);
 typedef HANDLE (WINAPI *imp_CreateRemoteThread)(HANDLE,
                 LPSECURITY_ATTRIBUTES, SIZE_T, LPTHREAD_START_ROUTINE, LPVOID, DWORD, LPDWORD);
 
+typedef DWORD (WINAPI *imp_GetFinalPathNameByHandleA)(HANDLE, LPSTR lpszFilePath, DWORD, DWORD);
+
 /* advapi32 */
 typedef BOOL (WINAPI *imp_OpenProcessToken)(HANDLE, DWORD, PHANDLE);
 typedef BOOL (WINAPI *imp_LookupPrivilegeValueA)(LPCSTR, LPCSTR, PLUID);
@@ -49,6 +51,7 @@ typedef DWORD (WINAPI *imp_GetModuleBaseNameA)(HANDLE, HMODULE, LPSTR, DWORD);
 typedef DWORD (WINAPI *imp_GetModuleFileNameExA)(HANDLE, HMODULE, LPSTR, DWORD);
 typedef DWORD (WINAPI *imp_GetModuleFileNameExW)(HANDLE, HMODULE, LPWSTR, DWORD);
 typedef BOOL (WINAPI *imp_GetModuleInformation)(HANDLE, HMODULE, LPMODULEINFO, DWORD);
+typedef DWORD (WINAPI *imp_GetMappedFileNameA)(HANDLE, LPVOID, LPSTR, DWORD);
 typedef DWORD (WINAPI *imp_GetMappedFileNameW)(HANDLE, LPVOID, LPWSTR, DWORD);
 
 /* kernel32 */
@@ -129,6 +132,7 @@ typedef struct _kernel32_t
     imp_Module32First Module32First;
     imp_Module32Next Module32Next;
     imp_CreateRemoteThread CreateRemoteThread;
+    imp_GetFinalPathNameByHandleA GetFinalPathNameByHandleA;
 
     /* optional */
     imp_HeapSetInformation HeapSetInformation;
@@ -164,6 +168,7 @@ typedef struct _psapi_t
     imp_GetModuleFileNameExA GetModuleFileNameExA;
     imp_GetModuleFileNameExW GetModuleFileNameExW;
     imp_GetModuleInformation GetModuleInformation;
+    imp_GetMappedFileNameA GetMappedFileNameA;
     imp_GetMappedFileNameW GetMappedFileNameW;
 } psapi_t;
 

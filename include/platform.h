@@ -93,6 +93,8 @@ extern int cw_rename(const char *oldname, const char *newname);
 #define strerror cw_strerror
 #define perror cw_perror
 
+extern int cw_get_filepath_from_filedesc(int desc, char **filepath);
+
 /* random */
 extern int cw_rand(void);
 extern void cw_srand(unsigned int seed);
