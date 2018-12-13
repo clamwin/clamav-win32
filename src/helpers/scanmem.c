@@ -616,7 +616,7 @@ int cw_scanfile(const char *filename, scanmem_data *scan_data)
         lseek(fd, 0, SEEK_SET);
     }
 
-    ret = cl_scandesc(fd, NULL, &virname, &info.blocks, scan_data->engine, scan_data->options);
+    ret = cl_scandesc(fd, filename, &virname, &info.blocks, scan_data->engine, scan_data->options);
     if (ret == CL_VIRUS)
     {
         logg("~%s: %s FOUND\n", filename, virname);
