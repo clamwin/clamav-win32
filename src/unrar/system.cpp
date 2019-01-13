@@ -94,7 +94,7 @@ void Wait()
 #endif
 #if defined(_WIN_ALL)
   // Reset system sleep timer to prevent system going sleep.
-  SetThreadExecutionState(ES_SYSTEM_REQUIRED);
+  //SetThreadExecutionState(ES_SYSTEM_REQUIRED);
 #endif
 }
 
