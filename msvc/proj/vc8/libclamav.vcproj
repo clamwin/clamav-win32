@@ -2079,6 +2079,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\include\clamav-types.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\include\cw_inline.h"
 					>
 				</File>

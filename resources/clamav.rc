@@ -3,8 +3,8 @@
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 VS_VERSION_INFO VERSIONINFO
-	FILEVERSION 0,101,0,0
-	PRODUCTVERSION 0,101,0,0
+	FILEVERSION 0,101,1,0
+	PRODUCTVERSION 0,101,1,0
 	FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
 	FILEFLAGS 0x1L
@@ -20,12 +20,12 @@ BEGIN
 		BLOCK "00000409"
 		BEGIN
 			VALUE "FileDescription", "ClamWin Antivirus"
-			VALUE "FileVersion", "0, 101, 0, 0"
+			VALUE "FileVersion", "0, 101, 1, 0"
 			VALUE "InternalName", __MODULE__
-			VALUE "LegalCopyright", "Copyright (C) 2005-2018 Cisco Systems, Inc. / ClamWin Pty Ltd"
+			VALUE "LegalCopyright", "Copyright (C) 2005-2019 Cisco Systems, Inc. / ClamWin Pty Ltd"
 			VALUE "OriginalFilename", __MODULE__
 			VALUE "ProductName", "ClamWin Antivirus"
-			VALUE "ProductVersion", "0, 101, 0, 0"
+			VALUE "ProductVersion", "0, 101, 1, 0"
 		END
 	END
 	BLOCK "VarFileInfo"
