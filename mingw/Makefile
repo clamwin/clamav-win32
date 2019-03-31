@@ -194,4 +194,6 @@ clean:
 %-rc.o: %.rc
 	$(WINDRES) -I$(top)/resources -I$(top)/tools -o $@ $<
 
+MAKEFLAGS += --no-builtin-rules
+.SUFFIXES:
 .PHONY: all llvm clean llvm-clean
