@@ -45,6 +45,7 @@ CLAMAV_TOOLS=exeScanner.exe sigcheck.exe
 all: $(CLAMAV_LIBS) $(CLAMAV_PROGRAMS) $(CLAMAV_TOOLS)
 
 libclammspack_SOURCES=$(wildcard $(clamav)/libclammspack/mspack/*.c)
+libclammspack_SOURCES:=$(filter-out $(clamav)/libclammspack/mspack/debug.c,$(libclammspack_SOURCES))
 libclammspack_OBJECTS=$(libclammspack_SOURCES:.c=.o)
 libclammspack.a: CFLAGS=-I$(top)/include -I$(clamav)/libclammspack/mspack -DHAVE_CONFIG_H
 libclammspack.a: $(libclammspack_OBJECTS)
