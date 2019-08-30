@@ -45,7 +45,9 @@
 #include <socket_inline.h>
 
 /* re-route main to cw_main to handle some startup code */
+#ifndef CLAMWIN_MAIN_HANDLED
 #define main cw_main
+#endif
 
 #undef strtok_r /* thanks to pthread.h */
 
