@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
+				PreprocessorDefinitions="LIBCLAMAV_EXPORTS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -128,7 +128,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
+				PreprocessorDefinitions="LIBCLAMAV_EXPORTS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -212,7 +212,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
+				PreprocessorDefinitions="LIBCLAMAV_EXPORTS"
 				ExceptionHandling="0"
 				SmallerTypeCheck="false"
 				RuntimeLibrary="2"
@@ -297,7 +297,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
+				PreprocessorDefinitions="LIBCLAMAV_EXPORTS"
 				ExceptionHandling="0"
 				SmallerTypeCheck="false"
 				RuntimeLibrary="2"
@@ -464,6 +464,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\clamav\libclamav\egg.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\clamav\libclamav\elf.c"
 				>
 			</File>
@@ -473,6 +477,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\clamav\libclamav\events.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\libclamav\execs.c"
 				>
 			</File>
 			<File
@@ -1614,6 +1622,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\clamav\libclamav\egg.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\clamav\libclamav\elf.h"
 				>
 			</File>
@@ -2207,7 +2219,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pthreads\pthread.c"
+					RelativePath="..\..\..\3rdparty\pthreads\pthread.c"
 					>
 				</File>
 				<File
@@ -2299,95 +2311,59 @@
 				Name="zlib"
 				>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\adler32.c"
+					RelativePath="..\..\..\3rdparty\zlib\adler32.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\compress.c"
+					RelativePath="..\..\..\3rdparty\zlib\crc32.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\crc32.c"
+					RelativePath="..\..\..\3rdparty\zlib\deflate.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\crc32.h"
+					RelativePath="..\..\..\3rdparty\zlib\gzclose.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\deflate.c"
+					RelativePath="..\..\..\3rdparty\zlib\gzlib.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\deflate.h"
+					RelativePath="..\..\..\3rdparty\zlib\gzread.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\gzclose.c"
+					RelativePath="..\..\..\3rdparty\zlib\infback.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\gzlib.c"
+					RelativePath="..\..\..\3rdparty\zlib\inffast.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\gzread.c"
+					RelativePath="..\..\..\3rdparty\zlib\inflate.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\gzwrite.c"
+					RelativePath="..\..\..\3rdparty\zlib\inftrees.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\infback.c"
+					RelativePath="..\..\..\3rdparty\zlib\trees.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\inffast.c"
+					RelativePath="..\..\..\3rdparty\zlib\uncompr.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\inffast.h"
+					RelativePath="..\..\..\3rdparty\zlib\zlib.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\inffixed.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\inflate.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\inflate.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\inftrees.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\inftrees.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\trees.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\trees.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\uncompr.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\zutil.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\zlib\zutil.h"
+					RelativePath="..\..\..\3rdparty\zlib\zutil.c"
 					>
 				</File>
 			</Filter>
@@ -2395,55 +2371,15 @@
 				Name="bzip2"
 				>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\bzip2\blocksort.c"
+					RelativePath="..\..\..\3rdparty\bzip2\blocksort.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\bzip2\bzlib.c"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|x64"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|x64"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\bzip2\bzlib_private.h"
+					RelativePath="..\..\..\3rdparty\bzip2\bzip2.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\bzip2\compress.c"
+					RelativePath="..\..\..\3rdparty\bzip2\bzlib.c"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2483,19 +2419,31 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\bzip2\crctable.c"
+					RelativePath="..\..\..\3rdparty\bzip2\bzlib.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\bzip2\decompress.c"
+					RelativePath="..\..\..\3rdparty\bzip2\compress.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\bzip2\huffman.c"
+					RelativePath="..\..\..\3rdparty\bzip2\crctable.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\bzip2\randtable.c"
+					RelativePath="..\..\..\3rdparty\bzip2\decompress.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\zlib\gzwrite.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\bzip2\huffman.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\bzip2\randtable.c"
 					>
 				</File>
 			</Filter>
@@ -2507,14 +2455,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\3rdparty\json-c\arraylist.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\bits.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\3rdparty\json-c\config.h"
 					>
 				</File>
@@ -2523,19 +2463,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\3rdparty\json-c\debug.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\3rdparty\json-c\json.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\json_c_version.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\json_c_version.h"
 					>
 				</File>
 				<File
@@ -2551,35 +2479,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\3rdparty\json-c\json_object.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\json_object_iterator.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\json_object_iterator.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\json_object_private.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\json_pointer.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\json_pointer.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\3rdparty\json-c\json_tokener.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\json_tokener.h"
 					>
 				</File>
 				<File
@@ -2587,27 +2487,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\3rdparty\json-c\json_util.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\json_visit.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\json_visit.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\3rdparty\json-c\linkhash.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\linkhash.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\math_compat.h"
 					>
 				</File>
 				<File
@@ -2615,39 +2495,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\3rdparty\json-c\printbuf.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\3rdparty\json-c\random_seed.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\3rdparty\json-c\random_seed.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\snprintf_compat.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\strdup_compat.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\3rdparty\json-c\strerror_override.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\strerror_override.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\strerror_override_private.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\3rdparty\json-c\vasprintf_compat.h"
 					>
 				</File>
 			</Filter>
@@ -2655,115 +2507,83 @@
 				Name="pcre2"
 				>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\config.h"
+					RelativePath="..\..\..\3rdparty\pcre2\src\config.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2.h"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_auto_possess.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_auto_possess.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_chartables.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_chartables.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_compile.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_compile.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_config.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_context.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_context.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_error.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_convert.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_find_bracket.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_dfa_match.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_jit_compile.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_error.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_match.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_extuni.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_match_data.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_find_bracket.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_newline.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_jit_compile.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_pattern_info.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_maketables.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_script_run.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_match.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_string_utils.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_match_data.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_study.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_newline.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_tables.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_ord2utf.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_ucd.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_pattern_info.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2_valid_utf.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_serialize.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_string_utils.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_study.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_substitute.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_substring.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_tables.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_ucd.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_valid_utf.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\clamav\win32\3rdparty\pcre2\pcre2_xclass.c"
+					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2posix.c"
 					>
 				</File>
 			</Filter>

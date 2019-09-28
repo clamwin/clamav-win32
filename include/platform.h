@@ -149,6 +149,16 @@ extern int __cdecl fseeko64 (FILE* stream, off64_t offset, int whence);
 /* <stdlib.h> */
 extern int mkstemp(char *tmpl);
 
+/* missing round() on vs 2005 */
+#if _MSC_VER <= 1400
+_CRTIMP double  __cdecl floor(__in double _X);
+inline double round(double x) { return floor(x + 0.5); }
+#endif
+
+#ifndef PATH_MAX
+#define PATH_MAX 260
+#endif
+
 /* UNC Path Handling on win32 */
 #define UNC_PREFIX "\\\\?\\"
 #define UN2_PREFIX "\\??\\"
@@ -175,7 +185,7 @@ typedef unsigned int in_addr_t;
 
 #define PATHSEP "\\"
 
-#ifdef _WINDLL
+#ifdef LIBCLAMAV_EXPORTS
 #define LIBCLAMAV_API
 #undef OUT
 #else

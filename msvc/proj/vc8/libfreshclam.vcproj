@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="freshclam"
-	ProjectGUID="{F88905DF-1BED-4C69-9F48-1B20FF7B084E}"
-	RootNamespace="freshclam"
+	Name="libfreshclam"
+	ProjectGUID="{9B6A6EC4-D5A0-41B0-85B7-D0103F5E865E}"
+	RootNamespace="libfreshclam"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -22,7 +22,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)\$(PlatformName)"
 			IntermediateDirectory="$(SolutionDir)$(ConfigurationName)\$(PlatformName)\$(ProjectName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			InheritedPropertySheets=".\clamav.vsprops"
 			CharacterSet="0"
 			>
@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -65,10 +65,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib crypt32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib crypt32.lib"
+				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="2"
+				ModuleDefinitionFile="$(SolutionDir)..\$(ProjectName).def"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -100,7 +102,7 @@
 			Name="Debug|x64"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)\$(PlatformName)"
 			IntermediateDirectory="$(SolutionDir)$(ConfigurationName)\$(PlatformName)\$(ProjectName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			InheritedPropertySheets=".\clamav.vsprops"
 			CharacterSet="0"
 			>
@@ -123,7 +125,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -144,10 +146,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib crypt32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib crypt32.lib"
+				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="2"
+				ModuleDefinitionFile="$(SolutionDir)..\$(ProjectName).def"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -179,7 +183,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)\$(PlatformName)"
 			IntermediateDirectory="$(SolutionDir)$(ConfigurationName)\$(PlatformName)\$(ProjectName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			InheritedPropertySheets=".\clamav.vsprops"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
@@ -201,7 +205,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				ExceptionHandling="0"
 				SmallerTypeCheck="false"
 				RuntimeLibrary="2"
@@ -220,10 +224,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib crypt32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib crypt32.lib"
 				LinkIncremental="1"
+				ModuleDefinitionFile="$(SolutionDir)..\$(ProjectName).def"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				SetChecksum="true"
 				TargetMachine="1"
@@ -257,7 +262,7 @@
 			Name="Release|x64"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)\$(PlatformName)"
 			IntermediateDirectory="$(SolutionDir)$(ConfigurationName)\$(PlatformName)\$(ProjectName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			InheritedPropertySheets=".\clamav.vsprops"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
@@ -280,7 +285,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				ExceptionHandling="0"
 				SmallerTypeCheck="false"
 				RuntimeLibrary="2"
@@ -299,10 +304,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib crypt32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib crypt32.lib"
 				LinkIncremental="1"
+				ModuleDefinitionFile="$(SolutionDir)..\$(ProjectName).def"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				SetChecksum="true"
 				TargetMachine="17"
@@ -342,15 +348,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\clamav\freshclam\execute.c"
+				RelativePath="..\..\..\src\helpers\dnsquery.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\freshclam\freshclam.c"
+				RelativePath="..\..\..\clamav\libfreshclam\libfreshclam.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\freshclam\notify.c"
+				RelativePath="..\..\..\clamav\libfreshclam\libfreshclam_internal.c"
 				>
 			</File>
 		</Filter>
@@ -360,11 +366,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\clamav\freshclam\execute.h"
+				RelativePath="..\..\..\clamav\libfreshclam\libfreshclam.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\freshclam\notify.h"
+				RelativePath="..\..\..\clamav\libfreshclam\libfreshclam_internal.h"
 				>
 			</File>
 		</Filter>
@@ -374,29 +380,21 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath="..\..\..\resources\freshclam.rc"
+				RelativePath="..\..\..\resources\libfreshclam.rc"
 				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Win32 Files"
 			>
-			<File
-				RelativePath="..\..\..\src\helpers\crashdump.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\helpers\cw_main.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\helpers\service.c"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Shared"
 			>
+			<File
+				RelativePath="..\..\..\clamav\shared\cdiff.c"
+				>
+			</File>
 			<File
 				RelativePath="..\..\..\clamav\shared\cert_util.c"
 				>
@@ -406,15 +404,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\clamav\shared\clamdcom.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\clamav\shared\misc.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\clamav\shared\output.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\clamav\shared\tar.c"
 				>
 			</File>
 		</Filter>

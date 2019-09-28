@@ -89,9 +89,6 @@
 /* "default FD_SETSIZE value" */
 #define DEFAULT_FD_SETSIZE ((unsigned __int32) (-1))
 
-/* enable libfreshclam */
-#undef ENABLE_LIBFRESHCLAM
-
 /* use fanotify */
 #undef FANOTIFY
 
@@ -207,8 +204,11 @@
 /* Define to 1 if you have the <grp.h> header file. */
 #undef HAVE_GRP_H
 
-/* iconv() available */
+/* Define if you have the iconv() function and it works. */
 #undef HAVE_ICONV
+
+/* Define to 1 if you have the <iconv.h> header file. */
+#undef HAVE_ICONV_H
 
 /* Define to 1 if you have the `inet_ntop' function. */
 #undef HAVE_INET_NTOP
@@ -227,6 +227,9 @@
 
 /* Define to 1 if you have the 'libjson' library (-ljson). */
 #define HAVE_JSON 1
+
+/* Define to 1 if you have the `charset' library (-lcharset). */
+#undef HAVE_LIBCHARSET
 
 /* Define to '1' if you have the check.h library */
 #undef HAVE_LIBCHECK
@@ -247,7 +250,7 @@
 #undef HAVE_LIBPDCURSES
 
 /* Define to 1 if you have the `ssl' library (-lssl). */
-#define HAVE_LIBSSL 1
+#undef HAVE_LIBSSL
 
 /* Define to 1 if you have the 'libxml2' library (-lxml2). */
 #undef HAVE_LIBXML2
@@ -257,6 +260,12 @@
 
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1
+
+/* Define to 1 if you have the <localcharset.h> header file. */
+#undef HAVE_LOCALCHARSET_H
+
+/* Define to 1 if you have the `locale_charset' function. */
+#undef HAVE_LOCALE_CHARSET
 
 /* Define this if a modern libltdl is already installed */
 #undef HAVE_LTDL
@@ -323,12 +332,6 @@
 
 /* Define to 1 if you have the `readdir' function. */
 #define HAVE_READDIR 1
-
-/* readdir_r takes 2 arguments */
-#undef HAVE_READDIR_R_2
-
-/* readdir_r takes 3 arguments */
-#undef HAVE_READDIR_R_3
 
 /* Define to 1 if you have the `recvmsg' function. */
 #undef HAVE_RECVMSG
@@ -471,14 +474,26 @@
 /* yara sources are compiled in */
 #define HAVE_YARA 1
 
+/* Define to 1 if you have the <zlib.h> header file. */
+#undef HAVE_ZLIB_H
+
 /* For internal use only - DO NOT DEFINE */
 #undef HAVE__INTERNAL__SHA_COLLECT
 
-/* "Full library version number" */
-#define LIBCLAMAV_FULLVER "dll"
+/* Define as const if the declaration of iconv() needs const. */
+#undef ICONV_CONST
 
-/* "Major library version number" */
-#define LIBCLAMAV_MAJORVER dll
+/* "Full clamav library version number" */
+#define LIBCLAMAV_FULLVER "9.0.2"
+
+/* "Major clamav library version number" */
+#define LIBCLAMAV_MAJORVER 9
+
+/* "Full freshclam library version number" */
+#define LIBFRESHCLAM_FULLVER "2.0.0"
+
+/* "Major freshclam library version number" */
+#define LIBFRESHCLAM_MAJORVER 2
 
 /* Define if the OS needs help to load dependent libraries for dlopen(). */
 #undef LTDL_DLOPEN_DEPLIBS
@@ -614,7 +629,7 @@
 #define USING_PCRE2 1
 
 /* Stable releases tag */
-#define CLAMWIN_RELEASE "0.101.4"
+#define CLAMWIN_RELEASE "0.102"
 
 /* Version number of package */
 #ifdef CLAMWIN_RELEASE

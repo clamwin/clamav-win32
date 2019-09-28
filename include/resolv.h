@@ -25,9 +25,7 @@
 #include "clamav-config.h"
 #endif
 
-#include <windns.h>
-
-#define T_A DNS_TYPE_A
-#define T_TXT DNS_TYPE_TEXT
+#define T_A 0x00ff
+#define T_TXT 0x0010
 
 #endif
