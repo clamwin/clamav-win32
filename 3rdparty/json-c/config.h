@@ -218,3 +218,9 @@
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
+
+/* open/close/read/write */
+#include <io.h>
+
+/* gnulib */
+extern long long int strtoll(const char *nptr, char **endptr, int base);
