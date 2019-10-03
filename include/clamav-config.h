@@ -250,13 +250,13 @@
 #undef HAVE_LIBPDCURSES
 
 /* Define to 1 if you have the `ssl' library (-lssl). */
-#undef HAVE_LIBSSL
+#define HAVE_LIBSSL 1
 
 /* Define to 1 if you have the 'libxml2' library (-lxml2). */
-#undef HAVE_LIBXML2
+#define HAVE_LIBXML2 1
 
 /* Define to 1 if you have the `z' library (-lz). */
-#undef HAVE_LIBZ
+#define HAVE_LIBZ 1
 
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1

@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="LIBCLAMAV_EXPORTS"
+				PreprocessorDefinitions="LIBCLAMAV_EXPORTS;LIBXML_STATIC"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -128,7 +128,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="LIBCLAMAV_EXPORTS"
+				PreprocessorDefinitions="LIBCLAMAV_EXPORTS;LIBXML_STATIC"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -212,7 +212,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="LIBCLAMAV_EXPORTS"
+				PreprocessorDefinitions="LIBCLAMAV_EXPORTS;LIBXML_STATIC"
 				ExceptionHandling="0"
 				SmallerTypeCheck="false"
 				RuntimeLibrary="2"
@@ -297,7 +297,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="LIBCLAMAV_EXPORTS"
+				PreprocessorDefinitions="LIBCLAMAV_EXPORTS;LIBXML_STATIC"
 				ExceptionHandling="0"
 				SmallerTypeCheck="false"
 				RuntimeLibrary="2"
@@ -2584,6 +2584,190 @@
 				</File>
 				<File
 					RelativePath="..\..\..\3rdparty\pcre2\src\pcre2posix.c"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="libxml2"
+				>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\buf.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\c14n.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\catalog.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\chvalid.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\debugXML.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\dict.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\encoding.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\entities.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\error.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\globals.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\hash.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\HTMLparser.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\HTMLtree.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\legacy.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\list.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\nanoftp.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\nanohttp.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\parser.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\parserInternals.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\pattern.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\relaxng.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\SAX.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\SAX2.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\schematron.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\threads.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\tree.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\uri.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\valid.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\xinclude.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\xlink.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\xmlIO.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\xmlmemory.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\xmlmodule.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\xmlreader.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\xmlregexp.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\xmlsave.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\xmlschemas.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\xmlschemastypes.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\xmlstring.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\xmlunicode.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\include\libxml\xmlversion.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\xmlwriter.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\xpath.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\xpointer.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\3rdparty\libxml2\xzlib.c"
 					>
 				</File>
 			</Filter>
