@@ -181,7 +181,7 @@ CLEAN_OBJECTS+=$(libcurl_OBJECTS) libcurl.a
 
 libfreshclam_SOURCES=$(clamav)/libfreshclam/libfreshclam.c $(clamav)/libfreshclam/libfreshclam_internal.c $(top)/src/helpers/dnsquery.c
 libfreshclam_SOURCES+=$(clamav)/shared/cert_util.c $(clamav)/shared/win/cert_util_win.c
-libfreshclam_OBJECTS=$(libfreshclam_SOURCES:.c=.o)
+libfreshclam_OBJECTS=$(libfreshclam_SOURCES:.c=.o) $(top)/resources/libfreshclam-rc.o
 libfreshclam.dll: CFLAGS+=-I$(3rdparty)/curl/include -DCURL_STATICLIB
 libfreshclam.dll: $(libfreshclam_OBJECTS) $(shared_OBJECTS) libcurl.a libclamav.dll.a
 	$(DLLWRAP) $(LDFLAGS) \
