@@ -85,6 +85,7 @@ extern int cw_unlink(const char *pathname);
 extern int cw_rename(const char *oldname, const char *newname);
 
 #define lstat           cw_stat
+#undef stat
 #define stat(p, b)      cw_stat(p, b)
 #define unlink          cw_unlink
 #define rename          cw_rename
