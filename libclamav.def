@@ -202,15 +202,16 @@ pthread_cond_signal                 @206 NONAME
 pthread_cond_timedwait              @207 NONAME
 pthread_cond_wait                   @208 NONAME
 pthread_create                      @209 NONAME
-pthread_getspecific                 @210 NONAME
-pthread_key_create                  @211 NONAME
-pthread_mutex_destroy               @212 NONAME
-pthread_mutex_init                  @213 NONAME
-pthread_mutex_lock                  @214 NONAME
-pthread_mutex_unlock                @215 NONAME
-pthread_once                        @216 NONAME
-pthread_setspecific                 @217 NONAME
-pthread_join                        @218 NONAME
+pthread_detach                      @210 NONAME
+pthread_getspecific                 @211 NONAME
+pthread_key_create                  @212 NONAME
+pthread_mutex_destroy               @213 NONAME
+pthread_mutex_init                  @214 NONAME
+pthread_mutex_lock                  @215 NONAME
+pthread_mutex_unlock                @216 NONAME
+pthread_once                        @217 NONAME
+pthread_setspecific                 @218 NONAME
+pthread_join                        @219 NONAME
 
 ; zlib @ 250
 gzclose                             @250 NONAME
