@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="LIBCLAMAV_EXPORTS;LIBXML_STATIC"
+				PreprocessorDefinitions="LIBCLAMAV_EXPORTS;PCRE2_STATIC;PTW32_STATIC_LIB;LIBXML_STATIC"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -128,7 +128,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="LIBCLAMAV_EXPORTS;LIBXML_STATIC"
+				PreprocessorDefinitions="LIBCLAMAV_EXPORTS;PCRE2_STATIC;PTW32_STATIC_LIB;LIBXML_STATIC"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -212,7 +212,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="LIBCLAMAV_EXPORTS;LIBXML_STATIC"
+				PreprocessorDefinitions="LIBCLAMAV_EXPORTS;PCRE2_STATIC;PTW32_STATIC_LIB;LIBXML_STATIC"
 				ExceptionHandling="0"
 				SmallerTypeCheck="false"
 				RuntimeLibrary="2"
@@ -297,7 +297,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="LIBCLAMAV_EXPORTS;LIBXML_STATIC"
+				PreprocessorDefinitions="LIBCLAMAV_EXPORTS;PCRE2_STATIC;PTW32_STATIC_LIB;LIBXML_STATIC"
 				ExceptionHandling="0"
 				SmallerTypeCheck="false"
 				RuntimeLibrary="2"

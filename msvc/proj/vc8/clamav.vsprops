@@ -7,7 +7,7 @@
 	<Tool
 		Name="VCCLCompilerTool"
 		AdditionalIncludeDirectories="&quot;$(SolutionDir)..\include&quot;;&quot;$(thirdparty)&quot;;&quot;$(thirdparty)\gnulib&quot;;&quot;$(thirdparty)\openssl\include&quot;;&quot;$(thirdparty)\pthreads&quot;;&quot;$(thirdparty)\zlib&quot;;&quot;$(thirdparty)\bzip2&quot;;&quot;$(thirdparty)\json-c&quot;;&quot;$(thirdparty)\pcre2\src&quot;;&quot;$(thirdparty)\curl\include&quot;;&quot;$(thirdparty)\libxml2\include&quot;;&quot;$(clamav)&quot;;&quot;$(clamav)\shared&quot;;&quot;$(clamav)\libclamav&quot;;&quot;$(clamav)\libclammspack\mspack&quot;"
-		PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;WIN32_LEAN_AND_MEAN;CLAMWIN;HAVE_CONFIG_H;PTW32_STATIC_LIB;PCRE2_STATIC;CURL_STATICLIB"
+		PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;WIN32_LEAN_AND_MEAN;CLAMWIN;HAVE_CONFIG_H"
 	/>
 	<UserMacro
 		Name="clamav"
