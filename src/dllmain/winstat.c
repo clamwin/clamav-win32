@@ -49,6 +49,12 @@ int cw_stat(const char *path, struct stat *buf)
         WIN32_FIND_DATA fdata;
         DWORD err = GetLastError();
 
+        /* Win9x is not able to get a directory HANDLE with CreateFileA and fails with ERROR_ACCESS_DENIED,
+           just to have more fun, if there is trailing slash the error is ERROR_PATH_NOT_FOUND instead */
+
+        if (isWin9x() && ((err == ERROR_ACCESS_DENIED) || (err == ERROR_PATH_NOT_FOUND)))
+            return stat(path, buf);
+
         /* Short circuit */
         if ((err == ERROR_FILE_NOT_FOUND) || (err == ERROR_PATH_NOT_FOUND))
         {
@@ -56,8 +62,6 @@ int cw_stat(const char *path, struct stat *buf)
              return -1;
         }
 
-        /* Win9x is not able to get a directory HANDLE with CreateFileA */
-        if (isWin9x() && (err == ERROR_ACCESS_DENIED)) return stat(path, buf);
 
         if ((hFile = FindFirstFileA(path, &fdata)) == INVALID_HANDLE_VALUE)
         {
