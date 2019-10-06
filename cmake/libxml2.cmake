@@ -10,6 +10,7 @@ set(libxml2_srcs
     xmlmodule.c schematron.c xzlib.c)
 list(TRANSFORM libxml2_srcs PREPEND ${3RDPARTY}/libxml2/)
 
-add_library(xml2 STATIC ${libxml2_srcs})
-target_include_directories(xml2 PRIVATE ${3RDPARTY}/libxml2/include)
-target_compile_definitions(xml2 PRIVATE LIBXML_STATIC)
+add_library(libxml2 STATIC ${libxml2_srcs})
+target_include_directories(libxml2 PRIVATE ${3RDPARTY}/libxml2/include)
+target_compile_definitions(libxml2 PRIVATE LIBXML_STATIC)
+set_target_properties(libxml2 PROPERTIES PREFIX "")

@@ -59,7 +59,7 @@ target_link_libraries(libclamav PRIVATE
     bzip2
     pcre2
     json-c
-    xml2
+    libxml2
     clammspack
     gnulib
     ${OPENSSL_SSL_LIBRARY}
