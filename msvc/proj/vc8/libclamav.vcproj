@@ -2199,10 +2199,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\src\dllmain\legacy_stdio.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\src\dllmain\libgen.c"
 					>
 				</File>

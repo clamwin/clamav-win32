@@ -71,10 +71,6 @@ target_link_libraries(libclamav PRIVATE
     ${OPENSSL_CRYPTO_LIBRARY}
     ws2_32)
 
-if(NOT MINGW)
-target_link_libraries(libclamav PRIVATE legacy_stdio_definitions)
-endif()
-
 set_target_properties(libclamav PROPERTIES
     DEFINE_SYMBOL LIBCLAMAV_EXPORTS
     PREFIX ""
