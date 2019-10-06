@@ -4,6 +4,7 @@ add_executable(clambc
     ${CLAMAV}/shared/output.c
     ${CLAMAV}/shared/misc.c
     ${CMAKE_SOURCE_DIR}/src/helpers/cw_main.c
+    ${CMAKE_SOURCE_DIR}/src/helpers/crashdump.c
     ${CMAKE_SOURCE_DIR}/src/helpers/cw_sch.c
     ${CMAKE_SOURCE_DIR}/resources/clambc.rc)
 

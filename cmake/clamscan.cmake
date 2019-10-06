@@ -5,6 +5,7 @@ add_executable(clamscan
     ${CLAMAV}/shared/misc.c
     ${CMAKE_SOURCE_DIR}/src/shared/win32actions.c
     ${CMAKE_SOURCE_DIR}/src/helpers/cw_main.c
+    ${CMAKE_SOURCE_DIR}/src/helpers/crashdump.c
     ${CMAKE_SOURCE_DIR}/src/helpers/scanmem.c
     ${CMAKE_SOURCE_DIR}/src/helpers/exeScanner.c
     ${CMAKE_SOURCE_DIR}/resources/clamscan.rc)

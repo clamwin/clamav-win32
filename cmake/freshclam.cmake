@@ -27,6 +27,7 @@ add_executable(freshclam
     ${CLAMAV}/shared/misc.c
     ${CLAMAV}/shared/clamdcom.c
     ${CMAKE_SOURCE_DIR}/src/helpers/cw_main.c
+    ${CMAKE_SOURCE_DIR}/src/helpers/crashdump.c
     ${CMAKE_SOURCE_DIR}/src/helpers/service.c
     ${CMAKE_SOURCE_DIR}/resources/freshclam.rc)
 

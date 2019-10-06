@@ -6,6 +6,7 @@ add_executable(clamd
     ${CLAMAV}/shared/clamdcom.c
     ${CLAMAV}/shared/idmef_logging.c
     ${CMAKE_SOURCE_DIR}/src/helpers/cw_main.c
+    ${CMAKE_SOURCE_DIR}/src/helpers/crashdump.c
     ${CMAKE_SOURCE_DIR}/src/helpers/service.c
     ${CMAKE_SOURCE_DIR}/src/helpers/win32poll.c
     ${CMAKE_SOURCE_DIR}/resources/clamd.rc)
