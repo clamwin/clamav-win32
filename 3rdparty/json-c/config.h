@@ -223,4 +223,6 @@
 #include <io.h>
 
 /* gnulib */
+#if !defined(_MSC_VER) || (_MSC_VER < 1700)
 extern long long int strtoll(const char *nptr, char **endptr, int base);
+#endif

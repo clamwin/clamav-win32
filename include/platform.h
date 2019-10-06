@@ -76,7 +76,9 @@ extern BOOL WINAPI cw_stop_ctrl_handler(DWORD CtrlType);
 extern char *strtok_r(char *s, const char *delim, char **save_ptr);
 extern struct tm *localtime_r(time_t const *t, struct tm *tp);
 extern char *strptime (const char *buf, const char *format, struct tm *tm);
+#if defined(_MSC_VER) && (_MSC_VER <= 1400)
 extern long long int strtoll(const char *nptr, char **endptr, int base);
+#endif
 #endif
 
 /* Re_routing */

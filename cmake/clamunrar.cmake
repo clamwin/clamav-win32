@@ -19,12 +19,16 @@ list(APPEND clamunrar_srcs
     ${CMAKE_SOURCE_DIR}/resources/libclamunrar.rc
     ${CMAKE_SOURCE_DIR}/libclamunrar.def)
 
-link_directories(${3RDPARTY}/libunicows)
-
 add_library(clamunrar SHARED ${clamunrar_srcs})
 target_compile_definitions(clamunrar PRIVATE HAVE_CONFIG_H RARDLL)
-target_link_libraries(clamunrar PRIVATE unicows)
 set_target_properties(clamunrar PROPERTIES DEFINE_SYMBOL "")
+
+if(MINGW)
+    find_library(UNICOWS_LIBRARY
+        NAMES unicows libunicows
+        HINTS "${3RDPARTY}/libunicows")
+    target_link_libraries(clamunrar PRIVATE ${UNICOWS_LIBRARY})
+endif()
 
 add_library(clamunrar_iface SHARED
     ${CLAMAV}/libclamunrar_iface/unrar_iface.cpp

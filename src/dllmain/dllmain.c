@@ -419,6 +419,14 @@ int cw_init(void)
 
 void fix_paths();
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1900)
+FILE* __cdecl __iob_func(void)
+{
+	FILE _iob[] = { *stdin, *stdout, *stderr };
+	return _iob;
+}
+#endif
+
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
 {
     switch (reason)

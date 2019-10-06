@@ -18,9 +18,28 @@ list(APPEND libclamav_srcs ${libclamav_dllmain})
 
 if(MINGW)
     list(APPEND libclamav_srcs ${CMAKE_SOURCE_DIR}/src/dllmain/pthread-mingw.c)
+else()
+    list(APPEND libclamav_srcs ${3RDPARTY}/pthreads/pthread.c)
 endif()
 
-link_directories(${3RDPARTY}/openssl/lib/mingw32)
+if(MINGW)
+    set(OPENSSL_LIBRARY_PATH ${3RDPARTY}/openssl/lib/mingw32)
+elseif(CMAKE_CL_64)
+    set(OPENSSL_LIBRARY_PATH ${3RDPARTY}/openssl/lib/x64)
+else()
+    set(OPENSSL_LIBRARY_PATH ${3RDPARTY}/openssl/lib/Win32)
+endif()
+
+find_library(OPENSSL_SSL_LIBRARY
+    NAMES ssl libssl
+    HINTS ${OPENSSL_LIBRARY_PATH}
+)
+
+find_library(OPENSSL_CRYPTO_LIBRARY
+    NAMES crypto libcrypto
+    HINTS ${OPENSSL_LIBRARY_PATH}
+)
+
 add_library(clamav SHARED
     ${libclamav_srcs}
     ${CMAKE_SOURCE_DIR}/resources/libclamav.rc
@@ -34,14 +53,18 @@ target_link_libraries(clamav PRIVATE
     xml2
     clammspack
     gnulib
-    ssl
-    crypto
+    ${OPENSSL_SSL_LIBRARY}
+    ${OPENSSL_CRYPTO_LIBRARY}
     ws2_32)
+
+if(NOT MINGW)
+target_link_libraries(clamav PRIVATE legacy_stdio_definitions)
+endif()
 
 set_target_properties(clamav PROPERTIES DEFINE_SYMBOL LIBCLAMAV_EXPORTS)
 
 target_include_directories(clamav PRIVATE
-    ${3RDPARTY}/pthreads
+    ${3RDPARTY}/bzip2
     ${3RDPARTY}/json-c
     ${3RDPARTY}/libxml2/include
     ${CLAMAV}/libclamav
