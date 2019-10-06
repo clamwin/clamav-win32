@@ -83,6 +83,7 @@ extern long long int strtoll(const char *nptr, char **endptr, int base);
 extern int cw_stat(const char *path, struct stat *buf);
 extern int cw_unlink(const char *pathname);
 extern int cw_rename(const char *oldname, const char *newname);
+extern int cw_rmdirs(const char *dirname);
 
 #define lstat           cw_stat
 #undef stat
