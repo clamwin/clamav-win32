@@ -526,8 +526,8 @@ void fix_paths()
 
     if (!cw_getregvalue("DataDir", _DATADIR))
     {
-        strncpy(_DATADIR, _CONFDIR, MAX_PATH);
-        strncat(_DATADIR, "\\db", MAX_PATH);
+        strncpy(_DATADIR, _CONFDIR, MAX_PATH - 1);
+        strncat(_DATADIR, "\\db", MAX_PATH - strlen(_DATADIR) - 1);
     }
 
     snprintf(_CONFDIR_CLAMD, sizeof(_CONFDIR_CLAMD), "%s\\%s", _CONFDIR, "clamd.conf");
