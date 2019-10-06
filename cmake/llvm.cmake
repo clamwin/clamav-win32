@@ -1,6 +1,16 @@
 include(cmake/llvm-sources.cmake)
-
 list(TRANSFORM llvm_srcs PREPEND ${CLAMAV}/libclamav/c++/)
+
+if(CMAKE_CL_64)
+    enable_language(ASM_MASM)
+    set(X86CompilationCallback_Win64 ${CLAMAV}/libclamav/c++/llvm/lib/Target/X86/X86CompilationCallback_Win64.asm)
+    ADD_CUSTOM_COMMAND(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/X86CompilationCallback_Win64.obj
+        COMMAND ${CMAKE_ASM_MASM_COMPILER} /Fo ${CMAKE_CURRENT_BINARY_DIR}/X86CompilationCallback_Win64.obj /c ${X86CompilationCallback_Win64}
+        DEPENDS ${X86CompilationCallback_Win64})
+    set(llvm_srcs ${llvm_srcs} ${CMAKE_CURRENT_BINARY_DIR}/X86CompilationCallback_Win64.obj)
+endif()
+
 add_library(libclamav_llvm SHARED
     ${llvm_srcs}
     ${CMAKE_SOURCE_DIR}/resources/libclamav_llvm.rc
