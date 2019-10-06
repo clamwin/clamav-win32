@@ -32,5 +32,4 @@ include(cmake/clamdscan.cmake)
 include(cmake/clamscan.cmake)
 include(cmake/freshclam.cmake)
 include(cmake/sigtool.cmake)
-
-include(cmake/clamunrar.cmake)
+include(cmake/libclamunrar.cmake)

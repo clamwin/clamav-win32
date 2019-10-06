@@ -8,7 +8,6 @@ set(libxml2_srcs
     xmlreader.c relaxng.c dict.c SAX2.c
     xmlwriter.c legacy.c chvalid.c pattern.c xmlsave.c
     xmlmodule.c schematron.c xzlib.c)
-
 list(TRANSFORM libxml2_srcs PREPEND ${3RDPARTY}/libxml2/)
 
 add_library(xml2 STATIC ${libxml2_srcs})

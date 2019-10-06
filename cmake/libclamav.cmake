@@ -40,12 +40,21 @@ find_library(OPENSSL_CRYPTO_LIBRARY
     HINTS ${OPENSSL_LIBRARY_PATH}
 )
 
-add_library(clamav SHARED
+add_library(libclamav SHARED
     ${libclamav_srcs}
     ${CMAKE_SOURCE_DIR}/resources/libclamav.rc
     ${CMAKE_SOURCE_DIR}/libclamav.def)
 
-target_link_libraries(clamav PRIVATE
+target_include_directories(libclamav PRIVATE
+    ${3RDPARTY}/bzip2
+    ${3RDPARTY}/json-c
+    ${3RDPARTY}/libxml2/include
+    ${CLAMAV}/libclamav
+    ${CLAMAV}/libclammspack/mspack)
+
+target_compile_definitions(libclamav PRIVATE HAVE_CONFIG_H PCRE2_STATIC PTW32_STATIC_LIB LIBXML_STATIC BZ_IMPORT)
+
+target_link_libraries(libclamav PRIVATE
     zlib
     bzip2
     pcre2
@@ -58,16 +67,10 @@ target_link_libraries(clamav PRIVATE
     ws2_32)
 
 if(NOT MINGW)
-target_link_libraries(clamav PRIVATE legacy_stdio_definitions)
+target_link_libraries(libclamav PRIVATE legacy_stdio_definitions)
 endif()
 
-set_target_properties(clamav PROPERTIES DEFINE_SYMBOL LIBCLAMAV_EXPORTS)
-
-target_include_directories(clamav PRIVATE
-    ${3RDPARTY}/bzip2
-    ${3RDPARTY}/json-c
-    ${3RDPARTY}/libxml2/include
-    ${CLAMAV}/libclamav
-    ${CLAMAV}/libclammspack/mspack)
-
-target_compile_definitions(clamav PRIVATE HAVE_CONFIG_H PCRE2_STATIC PTW32_STATIC_LIB LIBXML_STATIC BZ_IMPORT)
+set_target_properties(libclamav PROPERTIES
+    DEFINE_SYMBOL LIBCLAMAV_EXPORTS
+    PREFIX ""
+    OUTPUT_NAME libclamav)
