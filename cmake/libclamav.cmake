@@ -52,7 +52,7 @@ target_include_directories(libclamav PRIVATE
     ${CLAMAV}/libclamav
     ${CLAMAV}/libclammspack/mspack)
 
-target_compile_definitions(libclamav PRIVATE HAVE_CONFIG_H PCRE2_STATIC PTW32_STATIC_LIB LIBXML_STATIC BZ_IMPORT)
+target_compile_definitions(libclamav PRIVATE HAVE_CONFIG_H PCRE2_STATIC PTW32_STATIC_LIB LIBXML_STATIC NOBZ2PREFIX)
 
 target_link_libraries(libclamav PRIVATE
     zlib
