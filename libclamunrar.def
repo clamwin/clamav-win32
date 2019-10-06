@@ -1,7 +1,13 @@
 EXPORTS
 
+RAROpenArchiveEx@4=RAROpenArchiveEx
+RARReadHeaderEx@8=RARReadHeaderEx
+RARSetCallback@12=RARSetCallback
+RARProcessFile@16=RARProcessFile
+RARCloseArchive@4=RARCloseArchive
+
 RAROpenArchiveEx
-RARCloseArchive
 RARReadHeaderEx
-RARProcessFile
 RARSetCallback
+RARProcessFile
+RARCloseArchive
