@@ -34,3 +34,5 @@ add_executable(freshclam
 target_include_directories(freshclam PRIVATE ${CLAMAV}/libclamav)
 target_compile_definitions(freshclam PRIVATE HAVE_CONFIG_H)
 target_link_libraries(freshclam libfreshclam libclamav ws2_32)
+
+list(APPEND CLAMAV_INSTALL_TARGETS freshclam libfreshclam)

@@ -33,3 +33,5 @@ if(MSVC)
     target_compile_options(libclamav_llvm PRIVATE
         /wd4065 /wd4146 /wd4244 /wd4267 /wd4312 /wd4319 /wd4334 /wd4624 /wd4838)
 endif()
+
+list(APPEND CLAMAV_INSTALL_TARGETS libclamav_llvm)

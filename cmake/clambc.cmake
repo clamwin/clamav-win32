@@ -11,3 +11,5 @@ add_executable(clambc
 target_include_directories(clambc PRIVATE ${CLAMAV}/libclamav)
 target_compile_definitions(clambc PRIVATE HAVE_CONFIG_H)
 target_link_libraries(clambc PRIVATE libclamav ws2_32)
+
+list(APPEND CLAMAV_INSTALL_TARGETS clambc)

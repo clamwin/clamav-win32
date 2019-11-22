@@ -13,3 +13,5 @@ add_executable(sigtool
 target_include_directories(sigtool PRIVATE ${CLAMAV}/libclamav)
 target_compile_definitions(sigtool PRIVATE HAVE_CONFIG_H)
 target_link_libraries(sigtool PRIVATE libclamav ws2_32)
+
+list(APPEND CLAMAV_INSTALL_TARGETS sigtool)

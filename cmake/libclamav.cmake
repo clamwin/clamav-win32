@@ -1,9 +1,15 @@
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set (ARCH x64)
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    set (ARCH x86)
+endif()
+
 if(MINGW)
-    set(OPENSSL_LIBRARY_PATH ${3RDPARTY}/openssl/lib/mingw32)
-elseif(CMAKE_CL_64)
-    set(OPENSSL_LIBRARY_PATH ${3RDPARTY}/openssl/lib/x64)
+    set(OPENSSL_LIBRARY_PATH ${3RDPARTY}/openssl/lib/mingw/${ARCH})
+elseif(MSVC)
+    set(OPENSSL_LIBRARY_PATH ${3RDPARTY}/openssl/lib/msvc/${ARCH})
 else()
-    set(OPENSSL_LIBRARY_PATH ${3RDPARTY}/openssl/lib/Win32)
+    message(FATAL_ERROR "Unsupported compiler")
 endif()
 
 find_library(OPENSSL_SSL_LIBRARY
@@ -75,3 +81,9 @@ set_target_properties(libclamav PROPERTIES
     DEFINE_SYMBOL LIBCLAMAV_EXPORTS
     PREFIX ""
     OUTPUT_NAME libclamav)
+
+if(MSVC)
+    set_target_properties(libclamav PROPERTIES PUBLIC_HEADER ${CLAMAV}/libclamav/clamav.h)
+endif()
+
+list(APPEND CLAMAV_INSTALL_TARGETS libclamav)

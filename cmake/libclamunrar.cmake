@@ -26,7 +26,7 @@ set_target_properties(libclamunrar PROPERTIES
     PREFIX ""
     OUTPUT_NAME libclamunrar)
 
-if(MINGW OR NOT CMAKE_CL_64)
+if(MINGW)
     find_library(UNICOWS_LIBRARY
         NAMES libunicows.a unicows libunicows
         HINTS ${3RDPARTY}/libunicows
@@ -45,3 +45,5 @@ set_target_properties(libclamunrar_iface PROPERTIES
     DEFINE_SYMBOL ""
     PREFIX ""
     OUTPUT_NAME libclamunrar_iface)
+
+list(APPEND CLAMAV_INSTALL_TARGETS libclamunrar libclamunrar_iface)

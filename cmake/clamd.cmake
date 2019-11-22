@@ -14,3 +14,5 @@ add_executable(clamd
 target_include_directories(clamd PRIVATE ${CLAMAV}/libclamav)
 target_compile_definitions(clamd PRIVATE HAVE_CONFIG_H)
 target_link_libraries(clamd PRIVATE libclamav ws2_32)
+
+list(APPEND CLAMAV_INSTALL_TARGETS clamd)

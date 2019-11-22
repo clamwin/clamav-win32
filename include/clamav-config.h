@@ -629,7 +629,7 @@
 #define USING_PCRE2 1
 
 /* Stable releases tag */
-#define CLAMWIN_RELEASE "0.102"
+#define CLAMWIN_RELEASE "0.102.1"
 
 /* Version number of package */
 #ifdef CLAMWIN_RELEASE
