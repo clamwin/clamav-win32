@@ -38,7 +38,9 @@ include(cmake/freshclam.cmake)
 include(cmake/sigtool.cmake)
 include(cmake/libclamunrar.cmake)
 
-include(cmake/llvm.cmake)
+if(NOT DISABLE_LLVM)
+    include(cmake/llvm.cmake)
+endif()
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT clamscan)
 
