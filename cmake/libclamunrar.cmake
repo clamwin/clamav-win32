@@ -26,7 +26,7 @@ set_target_properties(libclamunrar PROPERTIES
     PREFIX ""
     OUTPUT_NAME libclamunrar)
 
-if(MINGW)
+if((MINGW) AND (CLAMAV_ARCH STREQUAL "x86"))
     find_library(UNICOWS_LIBRARY
         NAMES libunicows.a unicows libunicows
         HINTS ${3RDPARTY}/libunicows

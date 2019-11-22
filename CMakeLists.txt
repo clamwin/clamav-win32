@@ -23,6 +23,12 @@ elseif(MSVC)
     add_compile_options(/wd4996 /wd4005)
 endif()
 
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set (CLAMAV_ARCH x64)
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    set (CLAMAV_ARCH x86)
+endif()
+
 include(cmake/gnulib.cmake)
 include(cmake/zlib.cmake)
 include(cmake/bzip2.cmake)
