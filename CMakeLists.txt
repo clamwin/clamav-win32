@@ -46,6 +46,9 @@ include(cmake/freshclam.cmake)
 include(cmake/sigtool.cmake)
 include(cmake/libclamunrar.cmake)
 
+include(cmake/pdcurses.cmake)
+include(cmake/clamdtop.cmake)
+
 if(NOT DISABLE_LLVM)
     include(cmake/llvm.cmake)
 endif()

@@ -36,7 +36,7 @@
 /* #undef CONFDIR */
 
 /* curses header location */
-#undef CURSES_INCLUDE
+#define CURSES_INCLUDE "curses.h"
 
 /* os is aix */
 #undef C_AIX
