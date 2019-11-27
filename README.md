@@ -40,18 +40,8 @@ Clone repository using:
   paths can be also `REG_EXPAND_SZ`, environment variables are
   allowed here (i.e. you can use paths like `%HomeDrive%\ClamAV`).
 
-* To use binaries compiled with Visual Studio 2005,
-  you need the msvcrt80 side by side assembly, the "simple way" is
-  uncompress Microsoft.VC80.CRT.zip in the directory of executables,
-  the directory Microsoft.VC80.CRT must be placed as is, putting
-  directly dlls in the same directory of the executable will not work.
-  On windows 9x you should put the dll and the manifest in windows
-  system directory without the `Microsoft.VC80.CRT` directory.
-  For more info about this refer to the relative msdn-page.
-  You can also download the redist package directly from Microsoft.
-
-* libclamunrar needs `unicows.dll` when used on Windows 9x, it's bundled
-  in the archive, you can safely remove it if not using Windows 9x
+* libclamunrar needs `unicows.dll` when used on Windows 9x, you can download from
+  [Microsoft Layer for Unicode](https://www.microsoft.com/en-us/download/details.aspx?id=4237)
 
 ## Running Clamd and FreshClam as daemon
 
