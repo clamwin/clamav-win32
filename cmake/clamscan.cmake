@@ -13,3 +13,5 @@ add_executable(clamscan
 target_include_directories(clamscan PRIVATE ${CLAMAV}/libclamav)
 target_compile_definitions(clamscan PRIVATE HAVE_CONFIG_H)
 target_link_libraries(clamscan PRIVATE libclamav ws2_32 iphlpapi)
+
+list(APPEND CLAMAV_INSTALL_TARGETS clamscan)
