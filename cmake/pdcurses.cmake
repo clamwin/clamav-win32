@@ -15,3 +15,5 @@ set(pdc_src_files
 
 add_library(PDCurses STATIC ${pdc_src_files} ${pdcurses_src_files})
 target_include_directories(PDCurses PRIVATE ${PDCURSES})
+
+install(FILES ${PDCURSES}/README.md DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME PDCurses-README.md)

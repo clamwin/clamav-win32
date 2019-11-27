@@ -8,3 +8,5 @@ list(TRANSFORM pcre2_srcs PREPEND ${3RDPARTY}/pcre2/src/)
 add_library(pcre2 STATIC ${pcre2_srcs})
 target_compile_definitions(pcre2 PRIVATE PCRE2_STATIC HAVE_CONFIG_H)
 set_target_properties(pcre2 PROPERTIES OUTPUT_NAME pcre2-8)
+
+install(FILES ${3RDPARTY}/pcre2/LICENCE DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME COPYING.pcre2)
