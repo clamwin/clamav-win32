@@ -40,17 +40,16 @@ DWORD WINAPI CrashMiniDumpWriteDumpProc(LPVOID lpParam)
     LPBYTE lpMapAddress = NULL;
     BY_HANDLE_FILE_INFORMATION FileInformation;
     HMODULE hDll = NULL;
-    char dumpfile[MAX_PATH] = "";
+    char dumpfile[MAX_PATH];
     char executable[MAX_PATH] = "Unknown module";
-    char *lSlash = NULL;
+    char *lSlash;
     unsigned int i;
 
     GetModuleFileNameA(NULL, executable, MAX_PATH - 1);
     GetTempPathA(MAX_PATH - 1, dumpfile);
 
     lSlash = strrchr(executable, '\\');
-    strncat(dumpfile, lSlash ? lSlash + 1: "Unknown", MAX_PATH - 1 - strlen(dumpfile));
-    dumpfile[MAX_PATH - 1] = 0;
+    snprintf(&dumpfile[strlen(dumpfile)], MAX_PATH - strlen(dumpfile) - 1, "%s.%08lx.dmp", lSlash ? lSlash + 1 : "Unknown", GetCurrentProcessId());
 
     fprintf(stderr, "*** ClamWinDumper ***\n"
                     "*** %s Crashed\n"
@@ -66,12 +65,13 @@ DWORD WINAPI CrashMiniDumpWriteDumpProc(LPVOID lpParam)
     /* Try to get dll from executable directory, win2k dbghelp misses symbols */
     if (lSlash)
     {
-        strcpy(lSlash + 1, "dbghelp.dll");
+        strncpy(lSlash + 1, "dbghelp.dll", MAX_PATH - strlen(executable) - 1); // plus some chars but who cares
         hDll = LoadLibraryA(executable);
     }
 
     /* Load the version provided by the environment */
-    if (!hDll) hDll = LoadLibraryA("dbghelp.dll");
+    if (!hDll)
+        hDll = LoadLibraryA("dbghelp.dll");
 
     if (!hDll)
     {
@@ -87,7 +87,6 @@ DWORD WINAPI CrashMiniDumpWriteDumpProc(LPVOID lpParam)
         goto cleanup;
     }
 
-    strncat(dumpfile, ".dmp", MAX_PATH - 1 - strlen(dumpfile));
     hFile = CreateFileA(dumpfile, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
     if (hFile == INVALID_HANDLE_VALUE)
@@ -106,7 +105,7 @@ DWORD WINAPI CrashMiniDumpWriteDumpProc(LPVOID lpParam)
         goto cleanup;
     }
 
-#ifndef _WIN64
+#if 0
     /* Now scramble it by xor-ing with 42, to avoid false positives on the dump file */
     hMapFile = CreateFileMappingA(hFile, NULL, PAGE_READWRITE, 0, 0, "libClamAVDumper");
 
