@@ -1,68 +1,72 @@
 EXPORTS
 
-; Engine management
-cl_engine_addref
-cl_engine_compile
-cl_engine_free
-cl_engine_get_num
-cl_engine_get_str
-cl_engine_new
-cl_engine_set_clcb_hash
-cl_engine_set_clcb_meta
-cl_engine_set_clcb_post_scan
-cl_engine_set_clcb_pre_cache
-cl_engine_set_clcb_pre_scan
-cl_engine_set_clcb_progress
-cl_engine_set_clcb_sigload
-cl_engine_set_clcb_stats_get_hostid
-cl_engine_set_clcb_stats_submit
-cl_engine_set_clcb_virus_found
-cl_engine_set_num
-cl_engine_set_str
-cl_engine_settings_apply
-cl_engine_settings_copy
-cl_engine_settings_free
-cl_engine_stats_enable
-cl_init
-cl_load
-cl_retdbdir
-cl_scandesc_callback
-cl_scanfile_callback
-cl_set_clcb_msg
-
-; hash
-cl_always_gen_section_hash
-cl_finish_hash
-cl_hash_data
-cl_hash_destroy
-cl_hash_init
-cl_initialize_crypto
-cl_cleanup_crypto
-cl_sha1
-cl_update_hash
-
-; Scanning
-cl_scandesc
-cl_scanfile
-
-; Versions
-cl_retflevel
-cl_retver
-
-; CVD handlers
+; public symbols
+cl_cvdfree
 cl_cvdhead
 cl_cvdparse
 cl_cvdverify
-cl_cvdfree
-
-; Database stat functions
-cl_statinidir
+cl_debug
+cl_init
+cl_engine_new
+cl_engine_set_num
+cl_engine_get_num
+cl_engine_set_str
+cl_engine_get_str
+cl_engine_set_clcb_hash
+cl_engine_set_clcb_meta
+cl_engine_set_clcb_file_props
+cl_set_clcb_msg
+cl_engine_set_clcb_pre_scan
+cl_engine_set_clcb_post_scan
+cl_engine_set_clcb_progress
+cl_engine_set_clcb_virus_found
+cl_engine_set_clcb_sigload
+cl_engine_set_clcb_pre_cache
+cl_engine_settings_copy
+cl_engine_settings_apply
+cl_engine_settings_free
+cl_engine_compile
+cl_engine_addref
+cl_engine_free
+cl_load
+cl_retdbdir
+cl_retflevel
+cl_retver
+cl_scandesc
+cl_scandesc_callback
+cl_scanfile
+cl_scanfile_callback
 cl_statchkdir
 cl_statfree
-
-; Logging functions
-cl_debug
+cl_statinidir
+cl_countsigs
 cl_strerror
+cl_fmap_open_handle
+cl_fmap_open_memory
+cl_scanmap_callback
+cl_fmap_close
+cl_always_gen_section_hash
+cl_engine_set_stats_set_cbdata
+cl_engine_set_clcb_stats_add_sample
+cl_engine_set_clcb_stats_remove_sample
+cl_engine_set_clcb_stats_decrement_count
+cl_engine_set_clcb_stats_submit
+cl_engine_set_clcb_stats_flush
+cl_engine_set_clcb_stats_get_num
+cl_engine_set_clcb_stats_get_size
+cl_engine_set_clcb_stats_get_hostid
+cl_hash_init
+cl_update_hash
+cl_finish_hash
+cl_hash_destroy
+cl_engine_stats_enable
+lsig_sub_matched
+
+; needed by llvm
+cl_hash_data
+
+; needed by frontends
+cl_initialize_crypto
 
 ; ClamWin specific
 cw_init
