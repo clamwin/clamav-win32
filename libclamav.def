@@ -172,6 +172,8 @@ cli_free_vba_project                @153 NONAME
 ; 0.102
 cli_check_auth_header               @154 NONAME
 cli_realloc                         @155 NONAME
+; 0.102.2
+cli_gentemp_with_prefix             @156 NONAME
 
 html_normalise_map                  @160 NONAME
 text_normalize_init                 @161 NONAME
