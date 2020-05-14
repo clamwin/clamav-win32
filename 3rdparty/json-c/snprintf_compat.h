@@ -13,6 +13,7 @@
 
 #include <stdarg.h>
 
+/* sherpya: vasprintf from gnulib */
 #define snprintf gnulib_snprintf
 extern int gnulib_snprintf(char *str, size_t size, const char *format, ...);
 
@@ -38,7 +39,7 @@ static int json_c_snprintf(char *str, size_t size, const char *format, ...)
 #define snprintf json_c_snprintf
 
 #elif !defined(HAVE_SNPRINTF) /* !HAVE_SNPRINTF */
-# error Need vsnprintf!
+#error Need vsnprintf!
 #endif /* !HAVE_SNPRINTF && defined(WIN32) */
 
 #endif /* __snprintf_compat_h */

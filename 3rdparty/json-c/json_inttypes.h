@@ -16,9 +16,8 @@
 #include <stdint.h>
 
 #define PRId64 "I64d"
-#ifndef SCNd64
 #define SCNd64 "I64d"
-#endif
+#define PRIu64 "I64u"
 
 #endif
 
