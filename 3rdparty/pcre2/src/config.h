@@ -33,11 +33,11 @@ sure both macros are undefined; an emulation function will then be used. */
    value), this is changed so that backslash-R matches only CR, LF, or CRLF.
    The build-time default can be overridden by the user of PCRE2 at runtime.
    */
-#undef BSR_ANYCRLF
+/* #undef BSR_ANYCRLF */
 
 /* Define to any value to disable the use of the z and t modifiers in
    formatting settings such as %zu or %td (this is rarely needed). */
-#undef DISABLE_PERCENT_ZT
+/* #undef DISABLE_PERCENT_ZT */
 
 /* If you are compiling for a system that uses EBCDIC instead of ASCII
    character codes, define this macro to any value. When EBCDIC is set, PCRE2
@@ -45,15 +45,18 @@ sure both macros are undefined; an emulation function will then be used. */
    macro, PCRE2 will assume input strings are ASCII or UTF-8/16/32 Unicode. It
    is not possible to build a version of PCRE2 that supports both EBCDIC and
    UTF-8/16/32. */
-#undef EBCDIC
+/* #undef EBCDIC */
 
 /* In an EBCDIC environment, define this macro to any value to arrange for the
    NL character to be 0x25 instead of the default 0x15. NL plays the role that
    LF does in an ASCII/Unicode environment. */
-#undef EBCDIC_NL25
+/* #undef EBCDIC_NL25 */
+
+/* Define this if your compiler supports __attribute__((uninitialized)) */
+/* #undef HAVE_ATTRIBUTE_UNINITIALIZED */
 
 /* Define to 1 if you have the `bcopy' function. */
-#undef HAVE_BCOPY
+/* #undef HAVE_BCOPY */
 
 /* Define to 1 if you have the <bzlib.h> header file. */
 #define HAVE_BZLIB_H 1
@@ -65,16 +68,19 @@ sure both macros are undefined; an emulation function will then be used. */
 #define HAVE_DLFCN_H 1
 
 /* Define to 1 if you have the <editline/readline.h> header file. */
-#undef HAVE_EDITLINE_READLINE_H
+/* #undef HAVE_EDITLINE_READLINE_H */
 
 /* Define to 1 if you have the <edit/readline/readline.h> header file. */
-#undef HAVE_EDIT_READLINE_READLINE_H
+/* #undef HAVE_EDIT_READLINE_READLINE_H */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1
+
+/* Define to 1 if you have the `memfd_create' function. */
+/* #undef HAVE_MEMFD_CREATE */
 
 /* Define to 1 if you have the `memmove' function. */
 #define HAVE_MEMMOVE 1
@@ -83,22 +89,22 @@ sure both macros are undefined; an emulation function will then be used. */
 #define HAVE_MEMORY_H 1
 
 /* Define to 1 if you have the `mkostemp' function. */
-#undef HAVE_MKOSTEMP
+/* #undef HAVE_MKOSTEMP */
 
 /* Define if you have POSIX threads libraries and header files. */
 #define HAVE_PTHREAD 1
 
 /* Have PTHREAD_PRIO_INHERIT. */
-#undef HAVE_PTHREAD_PRIO_INHERIT
+/* #undef HAVE_PTHREAD_PRIO_INHERIT */
 
 /* Define to 1 if you have the <readline/history.h> header file. */
-#undef HAVE_READLINE_HISTORY_H
+/* #undef HAVE_READLINE_HISTORY_H */
 
 /* Define to 1 if you have the <readline/readline.h> header file. */
-#undef HAVE_READLINE_READLINE_H
+/* #undef HAVE_READLINE_READLINE_H */
 
 /* Define to 1 if you have the `secure_getenv' function. */
-#undef HAVE_SECURE_GETENV
+/* #undef HAVE_SECURE_GETENV */
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
@@ -122,13 +128,13 @@ sure both macros are undefined; an emulation function will then be used. */
 #define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <sys/wait.h> header file. */
-#undef HAVE_SYS_WAIT_H
+/* #undef HAVE_SYS_WAIT_H */
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
 /* Define to 1 if the compiler supports simple visibility declarations. */
-#undef HAVE_VISIBILITY
+/* #undef HAVE_VISIBILITY */
 
 /* Define to 1 if you have the <windows.h> header file. */
 #define HAVE_WINDOWS_H 1
@@ -149,7 +155,7 @@ sure both macros are undefined; an emulation function will then be used. */
 #define LINK_SIZE 2
 
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
-#undef LT_OBJDIR
+/* #undef LT_OBJDIR */
 
 /* The value of MATCH_LIMIT determines the default number of times the
    pcre2_match() function can record a backtrack position during a single
@@ -183,7 +189,7 @@ sure both macros are undefined; an emulation function will then be used. */
 #define MAX_NAME_SIZE 32
 
 /* Defining NEVER_BACKSLASH_C locks out the use of \C in all patterns. */
-#undef NEVER_BACKSLASH_C
+/* #undef NEVER_BACKSLASH_C */
 
 /* The value of NEWLINE_DEFAULT determines the default newline character
    sequence. PCRE2 client programs can override this by selecting other values
@@ -201,7 +207,7 @@ sure both macros are undefined; an emulation function will then be used. */
 #define PACKAGE_NAME "PCRE2"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "PCRE2 10.34"
+#define PACKAGE_STRING "PCRE2 10.35"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "pcre2"
@@ -210,7 +216,7 @@ sure both macros are undefined; an emulation function will then be used. */
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "10.34"
+#define PACKAGE_VERSION "10.35"
 
 /* The value of PARENS_NEST_LIMIT specifies the maximum depth of nested
    parentheses (of any kind) in a pattern. This limits the amount of system
@@ -232,16 +238,16 @@ sure both macros are undefined; an emulation function will then be used. */
 #define PCRE2GREP_MAX_BUFSIZE 1048576
 
 /* to make a symbol visible */
-#undef PCRE2POSIX_EXP_DECL
+/* #undef PCRE2POSIX_EXP_DECL */
 
 /* to make a symbol visible */
-#undef PCRE2POSIX_EXP_DEFN
+/* #undef PCRE2POSIX_EXP_DEFN */
 
 /* Define to any value to include debugging code. */
-#undef PCRE2_DEBUG
+/* #undef PCRE2_DEBUG */
 
 /* to make a symbol visible */
-#undef PCRE2_EXP_DECL
+/* #undef PCRE2_EXP_DECL */
 
 
 /* If you are compiling for a system other than a Unix-like system or
@@ -253,69 +259,69 @@ sure both macros are undefined; an emulation function will then be used. */
    This macro apears at the start of every exported function that is part
    of the external API. It does not appear on functions that are "external"
    in the C sense, but which are internal to the library. */
-#undef PCRE2_EXP_DEFN
+/* #undef PCRE2_EXP_DEFN */
 
 /* Define to any value if linking statically (TODO: make nice with Libtool) */
 #define PCRE2_STATIC 1
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
-#undef PTHREAD_CREATE_JOINABLE
+/* #undef PTHREAD_CREATE_JOINABLE */
 
 /* Define to any non-zero number to enable support for SELinux compatible
    executable memory allocator in JIT. Note that this will have no effect
    unless SUPPORT_JIT is also defined. */
-#undef SLJIT_PROT_EXECUTABLE_ALLOCATOR
+/* #undef SLJIT_PROT_EXECUTABLE_ALLOCATOR */
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
 /* Define to any value to enable support for Just-In-Time compiling. */
-#undef SUPPORT_JIT
+/* #undef SUPPORT_JIT */
 
 /* Define to any value to allow pcre2grep to be linked with libbz2, so that it
    is able to handle .bz2 files. */
-#undef SUPPORT_LIBBZ2
+/* #undef SUPPORT_LIBBZ2 */
 
 /* Define to any value to allow pcre2test to be linked with libedit. */
-#undef SUPPORT_LIBEDIT
+/* #undef SUPPORT_LIBEDIT */
 
 /* Define to any value to allow pcre2test to be linked with libreadline. */
-#undef SUPPORT_LIBREADLINE
+/* #undef SUPPORT_LIBREADLINE */
 
 /* Define to any value to allow pcre2grep to be linked with libz, so that it
    is able to handle .gz files. */
-#undef SUPPORT_LIBZ
+/* #undef SUPPORT_LIBZ */
 
 /* Define to any value to enable callout script support in pcre2grep. */
-#undef SUPPORT_PCRE2GREP_CALLOUT
+/* #undef SUPPORT_PCRE2GREP_CALLOUT */
 
 /* Define to any value to enable fork support in pcre2grep callout scripts.
    This will have no effect unless SUPPORT_PCRE2GREP_CALLOUT is also defined.
    */
-#undef SUPPORT_PCRE2GREP_CALLOUT_FORK
+/* #undef SUPPORT_PCRE2GREP_CALLOUT_FORK */
 
 /* Define to any value to enable JIT support in pcre2grep. Note that this will
    have no effect unless SUPPORT_JIT is also defined. */
-#undef SUPPORT_PCRE2GREP_JIT
+/* #undef SUPPORT_PCRE2GREP_JIT */
 
 /* Define to any value to enable the 16 bit PCRE2 library. */
-#undef SUPPORT_PCRE2_16
+/* #undef SUPPORT_PCRE2_16 */
 
 /* Define to any value to enable the 32 bit PCRE2 library. */
-#undef SUPPORT_PCRE2_32
+/* #undef SUPPORT_PCRE2_32 */
 
 /* Define to any value to enable the 8 bit PCRE2 library. */
-#define SUPPORT_PCRE2_8 1
+#define SUPPORT_PCRE2_8 /**/
 
 /* Define to any value to enable support for Unicode and UTF encoding. This
    will work even in an EBCDIC environment, but it is incompatible with the
    EBCDIC macro. That is, PCRE2 can support *either* EBCDIC code *or*
    ASCII/Unicode, but not both at once. */
-#undef SUPPORT_UNICODE
+/* #undef SUPPORT_UNICODE */
 
 /* Define to any value for valgrind support to find invalid memory reads. */
-#undef SUPPORT_VALGRIND
+/* #undef SUPPORT_VALGRIND */
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE
@@ -340,26 +346,24 @@ sure both macros are undefined; an emulation function will then be used. */
 
 
 /* Version number of package */
-#define VERSION "10.34"
+#define VERSION "10.35"
 
 /* Define to 1 if on MINIX. */
-#undef _MINIX
+/* #undef _MINIX */
 
 /* Define to 2 if the system does not provide POSIX.1 features except with
    this defined. */
-#undef _POSIX_1_SOURCE
+/* #undef _POSIX_1_SOURCE */
 
 /* Define to 1 if you need to in order for `stat' and other things to work. */
-#undef _POSIX_SOURCE
+/* #undef _POSIX_SOURCE */
 
 /* Define to empty if `const' does not conform to ANSI C. */
-#undef const
+/* #undef const */
 
 /* Define to the type of a signed integer type of width exactly 64 bits if
    such a type exists and the standard includes do not define it. */
-#undef int64_t
+/* #undef int64_t */
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
-#undef size_t
-
-#define PCRE2_CODE_UNIT_WIDTH 8
+/* #undef size_t */
