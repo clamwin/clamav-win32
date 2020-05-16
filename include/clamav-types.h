@@ -1,10 +1,10 @@
 /*
- *  Copyright (C) 2015-2018 Cisco Systems, Inc. and/or its affiliates. All rights reserved.
- *  Copyright (C) 2007-2008 Sourcefire, Inc.
+ *  Copyright (C) 2013-2020 Cisco Systems, Inc. and/or its affiliates. All rights reserved.
+ *  Copyright (C) 2007-2013 Sourcefire, Inc.
  *
  *  Authors: Tomasz Kojm, Micah Snyder
  *
- *  Nota bene: This file was constructed specifically for native Windows builds.
+ *  Warning: This file is generated with ./configure. Do not edit!
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -24,9 +24,7 @@
 #ifndef __CLAMAV_TYPES_H
 #define __CLAMAV_TYPES_H
 
-/* <inttypes.h> was added in VS2013, but will
- * continue to use <stdint.h> for now. */
-#include <stdint.h>
+#include <inttypes.h>
 
 /* Ensure we have print format types */
 /* PRIu64 should be in <inttypes.h> */

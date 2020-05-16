@@ -484,7 +484,7 @@
 #undef ICONV_CONST
 
 /* "Full clamav library version number" */
-#define LIBCLAMAV_FULLVER "9.0.2"
+#define LIBCLAMAV_FULLVER "9.0.4"
 
 /* "Major clamav library version number" */
 #define LIBCLAMAV_MAJORVER 9
@@ -629,7 +629,7 @@
 #define USING_PCRE2 1
 
 /* Stable releases tag */
-#define CLAMWIN_RELEASE "0.102.2"
+#define CLAMWIN_RELEASE "0.102.3"
 
 /* Version number of package */
 #ifdef CLAMWIN_RELEASE
