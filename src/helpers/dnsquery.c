@@ -26,73 +26,31 @@
 #include "others.h"
 #include "shared/output.h"
 
+/* I can't believe the vs2010 preprocessor pastes a macro after a dot */
+#undef DnsRecordListFree
+
+#if defined(__MINGW32__) && !defined(__MINGW64__)
+#include <resolv.h>
+/* including <iphlpapi.h> makes DATADIR define clash */
 DWORD WINAPI GetNetworkParams (PFIXED_INFO pFixedInfo, PULONG pOutBufLen);
 
 #define TCPIP_PARAMS "SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters"
 
-/* I can't believe the vs2010 preprocessor pastes a macro after a dot */
-#ifdef DnsRecordListFree
-#undef DnsRecordListFree
-#endif
-
-char *txtquery_dnsapi(const char *domain, unsigned int *ttl);
-char *txtquery_compat(const char *domain, unsigned int *ttl);
-
-#define NS_INT8SZ 1
-#define NS_PACKETSZ 512
-#define N_RETRY 5
-
-#define SETUINT16(x, v) *(uint16_t *) x = htons(v)
-
-#define GETUINT16(x) ntohs(*(uint16_t *) x)
-#define GETUINT32(x) ntohl(*(uint32_t *) x)
-
-/* Bound checks to avoid buffer overflows */
-#define NEED(len) \
-    /* printf("DNS Resolver: Need %d bytes - Have %d bytes\n", len, numbytes - (seek - reply)); */ \
-    if (((seek + len) - reply) > numbytes) \
-    { \
-        logg("!DNS Resolver: Bound Check failed - Bad packet\n"); \
-        return NULL; \
-    }
-
-#ifndef HAVE_ATTRIB_PACKED
-#define __attribute__(x)
-#endif
-
-#ifdef HAVE_PRAGMA_PACK
-#pragma pack(1)
-#endif
-
-typedef struct _simple_dns_query
-{
-    uint16_t transaction_id __attribute__ ((packed));
-    uint16_t flags __attribute__ ((packed));
-    uint16_t questions __attribute__ ((packed));
-    uint16_t ans_rrs __attribute__ ((packed));
-    uint16_t auth_rss __attribute__ ((packed));
-    uint16_t add_rss __attribute__ ((packed));
-    /* queries here */
-} simple_dns_query;
-
-#ifdef HAVE_PRAGMA_PACK
-#pragma pack()
-#endif
-
-char *dnsquery_dnsapi(const char *domain, int qtype, unsigned int *ttl);
-char *dnsquery_compat(const char *domain, int qtype, unsigned int *ttl);
+static char *dnsquery_dnsapi(const char *domain, int qtype, unsigned int *ttl);
+static char *dnsquery_compat(const char *domain, int qtype, unsigned int *ttl);
 
 /* Switcher */
 char *dnsquery(const char *domain, int qtype, unsigned int *ttl)
 {
     // FIXME: UH?? freshclam/dns.c:81
-    if ((qtype != DNS_TYPE_TEXT) && (qtype != DNS_TYPE_ANY))
+    if ((qtype != T_TXT) && (qtype != T_ANY))
     {
         if (ttl)
             *ttl = 2;
         return NULL;
     }
-    return ((isWin9x() || isOldOS()) ? dnsquery_compat(domain, qtype, ttl) : dnsquery_dnsapi(domain, qtype, ttl));
+
+    return (cw_helpers.dnsapi.ok ? dnsquery_dnsapi : dnsquery_compat)(domain, qtype, ttl);
 }
 
 static char *get_dns_fromreg(void)
@@ -101,13 +59,12 @@ static char *get_dns_fromreg(void)
     DWORD dwType = 0;
     unsigned char data[MAX_PATH];
     DWORD datalen = MAX_PATH - 1;
-    int i;
     char *keys[] = { "ClamWinNameServer", "NameServer", "DhcpNameServer", NULL };
 
     if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, TCPIP_PARAMS, 0, KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS)
         return NULL;
 
-    for (i = 0; keys[i]; i++)
+    for (int i = 0; keys[i]; i++)
     {
         datalen = MAX_PATH - 1;
         if ((RegQueryValueExA(hKey, keys[i], NULL, &dwType, data, &datalen) == ERROR_SUCCESS) &&
@@ -118,18 +75,18 @@ static char *get_dns_fromreg(void)
             if ((space = strchr(data, ' '))) *space = 0;
             if (inet_addr(data) == INADDR_NONE)
             {
-                /* printf("DNS Resolver: Found %s key: %s - invalid address\n", keys[i], data); */
+                logg("!DNS Resolver: Found %s key: %s - invalid address\n", keys[i], data);
                 return NULL;
             }
             else
             {
-                /* printf("DNS Resolver: Found %s key: %s\n", keys[i], data); */
+                logg("*DNS Resolver: using %s as DNS server from %s key\n", data, keys[i]);
                 return _strdup(data);
             }
         }
     }
 
-    /* printf("DNS Resolver: No nameservers found in registry\n"); */
+    logg("!DNS Resolver: No nameservers found in registry\n");
     RegCloseKey(hKey);
     return NULL;
 }
@@ -187,24 +144,73 @@ static char *get_dns(void)
     return dns_server;
 }
 
+static char *rcode_to_string(uint8_t rcode)
+{
+    static char *rcodes[] = {
+        /*  0 */ "No error",
+        /*  1 */ "Format error",
+        /*  2 */ "Server failure",
+        /*  3 */ "Non-Existent Domain",
+        /*  4 */ "Not Implemented",
+        /*  5 */ "Query Refused",
+        /*  6 */ "Name Exists when it should not",
+        /*  7 */ "RR Set Exists when it should not",
+        /*  8 */ "RR Set that should exist does not",
+        /*  9 */ "Server Not Authoritative for zone",
+        /* 10 */ "Name not contained in zone",
+        /* 11 */ "DSO-TYPE Not Implemented"
+    };
+
+    return (rcode < 12) ? rcodes[rcode] : "Unassigned";
+}
+
+/* courtesy of musl library, obfuscated c contest? ;)*/
+static int dn_expand(const unsigned char* base, const unsigned char* end, const unsigned char* src, char* dest, int space)
+{
+    const unsigned char* p = src;
+    char* dend, * dbegin = dest;
+    int len = -1, i, j;
+    if (p == end || space <= 0) return -1;
+    dend = dest + (space > 254 ? 254 : space);
+    /* detect reference loop using an iteration counter */
+    for (i = 0; i < end - base; i += 2) {
+        /* loop invariants: p<end, dest<dend */
+        if (*p & 0xc0) {
+            if (p + 1 == end) return -1;
+            j = ((p[0] & 0x3f) << 8) | p[1];
+            if (len < 0) len = p + 2 - src;
+            if (j >= end - base) return -1;
+            p = base + j;
+        }
+        else if (*p) {
+            if (dest != dbegin) *dest++ = '.';
+            j = *p++;
+            if (j >= end - p || j >= dend - dest) return -1;
+            while (j--) *dest++ = *p++;
+        }
+        else {
+            *dest = 0;
+            if (len < 0) len = p + 1 - src;
+            return len;
+        }
+    }
+    return -1;
+}
+
 static char *do_query(struct hostent *he, const char *domain, unsigned int *ttl)
 {
     struct sockaddr_in dns;
-    char *packet, *seek, *txtreply;
-    char reply[NS_PACKETSZ];
-    simple_dns_query query, *res;
-    int numbytes, addr_len, i;
-    int start, rev, len, off;
-    uint16_t tid;
-    int sockfd = -1;
+    char *packet, *txtreply;
+    unsigned char answer[NS_PACKETSZ], * answend, * pt;
+    unsigned int cttl, size, txtlen = 0;
+    HEADER query, *res;
+    ssize_t len;
+    int start, rev, off, type;
+    uint16_t id;
+    int sockfd;
     struct timeval tv;
-
-/* win32 random functions are enough here */
-#undef rand
-#undef srand
-    gettimeofday(&tv, NULL);
-    srand(tv.tv_usec + clock() + rand());
-    tid = rand();
+    char host[128];
+    int addr_len = sizeof(struct sockaddr);;
 
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
     {
@@ -219,11 +225,22 @@ static char *do_query(struct hostent *he, const char *domain, unsigned int *ttl)
 
     /* Generate the packet */
     memset(&query, 0, sizeof(query));
-    query.transaction_id = htons(tid);
-    query.flags = htons(0x0100); /* Request + Recursion */
-    query.questions = htons(1); /* 1 query */
 
-    len = sizeof(query) + NS_INT8SZ + (int) strlen(domain) + NS_INT8SZ + (2 * sizeof(uint16_t)); /* \0 + Type + Class */
+    /* win32 random functions are enough here */
+#undef rand
+#undef srand
+    gettimeofday(&tv, NULL);
+    srand(tv.tv_usec + clock() + rand());
+    id = rand();
+    query.id = htons(id);
+
+    /* ask for recursion */
+    query.rd = 1;
+
+    /* 1 query */
+    query.qdcount = htons(1);
+
+    len = sizeof(query) + NS_INT8SZ + (int) strlen(domain) + NS_INT8SZ + (2 * NS_INT16SZ); /* \0 + Type + Class */
     packet = (char *) cli_malloc(len);
 
     memcpy(packet, &query, sizeof(query));
@@ -234,7 +251,7 @@ static char *do_query(struct hostent *he, const char *domain, unsigned int *ttl)
     rev = start = off;
 
     /* String-ize */
-    for (i = (int) strlen(domain); i >= 0; i--)
+    for (int i = (int) strlen(domain); i >= 0; i--)
     {
         if (domain[i] != '.')
             packet[rev] = domain[i];
@@ -251,23 +268,25 @@ static char *do_query(struct hostent *he, const char *domain, unsigned int *ttl)
     packet[off++] = 0;
 
     /* Type TXT */
-    SETUINT16(&packet[off], DNS_TYPE_TEXT);
-    off += sizeof(uint16_t);
+    SETUINT16(&packet[off], T_TXT);
+    off += NS_INT16SZ;
 
     /* Class */
     SETUINT16(&packet[off], NS_INT8SZ);
-    off += sizeof(uint16_t);
+    off += NS_INT16SZ;
 
-    if ((numbytes = sendto(sockfd, packet, (int) len, 0, (struct sockaddr *) &dns, sizeof(struct sockaddr))) == -1)
-    {
-        logg("!DNS Resolver: sendto() failed, %s\n", strerror(errno));
-        free(packet);
-        return NULL;
-    }
+    logg("*DNS Resolver (compat): Querying %s\n", domain);
+
+    len = sendto(sockfd, packet, (int)len, 0, (struct sockaddr*) & dns, sizeof(struct sockaddr));
     free(packet);
 
-    addr_len = sizeof(struct sockaddr);
-    if ((numbytes = recvfrom(sockfd, reply, NS_PACKETSZ, 0, (struct sockaddr *) &dns, &addr_len)) == -1)
+    if (len == -1)
+    {
+        logg("!DNS Resolver: sendto() failed, %s\n", strerror(errno));
+        return NULL;
+    }
+
+    if ((len = recvfrom(sockfd, answer, NS_PACKETSZ, 0, (struct sockaddr *) &dns, &addr_len)) == -1)
     {
         logg("!DNS Resolver: recvfrom() failed, %s\n", strerror(errno));
         return NULL;
@@ -275,122 +294,128 @@ static char *do_query(struct hostent *he, const char *domain, unsigned int *ttl)
 
     /* printf("DNS Resolver: Received %d bytes from the DNS\n", numbytes); */
 
-    if (numbytes <= sizeof(simple_dns_query))
+    if (len < sizeof(HEADER))
     {
         logg("!DNS Resolver: Short reply\n");
         return NULL;
     }
 
-    seek = reply;
-    res = (simple_dns_query *) seek;
+    res = (HEADER *) answer;
 
     /* All your replies are belong to us? */
-    if (ntohs(res->transaction_id) != tid)
+    if (ntohs(res->id) != id)
     {
-        logg("!DNS Resolver: Bad TID, expected 0x%04x got 0x%04x\n", tid, ntohs(res->transaction_id));
+        logg("!DNS Resolver: Bad ID, expected 0x%04x got 0x%04x\n", id, ntohs(res->id));
+        return NULL;
+    }
+
+    if (!res->qr)
+    {
+        logg("!DNS Resolver: Bad Reply - reply flag is not set\n");
         return NULL;
     }
 
     /* Is a reply and result is ok */
-    if (!(ntohs(res->flags) >> 15) || (ntohs(res->flags) & 0x000f))
+    if (res->rcode)
     {
-        logg("!DNS Resolver: Bad Reply\n");
+        logg("!DNS Resolver: Bad Reply [%s] - %s (%d)\n", domain, rcode_to_string(res->rcode), res->rcode);
         return NULL;
     }
 
-    if (ntohs(res->ans_rrs) < 1)
+    if (ntohs(res->ancount) < 1)
     {
         logg("!DNS Resolver: No replies :(\n");
         return NULL;
     }
 
-    seek += sizeof(simple_dns_query) + NS_INT8SZ;
-    while (((seek - reply) < numbytes) && *seek) seek++; /* my request, don't care*/
-    seek++;
+    answend = answer + len;
+    pt = answer + sizeof(HEADER);
 
-    NEED(sizeof(uint16_t));
-    if (GETUINT16(seek) != DNS_TYPE_TEXT)
+    if ((len = dn_expand(answer, answend, pt, host, sizeof(host))) < 0)
+    {
+        logg("!DNS Resolver: dn_expand failed\n");
+        return NULL;
+    }
+
+    pt += len;
+
+    NS_GET16(type, pt);
+    if (type != T_TXT)
     {
         logg("!DNS Resolver: Query in DNS reply is not TXT\n");
         return NULL;
     }
-    seek += sizeof(uint16_t);
 
-    NEED(sizeof(uint16_t));
-    if (GETUINT16(seek) != NS_INT8SZ)
+    pt += NS_INT16SZ; /* class */
+    size = 0;
+
+    do
     {
-        logg("!DNS Resolver: Query in DNS reply has a different Class\n");
+        pt += size;
+        if ((len = dn_expand(answer, answend, pt, host, sizeof(host))) < 0)
+        {
+            logg("!DNS Resolver: second dn_expand failed\n");
+            return NULL;
+        }
+
+        pt += len;
+        NS_GET16(type, pt);
+        pt += NS_INT16SZ; /* class */
+        NS_GET32(cttl, pt);
+        NS_GET16(size, pt);
+
+        if (((pt + size) < answer) || ((pt + size) > answend))
+        {
+            logg("!DNS Resolver: DNS rr overflow\n");
+            return NULL;
+        }
+    } while (type == T_CNAME);
+
+    if (type != T_TXT)
+    {
+        logg("!Not a TXT record\n");
         return NULL;
     }
-    seek += sizeof(uint16_t);
-    seek += sizeof(uint16_t); /* Answer c0 0c ?? - Wireshark says Name */
 
-    NEED(sizeof(uint16_t));
-    if (GETUINT16(seek) != DNS_TYPE_TEXT)
+    if (!size || ((txtlen = *pt) >= size) || !txtlen)
     {
-        logg("!DNS Resolver: DNS reply Type is not TXT\n");
+        logg("!DNS Resolver: Broken TXT record (txtlen = %d, size = %d)\n", txtlen, size);
         return NULL;
     }
-    seek += sizeof(uint16_t);
 
-    NEED(sizeof(uint16_t));
-    if (GETUINT16(seek) != NS_INT8SZ)
-    {
-        logg("!DNS Resolver: DNS reply has a different Class\n");
+    if (!(txtreply = cli_malloc((size_t) txtlen + 1)))
         return NULL;
-    }
-    seek += sizeof(uint16_t);
 
-    NEED(sizeof(uint32_t));
+    memcpy(txtreply, pt + 1, txtlen);
+    txtreply[txtlen] = 0;
+
     if (ttl)
-        *ttl = (unsigned int) GETUINT32(seek);
-    seek += sizeof(uint32_t);
+        *ttl = cttl;
 
-    NEED(sizeof(uint16_t));
-    len = GETUINT16(seek);
-
-    if (len > NS_PACKETSZ)
-    {
-        logg("!DNS Resolver: Oversized reply\n");
-        return NULL;
-    }
-    seek += sizeof(uint16_t); /* Len */
-
-    NEED(len);
-
-    seek++;
-    if (!*seek)
-    {
-        logg("!DNS Resolver: Empty TXT reply\n");
-        return NULL;
-    }
-
-    txtreply = (char *) cli_malloc(len);
-    memcpy(txtreply, seek, len);
-    txtreply[len - 1] = 0;
     return txtreply;
 }
 
 /* Bare Version */
-char *dnsquery_compat(const char *domain, int qtype, unsigned int *ttl)
+static char *dnsquery_compat(const char *domain, int qtype, unsigned int *ttl)
 {
     struct hostent *he;
-    char *result = NULL, *nameserver = NULL;
+    char *result, *nameserver;
     int i;
 
     // FIXME: implement TYPE A?
-    if (qtype != DNS_TYPE_TEXT)
+    if (qtype != T_TXT)
         return NULL;
 
-    if ((nameserver = get_dns()) == NULL)
+    if (!(nameserver = get_dns()))
     {
         logg("!DNS Resolver: Cannot find a suitable DNS server\n");
         return NULL;
     }
 
-    if ((he = gethostbyname(nameserver)) == NULL)
+    if (!(he = gethostbyname(nameserver)))
     {
         logg("!DNS Resolver: gethostbyname(nameserver) failed\n");
+        free(nameserver);
         return NULL;
     }
 
@@ -400,24 +425,24 @@ char *dnsquery_compat(const char *domain, int qtype, unsigned int *ttl)
             break;
     }
 
-    if (nameserver) free(nameserver);
-    /* printf("DNS Resolver: Query done using compatibility Method\n"); */
-    /* printf("DNS Resolver: Result is [%s]\n", result); */
+    free(nameserver);
     return result;
 }
 
-
+static
+#else
+#define dnsquery_dnsapi dnsquery
+#endif /* defined(__MINGW32__) && !defined(__MINGW64__) */
 char *dnsquery_dnsapi(const char *domain, int qtype, unsigned int *ttl)
 {
     PDNS_RECORD pRec, pRecOrig;
     char *result = NULL;
 
-    if (!cw_helpers.dnsapi.ok)
-        return dnsquery_compat(domain, qtype, ttl);
+    logg("*DNS Resolver (dnsapi): Querying %s\n", domain);
 
-    if (cw_helpers.dnsapi.DnsQuery_A(domain, (WORD) qtype, DNS_QUERY_STANDARD | DNS_QUERY_BYPASS_CACHE, NULL, &pRec, NULL) != ERROR_SUCCESS)
+    if (cw_helpers.dnsapi.DnsQuery_A(domain, (WORD) qtype, DNS_QUERY_BYPASS_CACHE | DNS_QUERY_NO_HOSTS_FILE | DNS_QUERY_DONT_RESET_TTL_VALUES, NULL, &pRec, NULL) != ERROR_SUCCESS)
     {
-        logg("%cDNS Resolver: Can't query %s\n", (qtype == DNS_TYPE_TEXT || qtype == DNS_TYPE_ANY) ? '^' : '*', domain);
+        logg("!DNS Resolver: Can't query %s\n", domain);
         return NULL;
     }
 
@@ -442,17 +467,13 @@ char *dnsquery_dnsapi(const char *domain, int qtype, unsigned int *ttl)
                         *ttl = pRec->dwTtl;
                     goto done;
                 }
-                case DNS_TYPE_A:
-                {
-                    goto done;
-                }
             }
         }
         pRec = pRec->pNext;
     }
 done:
     cw_helpers.dnsapi.DnsRecordListFree(pRecOrig, DnsFreeRecordList);
-    /* printf("DNS Resolver: Query done using DnsApi Method\n"); */
-    /* printf("DNS Resolver: Result is [%s]\n", result); */
+    if (!result)
+        logg("!Not a TXT record\n");
     return result;
 }
