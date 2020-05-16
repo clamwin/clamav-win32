@@ -9,6 +9,6 @@ target_compile_definitions(curl PRIVATE
     HAVE_PTHREAD_H
     USE_THREADS_POSIX)
 
-if(MINGW)
+if((MINGW) AND (CLAMAV_ARCH STREQUAL "x86"))
     target_compile_definitions(curl PRIVATE _WIN32_WINNT=0x400)
 endif()
