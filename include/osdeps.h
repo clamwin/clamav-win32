@@ -42,12 +42,17 @@ LIBCLAMAV_API extern helpers_t cw_helpers;
 extern int cw_movefile(const char *source, const char *dest, int reboot);
 extern int cw_movefileex(const char *source, const char *dest, DWORD flags);
 
+#if defined(__MINGW32__) && !defined(__MINGW64__)
 #define PlatformId          ((cw_platform >> 16) & 0x000000ff)
 #define PlatformMajor       ((cw_platform >> 8 ) & 0x000000ff)
 #define PlatformMinor       (cw_platform & 0x000000ff)
 #define PlatformVersion     (cw_platform & 0x0000ffff)
 #define isWin9x()           (PlatformId == VER_PLATFORM_WIN32_WINDOWS)
 #define isOldOS()           (PlatformVersion <= 0x400)
+#else
+#define isWin9x()           (0)
+#define isOldOS()           (0)
+#endif
 
 static inline const char *cw_uncprefix(const char *filename)
 {
