@@ -116,7 +116,7 @@ static inline char *cw_wc2mb(const wchar_t *wc, DWORD flags)
 static inline char *cw_getfullpathname(const char *path)
 {
     char *fp = NULL;
-    DWORD len = GetFullPathNameA(path, 0, NULL, NULL);
+    size_t len = (size_t) GetFullPathNameA(path, 0, NULL, NULL);
     if (!len) return NULL;
 
     CW_CHECKALLOC(fp, malloc(len + 1), return NULL);
