@@ -196,6 +196,9 @@ typedef unsigned int in_addr_t;
 #define LIBCLAMAV_API __declspec(dllimport)
 #endif
 
+/* to set mprintf_disabled libfreshclam variable in freshclam whene running as service*/
+LIBCLAMAV_API extern void mprintf_disable(short int disable);
+
 /* win32 headers have DATADIR enum */
 #ifndef __cplusplus
 LIBCLAMAV_API extern const char *DATADIR;

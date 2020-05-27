@@ -10,6 +10,7 @@ add_library(libfreshclam SHARED
     ${CLAMAV}/shared/cert_util.c
     ${CLAMAV}/shared/win/cert_util_win.c
     ${CMAKE_SOURCE_DIR}/src/helpers/dnsquery.c
+    ${CMAKE_SOURCE_DIR}/src/helpers/mprintf_disable.c
     ${CMAKE_SOURCE_DIR}/resources/libfreshclam.rc
     ${CMAKE_SOURCE_DIR}/libfreshclam.def)
 
@@ -23,7 +24,6 @@ set_target_properties(libfreshclam PROPERTIES
 file(GLOB freshclam_srcs ${CLAMAV}/freshclam/*.c)
 add_executable(freshclam
     ${freshclam_srcs}
-    ${CLAMAV}/shared/output.c
     ${CLAMAV}/shared/misc.c
     ${CLAMAV}/shared/clamdcom.c
     ${CMAKE_SOURCE_DIR}/src/helpers/cw_main.c

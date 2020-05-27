@@ -10,3 +10,10 @@ fc_download_url_databases
 fc_update_database
 fc_update_databases
 fc_set_fccb_download_complete
+
+; https://github.com/Cisco-Talos/clamav-devel/commit/8214bafbefe2209d3ac7bd3dd961ad3e68d11a9a
+logg
+logg_close
+mprintf
+mprintf_disable
+
