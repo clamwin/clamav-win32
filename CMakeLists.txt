@@ -8,6 +8,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/resources)
 include_directories(${3RDPARTY} ${3RDPARTY}/zlib ${3RDPARTY}/pthreads ${3RDPARTY}/pcre2/src ${3RDPARTY}/openssl/include)
 include_directories(${CLAMAV} ${CLAMAV}/shared)
 
+add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
 add_compile_definitions(_WIN32 WIN32_LEAN_AND_MEAN)
 add_compile_definitions(CLAMWIN)
 
