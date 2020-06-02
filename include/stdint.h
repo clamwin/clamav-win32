@@ -113,5 +113,35 @@ typedef int ssize_t;
 #define PTRDIFF_MAX	INT32_MAX
 #endif
 
+#ifdef __cplusplus
+/* Certain compatibility updates to VC++ introduce the `cstdint'
+ * header, which defines the INT*_C macros. On default installs they
+ * are absent. */
+#ifndef INT8_C
+# define INT8_C(C)   C##i8
+#endif
+#ifndef UINT8_C
+# define UINT8_C(C)  C##ui8
+#endif
+#ifndef INT16_C
+# define INT16_C(C)  C##i16
+#endif
+#ifndef UINT16_C
+# define UINT16_C(C) C##ui16
+#endif
+#ifndef INT32_C
+# define INT32_C(C)  C##i32
+#endif
+#ifndef UINT32_C
+# define UINT32_C(C) C##ui32
+#endif
+#ifndef INT64_C
+# define INT64_C(C)  C##i64
+#endif
+#ifndef UINT64_C
+# define UINT64_C(C) C##ui64
+#endif
+#endif
+
 #endif /* _STDINT_H_ */
 #endif /* __GNUC__ */

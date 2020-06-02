@@ -25,81 +25,18 @@
 #define SUPPORT_DATATYPES_H
 
 #define HAVE_SYS_TYPES_H 1
-#undef HAVE_INTTYPES_H
-#undef HAVE_STDINT_H
-#define HAVE_UINT64_T 1
-#undef HAVE_U_INT64_T
-
-#if defined(_MSC_VER)
-typedef unsigned __int64 uint64_t;
-typedef signed __int64 int64_t;
-typedef unsigned __int32 uint32_t;
-typedef signed __int32 int32_t;
-typedef unsigned __int16 uint16_t;
-typedef signed __int16 int16_t;
-typedef unsigned __int8 uint8_t;
-typedef signed __int8 int8_t;
-
-#ifndef _DEBUG
-// Looks like I need to include first stdlib.h on vc rel
-// stdlib.h(477) : error C2365: '_byteswap_ushort' : redefinition; previous definition was 'formerly unknown identifier'
-#include <stdlib.h>
-#endif
-
-#ifdef  _WIN64
-typedef __int64 ssize_t;
-#else
-typedef int ssize_t;
-#endif
-
-#define INT8_MAX 127
-#define INT8_MIN -128
-#define UINT8_MAX 255
-#define INT16_MAX 32767
-#define INT16_MIN -32768
-#define UINT16_MAX 65535
-#define INT32_MAX 2147483647
-#define INT32_MIN -2147483648
-#define UINT32_MAX 4294967295U
-
-/* Certain compatibility updates to VC++ introduce the `cstdint'
- * header, which defines the INT*_C macros. On default installs they
- * are absent. */
-#ifndef INT8_C
-# define INT8_C(C)   C
-#endif
-#ifndef UINT8_C
-# define UINT8_C(C)  C
-#endif
-#ifndef INT16_C
-# define INT16_C(C)  C
-#endif
-#ifndef UINT16_C
-# define UINT16_C(C) C
-#endif
-#ifndef INT32_C
-# define INT32_C(C)  C
-#endif
-#ifndef UINT32_C
-# define UINT32_C(C) C ## U
-#endif
-#ifndef INT64_C
-# define INT64_C(C)  ((int64_t) C ## LL)
-#endif
-#ifndef UINT64_C
-# define UINT64_C(C) ((uint64_t) C ## ULL)
-#endif
-
-#elif defined(__MINGW32__)
-#define HAVE_INTTYPES_H 1
+/* undef HAVE_INTTYPES_H */
 #define HAVE_STDINT_H 1
-#endif
+#define HAVE_UINT64_T 1
+/* #undef HAVE_U_INT64_T */
 
 #ifdef __cplusplus
 #include <cmath>
 #else
 #include <math.h>
 #endif
+
+#if 1 // _MSC_VER
 
 /* Note that this header's correct operation depends on __STDC_LIMIT_MACROS
    being defined.  We would define it here, but in order to prevent Bad Things
@@ -151,6 +88,82 @@ typedef u_int64_t uint64_t;
 #define INT32_MIN -2147483648
 #define UINT32_MAX 4294967295U
 #endif
+
+#else /* _MSC_VER */
+/* Visual C++ doesn't provide standard integer headers, but it does provide
+   built-in data types. */
+#include <stdlib.h>
+#include <stddef.h>
+#include <sys/types.h>
+#ifdef __cplusplus
+#include <cmath>
+#else
+#include <math.h>
+#endif
+typedef __int64 int64_t;
+typedef unsigned __int64 uint64_t;
+typedef signed int int32_t;
+typedef unsigned int uint32_t;
+typedef short int16_t;
+typedef unsigned short uint16_t;
+typedef signed char int8_t;
+typedef unsigned char uint8_t;
+typedef signed int ssize_t;
+#ifndef INT8_MAX
+# define INT8_MAX 127
+#endif
+#ifndef INT8_MIN
+# define INT8_MIN -128
+#endif
+#ifndef UINT8_MAX
+# define UINT8_MAX 255
+#endif
+#ifndef INT16_MAX
+# define INT16_MAX 32767
+#endif
+#ifndef INT16_MIN
+# define INT16_MIN -32768
+#endif
+#ifndef UINT16_MAX
+# define UINT16_MAX 65535
+#endif
+#ifndef INT32_MAX
+# define INT32_MAX 2147483647
+#endif
+#ifndef INT32_MIN
+# define INT32_MIN -2147483648
+#endif
+#ifndef UINT32_MAX
+# define UINT32_MAX 4294967295U
+#endif
+/* Certain compatibility updates to VC++ introduce the `cstdint'
+ * header, which defines the INT*_C macros. On default installs they
+ * are absent. */
+#ifndef INT8_C
+# define INT8_C(C)   C##i8
+#endif
+#ifndef UINT8_C
+# define UINT8_C(C)  C##ui8
+#endif
+#ifndef INT16_C
+# define INT16_C(C)  C##i16
+#endif
+#ifndef UINT16_C
+# define UINT16_C(C) C##ui16
+#endif
+#ifndef INT32_C
+# define INT32_C(C)  C##i32
+#endif
+#ifndef UINT32_C
+# define UINT32_C(C) C##ui32
+#endif
+#ifndef INT64_C
+# define INT64_C(C)  C##i64
+#endif
+#ifndef UINT64_C
+# define UINT64_C(C) C##ui64
+#endif
+#endif /* _MSC_VER */
 
 /* Set defaults for constants which we cannot find. */
 #if !defined(INT64_MAX)

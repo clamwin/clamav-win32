@@ -32,7 +32,17 @@
 #undef LLVM_ETCDIR
 
 /* Host triple we were built on */
-#undef LLVM_HOSTTRIPLE
+#if defined(_MSC_VER)
+#ifdef _WIN64
+#define LLVM_HOSTTRIPLE "x86_64-pc-win32"
+#else
+#define LLVM_HOSTTRIPLE "i386-pc-win32"
+#endif
+#elif defined(__MINGW64__)
+#define LLVM_HOSTTRIPLE "x86_64-pc-mingw64"
+#elif defined(__MINGW32__)
+#define LLVM_HOSTTRIPLE "i386-pc-mingw32"
+#endif
 
 /* Installation directory for include files */
 #undef LLVM_INCLUDEDIR

@@ -1,4 +1,4 @@
-file(GLOB_RECURSE llvm_headers ${CLAMWIN_DIR}/include/llvmbuild/*.h)
+file(GLOB_RECURSE llvm_headers ${CLAMWIN_DIR}/include/llvm/*.h)
 
 include(cmake/llvm-sources.cmake)
 list(TRANSFORM llvm_sources PREPEND ${CLAMAV_DIR}/libclamav/c++/)
@@ -21,7 +21,7 @@ add_library(libclamav_llvm SHARED
 )
 
 target_include_directories(libclamav_llvm PRIVATE
-    ${CLAMWIN_DIR}/include/llvmbuild
+    ${CLAMWIN_DIR}/include/llvm
     ${CLAMAV_DIR}/libclamav/c++
     ${CLAMAV_DIR}/libclamav/c++/llvm/include
     ${CLAMAV_DIR}/libclamav/c++/llvm/lib/Target/X86
