@@ -196,8 +196,18 @@ typedef unsigned int in_addr_t;
 #define LIBCLAMAV_API __declspec(dllimport)
 #endif
 
+#ifdef LIBFRESHCLAM_EXPORTS
+#define LIBFRESHCLAM_API
+#else
+#define LIBFRESHCLAM_API __declspec(dllimport)
+#endif
+
 /* to set mprintf_disabled libfreshclam variable in freshclam whene running as service*/
-LIBCLAMAV_API extern void mprintf_disable(short int disable);
+LIBFRESHCLAM_API extern void mprintf_disable(short int disable);
+
+/* <arpa/inet.h> */
+LIBCLAMAV_API extern const char* cw_inet_ntop(int af, const void* a0, char* s, socklen_t l);
+#define inet_ntop cw_inet_ntop
 
 /* win32 headers have DATADIR enum */
 #ifndef __cplusplus

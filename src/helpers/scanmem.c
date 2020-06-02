@@ -22,7 +22,7 @@
 #include <exeScanner.h>
 
 #include <clamav.h>
-#include <output.h>
+#include <shared/output.h>
 #include <others.h>
 #include <clamscan/manager.h>
 #include <shared/actions.h>

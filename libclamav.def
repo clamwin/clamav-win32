@@ -85,6 +85,7 @@ cw_rename
 cw_getaddrinfo
 cw_freeaddrinfo
 cw_gai_strerror
+cw_inet_ntop
 
 ; clamwin internals @ 50
 cw_async_noalert                    @50 NONAME

@@ -17,3 +17,6 @@
 [submodule "3rdparty/PDCurses"]
 	path = 3rdparty/PDCurses
 	url = https://github.com/sherpya/PDCurses.git
+[submodule "3rdparty/json-c"]
+	path = 3rdparty/json-c
+	url = ../json-c

@@ -35,7 +35,7 @@ typedef unsigned __int32 uint32_t;
 typedef __int16 int16_t;
 #else
 #include <osdeps.h>
-#include <output.h>
+#include <shared/output.h>
 #include <others.h>
 static inline void elogg(const char *fmt, ...) {};
 #endif /* EXESCANNER_STANDALONE */

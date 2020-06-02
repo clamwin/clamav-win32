@@ -1,16 +1,42 @@
 cmake_minimum_required (VERSION 3.6)
 project(clamav-win32)
 
-set(CLAMAV ${CMAKE_SOURCE_DIR}/clamav)
-set(3RDPARTY ${CMAKE_SOURCE_DIR}/3rdparty)
+set(CLAMWIN_DIR ${CMAKE_SOURCE_DIR})
+set(CLAMAV_DIR ${CLAMWIN_DIR}/clamav)
+set(3RDPARTY_DIR ${CLAMWIN_DIR}/3rdparty)
 
-include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/resources)
-include_directories(${3RDPARTY} ${3RDPARTY}/zlib ${3RDPARTY}/pthreads ${3RDPARTY}/pcre2/src ${3RDPARTY}/openssl/include)
-include_directories(${CLAMAV} ${CLAMAV}/shared)
+option(DISABLE_LLVM "Disable LLVM Engine" OFF)
 
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
-add_compile_definitions(_WIN32 WIN32_LEAN_AND_MEAN)
-add_compile_definitions(CLAMWIN)
+add_compile_options($<$<C_COMPILER_ID:MSVC>:/MP>)
+
+set(CLAMWIN_INCLUDES
+    ${CLAMWIN_DIR}/resources
+    ${CLAMWIN_DIR}/include
+    ${CLAMWIN_DIR}/include/json-c
+    ${CLAMWIN_DIR}/include/libxml2
+    ${CLAMAV_DIR}
+    ${CLAMAV_DIR}/libclamav
+    ${CLAMAV_DIR}/libclammspack/mspack
+    ${3RDPARTY_DIR}
+    ${3RDPARTY_DIR}/zlib
+    ${3RDPARTY_DIR}/bzip2
+    ${3RDPARTY_DIR}/json-c
+    ${3RDPARTY_DIR}/libxml2/include
+    ${3RDPARTY_DIR}/openssl/include
+    ${3RDPARTY_DIR}/pcre2/src
+    ${3RDPARTY_DIR}/pthreads
+)
+
+set(CLAMWIN_DEFINES
+    CLAMWIN
+    HAVE_CONFIG_H
+    WIN32_LEAN_AND_MEAN
+    PCRE2_STATIC
+    PTW32_STATIC_LIB
+    LIBXML_STATIC
+    NOBZ2PREFIX
+)
 
 if(MINGW)
     link_libraries("-static")
@@ -50,7 +76,10 @@ include(cmake/libclamunrar.cmake)
 include(cmake/pdcurses.cmake)
 include(cmake/clamdtop.cmake)
 
-if(NOT DISABLE_LLVM)
+if(DISABLE_LLVM)
+    message(STATUS "LLVM is DISABLED")
+else()
+    message(STATUS "LLVM is ENABLED")
     include(cmake/llvm.cmake)
 endif()
 

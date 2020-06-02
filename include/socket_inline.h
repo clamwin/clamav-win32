@@ -314,19 +314,6 @@ static inline SOCKET inl_socket(int domain, int type, int protocol)
 }
 #define socket (int) inl_socket
 
-/* <arpa/inet.h> */
-static inline const char * WSAAPI inet_ntop(int af, const void *src, char *dst, size_t size)
-{
-    unsigned char *ip = (unsigned char *) src;
-    if ((af != AF_INET) || (size < 16))
-    {
-        errno = EINVAL;
-        return NULL;
-    }
-    gnulib_snprintf(dst, size, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
-    return dst;
-}
-
 /* pollfd struct is _WIN32_WINNT >= 0x0600 */
 
 typedef struct mypollfd

@@ -19,7 +19,7 @@
  */
 
 #include <platform.h>
-#include "shared/output.h"
+#include <shared/output.h>
 
 void mprintf_disable(short int disable)
 {
