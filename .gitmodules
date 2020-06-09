@@ -14,9 +14,9 @@
 [submodule "3rdparty/libxml2"]
 	path = 3rdparty/libxml2
 	url = https://github.com/GNOME/libxml2.git
-[submodule "3rdparty/PDCurses"]
-	path = 3rdparty/PDCurses
-	url = https://github.com/sherpya/PDCurses.git
 [submodule "3rdparty/json-c"]
 	path = 3rdparty/json-c
-	url = ../json-c
+	url = https://github.com/json-c/json-c.git
+[submodule "3rdparty/PDCurses"]
+	path = 3rdparty/PDCurses
+	url = https://github.com/Bill-Gray/PDCurses.git
