@@ -4,7 +4,7 @@
 [submodule "clamav"]
 	path = clamav
 	url = ../clamav.git
-	branch = 0.99.3
+	branch = 0.102.3
 [submodule "3rdparty/3rdparty/curl"]
 	path = 3rdparty/3rdparty/curl
 	url = https://github.com/curl/curl.git
