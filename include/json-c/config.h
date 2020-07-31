@@ -3,6 +3,9 @@
 /* Enable RDRAND Hardware RNG Hash Seed */
 /* #undef ENABLE_RDRAND */
 
+/* Override json_c_get_random_seed() with custom code */
+/* #undef OVERRIDE_GET_RANDOM_SEED */
+
 /* Enable partial threading support */
 /* #undef ENABLE_THREADING */
 
@@ -10,10 +13,10 @@
 /* #undef HAS_GNU_WARNING_LONG */
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
-#undef HAVE_DLFCN_H
+/* #undef HAVE_DLFCN_H */
 
 /* Define to 1 if you have the <endian.h> header file. */
-#undef HAVE_ENDIAN_H
+/* #undef HAVE_ENDIAN_H */
 
 /* Define to 1 if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H 1
@@ -58,6 +61,9 @@
 #ifdef __GNUC__
 #define HAVE_SYS_PARAM_H 1
 #endif
+
+/* Define to 1 if you have the <sys/resource.h> header file. */
+/* #undef HAVE_SYS_RESOURCE_H */
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
@@ -151,6 +157,9 @@
 /* Define to 1 if you have the `vsyslog' function. */
 /* #undef HAVE_VSYSLOG */
 
+/* Define if you have the `getrusage' function. */
+/* #undef HAVE_GETRUSAGE */
+
 #define HAVE_STRTOLL
 #if !defined(HAVE_STRTOLL)
 #if defined(_MSC_VER) && (_MSC_VER < 1800)
@@ -185,7 +194,7 @@
 #define PACKAGE_NAME "json-c"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "json-c 0.14."
+#define PACKAGE_STRING "json-c 0.15."
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "json-c"
@@ -194,7 +203,7 @@
 #define PACKAGE_URL "https://github.com/json-c/json-c"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.14."
+#define PACKAGE_VERSION "0.15."
 
 /* The number of bytes in type int */
 #define SIZEOF_INT 4
@@ -215,6 +224,13 @@
 #define SIZEOF_SIZE_T 4
 #endif
 
+/* The number of bytes in type ssize_t */
+#ifdef _WIN64
+#define SIZEOF_SSIZE_T 8
+#else
+#define SIZEOF_SSIZE_T 4
+#endif
+
 /* Specifier for __thread */
 #ifdef __GNUC__
 #define SPEC___THREAD __thread
@@ -226,7 +242,7 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.14."
+#define VERSION "0.15."
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
