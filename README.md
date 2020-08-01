@@ -1,4 +1,4 @@
-# ClamAV native win32 port - 0.102.3
+# ClamAV native win32 port - 0.102.4
 
 Copyright (c) 2005-2020 Gianluigi Tiesi <sherpya@netfarm.it>
 
