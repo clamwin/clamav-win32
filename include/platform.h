@@ -189,37 +189,32 @@ typedef unsigned int in_addr_t;
 
 #define PATHSEP "\\"
 
-#ifdef LIBCLAMAV_EXPORTS
-#define LIBCLAMAV_API
-#undef OUT
+#if defined(THIS_IS_LIBCLAMAV)
+#define LIBCLAMAV_EXPORT
 #else
-#define LIBCLAMAV_API __declspec(dllimport)
-#endif
-
-#ifdef LIBFRESHCLAM_EXPORTS
-#define LIBFRESHCLAM_API
-#else
-#define LIBFRESHCLAM_API __declspec(dllimport)
+#define LIBCLAMAV_EXPORT __declspec(dllimport)
 #endif
 
 /* to set mprintf_disabled libfreshclam variable in freshclam whene running as service*/
-LIBFRESHCLAM_API extern void mprintf_disable(short int disable);
+extern void mprintf_disable(short int disable);
 
 /* <arpa/inet.h> */
-LIBCLAMAV_API extern const char* cw_inet_ntop(int af, const void* a0, char* s, socklen_t l);
+extern const char* cw_inet_ntop(int af, const void* a0, char* s, socklen_t l);
 #define inet_ntop cw_inet_ntop
 
 /* win32 headers have DATADIR enum */
 #ifndef __cplusplus
-LIBCLAMAV_API extern const char *DATADIR;
-LIBCLAMAV_API extern const char *CONFDIR;
-LIBCLAMAV_API extern const char *CONFDIR_CLAMD;
-LIBCLAMAV_API extern const char *CONFDIR_FRESHCLAM;
-LIBCLAMAV_API extern const char *CONFDIR_MILTER;
+LIBCLAMAV_EXPORT extern const char *DATADIR;
+LIBCLAMAV_EXPORT extern const char *CONFDIR;
+LIBCLAMAV_EXPORT extern const char *CONFDIR_CLAMD;
+LIBCLAMAV_EXPORT extern const char *CONFDIR_FRESHCLAM;
+LIBCLAMAV_EXPORT extern const char *CONFDIR_MILTER;
 #endif
 
 #define cli_to_utf8_maybe_alloc(x) (x)
 #define cli_strdup_to_utf8(x) strdup(x)
+
+#define SEARCH_LIBDIR ""
 
 #ifdef MSPACK_VER_LIBRARY
 /* very ugly hacks, vs2005 does not support struct field assignment ;( */

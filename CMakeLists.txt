@@ -16,7 +16,9 @@ set(CLAMWIN_INCLUDES
     ${CLAMWIN_DIR}/include/json-c
     ${CLAMWIN_DIR}/include/libxml2
     ${CLAMAV_DIR}
+    ${CLAMAV_DIR}/shared
     ${CLAMAV_DIR}/libclamav
+    ${CLAMAV_DIR}/libclamunrar_iface
     ${CLAMAV_DIR}/libclammspack/mspack
     ${3RDPARTY_DIR}
     ${3RDPARTY_DIR}/zlib

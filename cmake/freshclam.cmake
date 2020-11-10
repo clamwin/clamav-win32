@@ -29,7 +29,7 @@ add_library(libfreshclam SHARED
     ${CLAMWIN_DIR}/libfreshclam.def
 )
 
-set_target_properties(libfreshclam PROPERTIES DEFINE_SYMBOL LIBFRESHCLAM_EXPORTS PREFIX "" OUTPUT_NAME libfreshclam)
+set_target_properties(libfreshclam PROPERTIES PREFIX "" OUTPUT_NAME libfreshclam)
 target_include_directories(libfreshclam PRIVATE ${CLAMWIN_INCLUDES} ${3RDPARTY_DIR}/curl/include)
 target_compile_definitions(libfreshclam PRIVATE ${CLAMWIN_DEFINES} CURL_STATICLIB)
 target_link_libraries(libfreshclam PRIVATE curl libclamav crypt32 ws2_32 iphlpapi)
@@ -58,7 +58,7 @@ add_executable(freshclam
     ${CLAMWIN_DIR}/resources/freshclam.rc
 )
 
-target_include_directories(freshclam PRIVATE ${CLAMWIN_INCLUDES})
+target_include_directories(freshclam PRIVATE ${CLAMWIN_INCLUDES} ${CLAMAV_DIR}/libfreshclam)
 target_compile_definitions(freshclam PRIVATE ${CLAMWIN_DEFINES})
 target_link_libraries(freshclam libfreshclam libclamav ws2_32)
 

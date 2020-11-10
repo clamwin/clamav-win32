@@ -36,8 +36,8 @@
 
 #define DATADIRBASEKEY  "Software\\ClamAV"
 
-LIBCLAMAV_API extern uint32_t cw_platform;
-LIBCLAMAV_API extern helpers_t cw_helpers;
+LIBCLAMAV_EXPORT extern uint32_t cw_platform;
+LIBCLAMAV_EXPORT extern helpers_t cw_helpers;
 
 extern int cw_movefile(const char *source, const char *dest, int reboot);
 extern int cw_movefileex(const char *source, const char *dest, DWORD flags);

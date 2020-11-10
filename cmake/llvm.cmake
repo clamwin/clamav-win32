@@ -30,7 +30,7 @@ target_include_directories(libclamav_llvm PRIVATE
 
 target_compile_definitions(libclamav_llvm PRIVATE ${CLAMWIN_DEFINES} __STDC_LIMIT_MACROS __STDC_CONSTANT_MACROS)
 target_link_libraries(libclamav_llvm PRIVATE libclamav imagehlp psapi)
-set_target_properties(libclamav_llvm PROPERTIES DEFINE_SYMBOL "" PREFIX "" OUTPUT_NAME libclamav_llvm)
+set_target_properties(libclamav_llvm PROPERTIES DEFINE_SYMBOL THIS_IS_LIBCLAMAV PREFIX "" OUTPUT_NAME libclamav_llvm)
 
 target_compile_options(libclamav_llvm PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/wd4065 /wd4146 /wd4244 /wd4267 /wd4312 /wd4319 /wd4334 /wd4624 /wd4838>)
 

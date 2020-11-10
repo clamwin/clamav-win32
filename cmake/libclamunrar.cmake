@@ -32,7 +32,7 @@ add_library(libclamunrar SHARED
 )
 
 set_target_properties(libclamunrar PROPERTIES DEFINE_SYMBOL "" PREFIX "" OUTPUT_NAME libclamunrar)
-target_include_directories(libclamunrar PRIVATE ${CLAMAV_DIR} ${CLAMWIN_DIR}/resources)
+target_include_directories(libclamunrar PRIVATE ${CLAMAV_DIR}/ ${CLAMWIN_DIR}/resources)
 target_compile_definitions(libclamunrar PRIVATE HAVE_CONFIG_H RARDLL)
 
 if((MINGW) AND (CLAMAV_ARCH STREQUAL "x86"))
@@ -52,7 +52,7 @@ add_library(libclamunrar_iface SHARED
 
 set_target_properties(libclamunrar_iface PROPERTIES DEFINE_SYMBOL "" PREFIX "" OUTPUT_NAME libclamunrar_iface)
 target_compile_definitions(libclamunrar_iface PRIVATE HAVE_CONFIG_H RARDLL)
-target_include_directories(libclamunrar_iface PRIVATE ${CLAMWIN_DIR}/include ${CLAMAV_DIR} ${CLAMWIN_DIR}/resources)
+target_include_directories(libclamunrar_iface PRIVATE ${CLAMWIN_DIR}/include ${CLAMAV_DIR} ${CLAMAV_DIR}/libclamunrar ${CLAMWIN_DIR}/resources)
 target_link_libraries(libclamunrar_iface PRIVATE libclamunrar)
 
 list(APPEND CLAMAV_INSTALL_TARGETS libclamunrar libclamunrar_iface)

@@ -121,8 +121,10 @@ cli_chomp                           @103 NONAME
 cli_ctime                           @104 NONAME
 cli_cvdunpack                       @105 NONAME
 cli_filecopy                        @106 NONAME
-cli_filetype2                       @107 NONAME
-cli_fmap_scandesc                   @108 NONAME
+; renamed from cli_filetype2 in 0.103.0
+cli_determine_fmap_type             @107 NONAME
+; renamed from cli_fmap_scandesc in 0.103.0
+cli_scan_fmap                       @108 NONAME
 cli_ftw                             @109 NONAME
 cli_gentemp                         @110 NONAME
 cli_gentempfd                       @111 NONAME
@@ -177,6 +179,8 @@ cli_realloc                         @155 NONAME
 cli_gentemp_with_prefix             @156 NONAME
 ; 0.102.4
 cli_realpath                        @157 NONAME
+; 0.103.0
+cli_strntoul                        @158 NONAME
 
 html_normalise_map                  @160 NONAME
 text_normalize_init                 @161 NONAME

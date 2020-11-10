@@ -1,4 +1,4 @@
-# ClamAV native win32 port - 0.102.4
+# ClamAV native win32 port - 0.103.0
 
 Copyright (c) 2005-2020 Gianluigi Tiesi <sherpya@netfarm.it>
 
@@ -29,15 +29,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ## 3rdparty libraries and versions
 
-- OpenSSL: 1.1.1g
+- OpenSSL: 1.1.1h
 - bzip2: 1.0.8
-- curl: 7.70.0
+- curl: 7.73.0
 - gnulib: old version but still fine for my needs
-- json-c: 0.14-20200419 + fix for CVE-2020-12762 + fix for regression
+- json-c: 0.15-20200726
 - libunicows: 1.1.2 (32bit builds only)
 - libxml2: 2.9.10
 - pcre2: 10.35
-- PDCurses: my fork of master@71697bd4 with some patches
+- PDCurses: master@71697bd4
 - Pthreads-w32: 2.9.1 + some fixes
 - zlib: 1.2.11
 

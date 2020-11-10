@@ -9,9 +9,6 @@
 /* enable bind8 compatibility */
 #undef BIND_8_COMPAT
 
-/* "build clamd" */
-#define BUILD_CLAMD 1
-
 /* use ClamAuth */
 #undef CLAMAUTH
 
@@ -88,9 +85,6 @@
 
 /* "default FD_SETSIZE value" */
 #define DEFAULT_FD_SETSIZE ((unsigned __int32) (-1))
-
-/* use fanotify */
-#undef FANOTIFY
 
 /* whether _XOPEN_SOURCE needs to be defined for fd passing to work */
 #undef FDPASS_NEED_XOPEN
@@ -420,6 +414,9 @@
 /* Define to 1 if you have the <sys/dl.h> header file. */
 #undef HAVE_SYS_DL_H
 
+/* use fanotify */
+#undef HAVE_SYS_FANOTIFY_H
+
 /* Define to 1 if you have the <sys/filio.h> header file. */
 #undef HAVE_SYS_FILIO_H
 
@@ -475,7 +472,7 @@
 #define HAVE_YARA 1
 
 /* Define to 1 if you have the <zlib.h> header file. */
-#undef HAVE_ZLIB_H
+#define HAVE_ZLIB_H 1
 
 /* For internal use only - DO NOT DEFINE */
 #undef HAVE__INTERNAL__SHA_COLLECT
@@ -629,7 +626,7 @@
 #define USING_PCRE2 1
 
 /* Stable releases tag */
-#define CLAMWIN_RELEASE "0.102.4"
+#define CLAMWIN_RELEASE "0.103.0"
 
 /* Version number of package */
 #ifdef CLAMWIN_RELEASE
