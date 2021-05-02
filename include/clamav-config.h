@@ -481,13 +481,13 @@
 #undef ICONV_CONST
 
 /* "Full clamav library version number" */
-#define LIBCLAMAV_FULLVER "9.0.4"
+#define LIBCLAMAV_FULLVER "9.0.5"
 
 /* "Major clamav library version number" */
 #define LIBCLAMAV_MAJORVER 9
 
 /* "Full freshclam library version number" */
-#define LIBFRESHCLAM_FULLVER "2.0.0"
+#define LIBFRESHCLAM_FULLVER "2.0.1"
 
 /* "Major freshclam library version number" */
 #define LIBFRESHCLAM_MAJORVER 2
@@ -626,7 +626,7 @@
 #define USING_PCRE2 1
 
 /* Stable releases tag */
-#define CLAMWIN_RELEASE "0.103.0"
+#define CLAMWIN_RELEASE "0.103.2"
 
 /* Version number of package */
 #ifdef CLAMWIN_RELEASE

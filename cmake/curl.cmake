@@ -12,7 +12,7 @@ target_include_directories(curl PRIVATE
 target_compile_definitions(curl PRIVATE
     BUILDING_LIBCURL
     CURL_STATICLIB
-    CURL_DISABLE_LDAP
+    HTTP_ONLY
     USE_OPENSSL
     HAVE_PTHREAD_H
     USE_THREADS_POSIX

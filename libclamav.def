@@ -181,6 +181,8 @@ cli_gentemp_with_prefix             @156 NONAME
 cli_realpath                        @157 NONAME
 ; 0.103.0
 cli_strntoul                        @158 NONAME
+; 0.103.2
+cli_get_filepath_from_filedesc      @159 NONAME
 
 html_normalise_map                  @160 NONAME
 text_normalize_init                 @161 NONAME
@@ -487,3 +489,12 @@ d2i_X509_bio                            @1204
 i2a_ASN1_OBJECT                         @1205
 i2d_X509_PUBKEY                         @1206
 i2t_ASN1_OBJECT                         @1207
+
+; curl 7.76.1
+EVP_DigestInit                          @1208
+EVP_sha1                                @1209
+OCSP_CERTID_free                        @1210
+OCSP_cert_to_id                         @1211
+OCSP_resp_find_status                   @1212
+OPENSSL_init_ssl                        @1213
+SSL_get_version                         @1214
