@@ -5850,7 +5850,7 @@ a)"xI
 /^\w+/tables=3
     École
 
-#loadtables ./testdata/testbtables
+#loadtables ./testbtables
 
 /^\w+/tables=3
     École
@@ -5863,5 +5863,23 @@ a)"xI
 
 /"(*MARK:>" 00 "<).(?C1)."/hex,mark,no_start_optimize
     AB
+
+/(?(VERSION=0.0/
+
+# Perl has made \K in lookarounds an error. At the moment PCRE2 still accepts.
+
+/(?=a\Kb)ab/
+    ab 
+
+/(?!a\Kb)ac/
+    ac 
+    
+/^abc(?<=b\Kc)d/
+    abcd
+
+/^abc(?<!b\Kq)d/
+    abcd
+    
+# --------- 
 
 # End of testinput2
