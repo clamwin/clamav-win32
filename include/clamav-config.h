@@ -537,7 +537,7 @@
 #undef NO_FD_SET
 
 /* Name of package */
-#define PACKAGE "ClamWin"
+#define PACKAGE "ClamAV"
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT

@@ -498,3 +498,8 @@ OCSP_cert_to_id                         @1211
 OCSP_resp_find_status                   @1212
 OPENSSL_init_ssl                        @1213
 SSL_get_version                         @1214
+
+; curl 7.77.0
+X509_STORE_add_crl                      @1215
+X509_INFO_free                          @1216
+PEM_X509_INFO_read_bio                  @1217

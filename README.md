@@ -1,4 +1,4 @@
-# ClamAV native win32 port - 0.103.2
+# ClamAV native win32 port - 0.103.2-r1
 
 Copyright (c) 2005-2021 Gianluigi Tiesi <sherpya@netfarm.it>
 
@@ -31,13 +31,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 - OpenSSL: 1.1.1k
 - bzip2: 1.0.8
-- curl: 7.76.1
+- curl: 7.77.0
 - gnulib: old version but still fine for my needs
 - json-c: 0.15-20200726
 - libunicows: 1.1.2 (32bit builds only)
-- libxml2: 2.9.10
-- pcre2: 10.36
-- PDCurses: master@c6556e54
+- libxml2: 2.9.12
+- pcre2: 10.37
+- PDCurses: master@cb58be36
 - Pthreads-w32: 2.9.1 + some fixes
 - zlib: 1.2.11
 
@@ -54,8 +54,8 @@ Clone repository using:
   paths can be also `REG_EXPAND_SZ`, environment variables are
   allowed here (i.e. you can use paths like `%HomeDrive%\ClamAV`).
 
-- libclamunrar needs `unicows.dll` when used on Windows 9x, you can download from
-  [Microsoft Layer for Unicode](https://www.microsoft.com/en-us/download/details.aspx?id=4237)
+- libclamunrar needs `unicows.dll` when used on Windows 9x, you can download
+  [Open Layer For Unicode](https://oss.netfarm.it/clamav/files/opencow-0.7.7z)
 
 - On WinNT4 you may need to set OPENSSL\_ia32cap environment variable to 0x16980010 because
   NT4 does not support SSE out of the box (it will crash with illegal instruction).
