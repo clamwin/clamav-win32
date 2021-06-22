@@ -1,4 +1,4 @@
-# ClamAV native win32 port - 0.103.2-r1
+# ClamAV native win32 port - 0.103.3
 
 Copyright (c) 2005-2021 Gianluigi Tiesi <sherpya@netfarm.it>
 
@@ -37,7 +37,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 - libunicows: 1.1.2 (32bit builds only)
 - libxml2: 2.9.12
 - pcre2: 10.37
-- PDCurses: master@cb58be36
+- PDCurses: master@a96c85d5
 - Pthreads-w32: 2.9.1 + some fixes
 - zlib: 1.2.11
 

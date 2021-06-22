@@ -27,7 +27,7 @@
  * @macro
  * Version number of the clamav package release
  */
-#define CLAMAV_VERSION "0.103.0"
+#define CLAMAV_VERSION "0.103.3"
 
 /**
  * @macro
@@ -35,13 +35,13 @@
  * release. This is a 24 bit number with 8 bits for major number, 8 bits
  * for minor and 8 bits for patch. Version 1.2.3 becomes 0x010203.
  */
-#define CLAMAV_VERSION_NUM 0x006600
+#define CLAMAV_VERSION_NUM 0x006703
 
 /**
  * @macro
  * Version number of the clamav library release
  */
-#define LIBCLAMAV_VERSION "9:4:0"
+#define LIBCLAMAV_VERSION "9:5:0"
 
 /**
  * @macro
@@ -49,13 +49,13 @@
  * release. This is a 24 bit number with 8 bits for major number, 8 bits
  * for minor and 8 bits for patch. Version 1.2.3 becomes 0x010203.
  */
-#define LIBCLAMAV_VERSION_NUM 0x090400
+#define LIBCLAMAV_VERSION_NUM 0x090500
 
 /**
  * @macro
  * Version number of the clamav library release
  */
-#define LIBFRESHCLAM_VERSION "2:0:0"
+#define LIBFRESHCLAM_VERSION "2:1:0"
 
 /**
  * @macro
@@ -63,6 +63,6 @@
  * release. This is a 24 bit number with 8 bits for major number, 8 bits
  * for minor and 8 bits for patch. Version 1.2.3 becomes 0x010203.
  */
-#define LIBFRESHCLAM_VERSION_NUM 0x020000
+#define LIBFRESHCLAM_VERSION_NUM 0x020100
 
 #endif /* CLAMAV_VER_H */

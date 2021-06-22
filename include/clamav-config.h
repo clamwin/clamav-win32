@@ -505,11 +505,7 @@
 #undef LT_LIBPREFIX
 
 /* Define to the extension used for runtime loadable modules, say, ".so". */
-#if defined(_MSC_VER) && defined(_DEBUG)
-#define LT_MODULE_EXT "d"
-#else
-#define LT_MODULE_EXT ""
-#endif
+#define LT_MODULE_EXT ".dll"
 
 /* Define to the name of the environment variable that determines the run-time
    module search path. */
@@ -625,19 +621,9 @@
 /* Define to 1 if you using the pcre2 library. */
 #define USING_PCRE2 1
 
-/* Stable releases tag */
-#define CLAMWIN_RELEASE "0.103.2"
 
 /* Version number of package */
-#ifdef CLAMWIN_RELEASE
-#define VERSION CLAMWIN_RELEASE
-#else
-#ifdef _MSC_VER
-#define VERSION "devel@clamwin msvc - "__DATE__
-#else
-#define VERSION "devel@clamwin MinGW - "__DATE__
-#endif
-#endif
+#define VERSION "0.103.3"
 
 /* Version suffix for package */
 #define VERSION_SUFFIX ""
