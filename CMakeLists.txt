@@ -96,13 +96,6 @@ install(TARGETS ${CLAMAV_INSTALL_TARGETS}
 
 set(DIST_FILES README.md clamd.conf freshclam.conf clamav.reg)
 
-if(NOT MINGW)
-    list(APPEND DIST_FILES include/clamav-types.h)
-    install(TARGETS libclamav
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}
-        PUBLIC_HEADER EXCLUDE_FROM_ALL)
-endif()
-
 file(GLOB COPYRIGHT_FILES ${CLAMAV}/COPYING*)
 install(FILES ${COPYRIGHT_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright)
 
