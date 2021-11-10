@@ -623,7 +623,7 @@
 
 
 /* Version number of package */
-#define VERSION "0.103.3"
+#define VERSION "0.103.4"
 
 /* Version suffix for package */
 #define VERSION_SUFFIX ""
