@@ -15,6 +15,7 @@ set(CLAMWIN_INCLUDES
     ${CLAMWIN_DIR}/include
     ${CLAMWIN_DIR}/include/json-c
     ${CLAMWIN_DIR}/include/libxml2
+    ${CLAMWIN_DIR}/include/pcre2
     ${CLAMAV_DIR}
     ${CLAMAV_DIR}/shared
     ${CLAMAV_DIR}/libclamav

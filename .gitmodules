@@ -17,3 +17,6 @@
 [submodule "3rdparty/PDCurses"]
 	path = 3rdparty/PDCurses
 	url = https://github.com/Bill-Gray/PDCurses.git
+[submodule "3rdparty/pcre2"]
+	path = 3rdparty/pcre2
+	url = https://github.com/PhilipHazel/pcre2.git
