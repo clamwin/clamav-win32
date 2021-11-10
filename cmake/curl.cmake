@@ -10,10 +10,11 @@ target_include_directories(curl PRIVATE
 )
 
 target_compile_definitions(curl PRIVATE
+    CURL_ENABLE_SSL
+    USE_OPENSSL
     BUILDING_LIBCURL
     CURL_STATICLIB
     HTTP_ONLY
-    USE_OPENSSL
     HAVE_PTHREAD_H
     USE_THREADS_POSIX
 )

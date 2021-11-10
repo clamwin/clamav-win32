@@ -503,3 +503,6 @@ SSL_get_version                         @1214
 X509_STORE_add_crl                      @1215
 X509_INFO_free                          @1216
 PEM_X509_INFO_read_bio                  @1217
+
+; curl 7.80.0
+DES_set_key_unchecked                   @1218
