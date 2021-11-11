@@ -71,6 +71,7 @@ target_link_libraries(libclamav PRIVATE
 if(MSVC)
     install(FILES ${CLAMAV_DIR}/libclamav/clamav.h DESTINATION ${CMAKE_INSTALL_PREFIX})
     install(FILES ${CLAMWIN_DIR}/include/clamav-types.h DESTINATION ${CMAKE_INSTALL_PREFIX})
+    install(TARGETS libclamav ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX})
 endif()
 
 list(APPEND CLAMAV_INSTALL_TARGETS libclamav)
