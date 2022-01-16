@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2021 Cisco Systems, Inc. and/or its affiliates. All rights reserved.
+ *  Copyright (C) 2013-2022 Cisco Systems, Inc. and/or its affiliates. All rights reserved.
  *  Copyright (C) 2007-2013 Sourcefire, Inc.
  *
  *  Authors: Tomasz Kojm, Micah Snyder
@@ -25,22 +25,7 @@
 #define __CLAMAV_TYPES_H
 
 #include <inttypes.h>
-
-/* Ensure we have print format types */
-/* PRIu64 should be in <inttypes.h> */
-#ifndef _SF64_PREFIX
-    #define _SF64_PREFIX "ll"
-#endif
-
-#ifndef PRIu64
-    #define PRIu64 _SF64_PREFIX "u"
-#endif
-#ifndef PRIx64
-    #define PRIx64 _SF64_PREFIX "i"
-#endif
-#ifndef PRIi64
-    #define PRIi64 _SF64_PREFIX "x"
-#endif
+#include <stdint.h>
 
 #ifndef STDu64
     #define STDu64 "%" PRIu64
@@ -48,25 +33,10 @@
     #define STDx64 "%" PRIx64
 #endif
 
-/* PRIu32 should also be in <inttypes.h> */
-#ifndef PRIu32
-    #ifndef _SF32_PREFIX
-        #define _SF32_PREFIX "l"
-    #endif
-
-    #define PRIu32 _SF32_PREFIX "u"
-    #define PRIi32 _SF32_PREFIX "i"
-    #define PRIx32 _SF32_PREFIX "x"
-#endif
-
 #ifndef STDu32
     #define STDu32 "%" PRIu32
     #define STDi32 "%" PRIi32
     #define STDx32 "%" PRIx32
-#endif
-
-#ifndef INT32_MAX
-    #define INT32_MAX 2147483647
 #endif
 
 #endif

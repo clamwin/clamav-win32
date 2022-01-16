@@ -1,6 +1,6 @@
-# ClamAV native win32 port - 0.103.4
+# ClamAV native win32 port - 0.103.5
 
-Copyright (c) 2005-2021 Gianluigi Tiesi <sherpya@netfarm.it>
+Copyright (c) 2005-2022 Gianluigi Tiesi <sherpya@netfarm.it>
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
