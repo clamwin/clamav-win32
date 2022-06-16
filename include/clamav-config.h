@@ -699,7 +699,7 @@
 #define USING_PCRE2 1
 
 /* Version number of package */
-#define VERSION "0.103.5"
+#define VERSION "0.103.6"
 
 /* Version suffix for package */
 #define VERSION_SUFFIX ""
