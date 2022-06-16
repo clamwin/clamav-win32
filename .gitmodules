@@ -20,3 +20,6 @@
 [submodule "3rdparty/pcre2"]
 	path = 3rdparty/pcre2
 	url = https://github.com/PhilipHazel/pcre2.git
+[submodule "3rdparty/zlib"]
+	path = 3rdparty/zlib
+	url = https://github.com/madler/zlib.git
