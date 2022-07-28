@@ -7,7 +7,7 @@ set(libclamunrar_sources
     dll.cpp encname.cpp errhnd.cpp extract.cpp
     filcreat.cpp file.cpp filefn.cpp filestr.cpp
     find.cpp getbits.cpp global.cpp hash.cpp
-    headers.cpp isnt.cpp match.cpp options.cpp
+    headers.cpp match.cpp options.cpp
     pathfn.cpp qopen.cpp rar.cpp rarpch.cpp
     rarvm.cpp rawread.cpp rdwrfn.cpp rijndael.cpp
     scantree.cpp secpassword.cpp sha1.cpp
@@ -18,6 +18,7 @@ list(TRANSFORM libclamunrar_sources PREPEND ${CLAMAV_DIR}/libclamunrar/)
 
 set(libclamunrar_win32_sources
     ${CLAMWIN_DIR}/src/unrar/extinfo.cpp
+    ${CLAMWIN_DIR}/src/unrar/isnt.cpp
     ${CLAMWIN_DIR}/src/unrar/system.cpp
     ${CLAMWIN_DIR}/resources/libclamunrar.rc
 )
@@ -33,7 +34,7 @@ add_library(libclamunrar SHARED
 
 set_target_properties(libclamunrar PROPERTIES DEFINE_SYMBOL "" PREFIX "" OUTPUT_NAME libclamunrar)
 target_include_directories(libclamunrar PRIVATE ${CLAMAV_DIR}/ ${CLAMWIN_DIR}/resources)
-target_compile_definitions(libclamunrar PRIVATE HAVE_CONFIG_H RARDLL)
+target_compile_definitions(libclamunrar PRIVATE HAVE_CONFIG_H RARDLL WARN_DLOPEN_FAIL _FILE_OFFSET_BITS=64)
 
 if((MINGW) AND (CLAMAV_ARCH STREQUAL "x86"))
     find_library(UNICOWS_LIBRARY
@@ -51,7 +52,7 @@ add_library(libclamunrar_iface SHARED
 )
 
 set_target_properties(libclamunrar_iface PROPERTIES DEFINE_SYMBOL "" PREFIX "" OUTPUT_NAME libclamunrar_iface)
-target_compile_definitions(libclamunrar_iface PRIVATE HAVE_CONFIG_H RARDLL)
+target_compile_definitions(libclamunrar_iface PRIVATE HAVE_CONFIG_H RARDLL WARN_DLOPEN_FAIL _FILE_OFFSET_BITS=64)
 target_include_directories(libclamunrar_iface PRIVATE ${CLAMWIN_DIR}/include ${CLAMAV_DIR} ${CLAMAV_DIR}/libclamunrar ${CLAMWIN_DIR}/resources)
 target_link_libraries(libclamunrar_iface PRIVATE libclamunrar)
 

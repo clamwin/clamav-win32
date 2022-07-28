@@ -17,7 +17,7 @@ bool ExtractSymlink(CommandData *Cmd, ComprDataIO &DataIO, Archive &Arc, const w
     return false;
 }
 
-bool ExtractHardlink(wchar *NameNew, wchar *NameExisting, size_t NameExistingSize)
+bool ExtractHardlink(CommandData* Cmd, wchar* NameNew, wchar* NameExisting, size_t NameExistingSize)
 {
     return false;
 }

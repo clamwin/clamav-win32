@@ -282,9 +282,6 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
 
-/* Define to 1 if you have the <minix/config.h> header file. */
-#undef HAVE_MINIX_CONFIG_H
-
 /* Define to 1 if you have the `mkstemp' function. */
 #define HAVE_MKSTEMP 1
 
@@ -365,9 +362,6 @@
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
-
-/* Define to 1 if you have the <stdio.h> header file. */
-#define HAVE_STDIO_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -470,9 +464,6 @@
 
 /* Define to 1 if you have the `vsnprintf' function. */
 #undef HAVE_VSNPRINTF
-
-/* Define to 1 if you have the <wchar.h> header file. */
-#define HAVE_WCHAR_H 1
 
 /* This value is set to 1 to indicate that the system argz facility works */
 #undef HAVE_WORKING_ARGZ
@@ -699,7 +690,7 @@
 #define USING_PCRE2 1
 
 /* Version number of package */
-#define VERSION "0.103.6"
+#define VERSION "0.103.7"
 
 /* Version suffix for package */
 #define VERSION_SUFFIX ""
