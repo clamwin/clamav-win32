@@ -1,6 +1,7 @@
 /* src/config.h.  Generated from config.h.in by configure.  */
 /* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
+
 /* PCRE2 is written in Standard C, but there are a few non-standard things it
 can cope with, allowing it to run on SunOS4 and other "close to standard"
 systems.
@@ -97,6 +98,9 @@ sure both macros are undefined; an emulation function will then be used. */
 /* Have PTHREAD_PRIO_INHERIT. */
 /* #undef HAVE_PTHREAD_PRIO_INHERIT */
 
+/* Define to 1 if you have the <readline.h> header file. */
+/* #undef HAVE_READLINE_H */
+
 /* Define to 1 if you have the <readline/history.h> header file. */
 /* #undef HAVE_READLINE_HISTORY_H */
 
@@ -113,7 +117,7 @@ sure both macros are undefined; an emulation function will then be used. */
 #define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdio.h> header file. */
-/* #undef HAVE_STDIO_H */
+#define HAVE_STDIO_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -140,7 +144,7 @@ sure both macros are undefined; an emulation function will then be used. */
 #define HAVE_UNISTD_H 1
 
 /* Define to 1 if the compiler supports simple visibility declarations. */
-/* #undef HAVE_VISIBILITY */
+#define HAVE_VISIBILITY 0
 
 /* Define to 1 if you have the <wchar.h> header file. */
 #define HAVE_WCHAR_H 1
@@ -230,7 +234,7 @@ sure both macros are undefined; an emulation function will then be used. */
 #define PACKAGE_NAME "PCRE2"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "PCRE2 10.39"
+#define PACKAGE_STRING "PCRE2 10.42"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "pcre2"
@@ -266,8 +270,18 @@ sure both macros are undefined; an emulation function will then be used. */
 #define PCRE2GREP_MAX_BUFSIZE 1048576
 #endif
 
+/* to make a symbol visible */
+/* #undef PCRE2POSIX_EXP_DECL */
+
+/* to make a symbol visible */
+/* #undef PCRE2POSIX_EXP_DEFN */
+
 /* Define to any value to include debugging code. */
 /* #undef PCRE2_DEBUG */
+
+/* to make a symbol visible */
+/* #undef PCRE2_EXP_DECL */
+
 
 /* If you are compiling for a system other than a Unix-like system or
    Win32, and it needs some magic to be inserted before the definition
@@ -431,8 +445,15 @@ sure both macros are undefined; an emulation function will then be used. */
 /* # undef _XOPEN_SOURCE */
 #endif
 
+
 /* Version number of package */
-#define VERSION "10.39"
+#define VERSION "10.42"
+
+/* Number of bits in a file offset, on hosts where this is settable. */
+/* #undef _FILE_OFFSET_BITS */
+
+/* Define for large files, on AIX-style hosts. */
+/* #undef _LARGE_FILES */
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
