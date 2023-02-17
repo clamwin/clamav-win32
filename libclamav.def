@@ -506,3 +506,23 @@ PEM_X509_INFO_read_bio                  @1217
 
 ; curl 7.80.0
 DES_set_key_unchecked                   @1218
+
+; curl 7.88.0
+BIO_clear_flags                         @1219
+BIO_get_data                            @1220
+BIO_get_shutdown                        @1221
+BIO_meth_free                           @1222
+BIO_meth_new                            @1223
+BIO_meth_set_create                     @1224
+BIO_meth_set_ctrl                       @1225
+BIO_meth_set_destroy                    @1226
+BIO_meth_set_read                       @1227
+BIO_meth_set_write                      @1228
+BIO_set_data                            @1229
+BIO_set_flags                           @1230
+BIO_set_init                            @1231
+BIO_set_shutdown                        @1232
+SSL_CTX_set_cert_store                  @1233
+X509_STORE_free                         @1234
+X509_STORE_load_locations               @1235
+X509_STORE_up_ref                       @1236
