@@ -29,6 +29,8 @@ target_link_libraries(libclamav_llvm PRIVATE libclamav imagehlp psapi)
 set_target_properties(libclamav_llvm PROPERTIES DEFINE_SYMBOL THIS_IS_LIBCLAMAV PREFIX "" OUTPUT_NAME libclamav_llvm)
 
 target_compile_options(libclamav_llvm PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-deprecated-declarations>)
-target_compile_options(libclamav_llvm PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/wd4065 /wd4146 /wd4244 /wd4267 /wd4312 /wd4319 /wd4334 /wd4624 /wd4838>)
+if(MSVC)
+    target_compile_options(libclamav_llvm PRIVATE $<$<COMPILE_LANGUAGE:CXX>:/wd4065 /wd4146 /wd4244 /wd4267 /wd4312 /wd4319 /wd4334 /wd4624 /wd4838>)
+endif()
 
 list(APPEND CLAMAV_INSTALL_TARGETS libclamav_llvm)

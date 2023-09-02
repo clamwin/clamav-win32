@@ -7,8 +7,9 @@ set(3RDPARTY_DIR ${CLAMWIN_DIR}/3rdparty)
 
 option(DISABLE_LLVM "Disable LLVM Engine" OFF)
 
-add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
-add_compile_options($<$<C_COMPILER_ID:MSVC>:/MP>)
+if(MSVC)
+
+endif()
 
 set(CLAMWIN_INCLUDES
     ${CLAMWIN_DIR}/resources
@@ -51,7 +52,8 @@ if(MINGW)
 elseif(MSVC)
     set(CMAKE_DEBUG_POSTFIX d)
     add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
-    add_compile_options(/wd4996 /wd4005)
+    add_compile_options($<$<COMPILE_LANGUAGE:C>:/MP$<SEMICOLON>/wd4996$<SEMICOLON>/wd4005>)
+    add_compile_options($<$<COMPILE_LANGUAGE:CXX>:/MP$<SEMICOLON>/wd4996$<SEMICOLON>/wd4005>)
 endif()
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
