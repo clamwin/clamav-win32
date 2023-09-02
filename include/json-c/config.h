@@ -62,6 +62,9 @@
 #define HAVE_SYS_PARAM_H 1
 #endif
 
+/* Define to 1 if you have the <sys/random.h> header file. */
+/* #undef HAVE_SYS_RANDOM_H */
+
 /* Define to 1 if you have the <sys/resource.h> header file. */
 /* #undef HAVE_SYS_RESOURCE_H */
 
@@ -76,6 +79,12 @@
 
 /* Define to 1 if you have the <xlocale.h> header file. */
 /* #undef HAVE_XLOCALE_H */
+
+/* Define to 1 if you have the <bsd/stdlib.h> header file. */
+/* #undef HAVE_BSD_STDLIB_H */
+
+/* Define to 1 if you have `arc4random' */
+/* #undef HAVE_ARC4RANDOM */
 
 /* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
 /* #undef HAVE_DOPRNT */
@@ -143,7 +152,10 @@
 #endif
 
 /* Define to 1 if you have the `uselocale' function. */
-#undef HAVE_USELOCALE
+/* #undef HAVE_USELOCALE */
+
+/* Define to 1 if newlocale() needs freelocale() called on it's `base` argument */
+/* #undef NEWLOCALE_NEEDS_FREELOCALE */
 
 /* Define to 1 if you have the `vasprintf' function. */
 #define HAVE_VASPRINTF 1
@@ -156,6 +168,9 @@
 
 /* Define to 1 if you have the `vsyslog' function. */
 /* #undef HAVE_VSYSLOG */
+
+/* Define if you have the `getrandom' function. */
+/* #undef HAVE_GETRANDOM */
 
 /* Define if you have the `getrusage' function. */
 /* #undef HAVE_GETRUSAGE */
@@ -194,7 +209,7 @@
 #define PACKAGE_NAME "json-c"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "json-c 0.15."
+#define PACKAGE_STRING "json-c 0.17."
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "json-c"
@@ -203,7 +218,7 @@
 #define PACKAGE_URL "https://github.com/json-c/json-c"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.15."
+#define PACKAGE_VERSION "0.17."
 
 /* The number of bytes in type int */
 #define SIZEOF_INT 4
@@ -242,7 +257,7 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.15."
+#define VERSION "0.17."
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
