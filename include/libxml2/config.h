@@ -1,12 +1,12 @@
 #ifndef __LIBXML_WIN32_CONFIG__
 #define __LIBXML_WIN32_CONFIG__
 
-#define HAVE_SYS_STAT_H
-#define HAVE_STAT
-#define HAVE_FCNTL_H
+#define HAVE_SYS_STAT_H 1
+#define HAVE_STAT 1
+#define HAVE_FCNTL_H 1
 
 #if defined(__MINGW32__) || (defined(_MSC_VER) && _MSC_VER >= 1600)
-  #define HAVE_STDINT_H
+  #define HAVE_STDINT_H 1
 #endif
 
 #if defined(_MSC_VER)
@@ -19,4 +19,3 @@
 #endif
 
 #endif /* __LIBXML_WIN32_CONFIG__ */
-
