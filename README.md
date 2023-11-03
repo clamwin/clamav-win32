@@ -29,15 +29,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ## 3rdparty libraries and versions
 
-- OpenSSL: 1.1.1v
+- OpenSSL: 1.1.1w
 - bzip2: 1.0.8
-- curl: 8.2.1
+- curl: 8.4.0
 - gnulib: old version but still fine for my needs
 - json-c: 0.17-20230812
 - libunicows: 1.1.2 (32bit builds only)
-- libxml2: 2.11.4
+- libxml2: 2.11.5
 - pcre2: 10.42
-- PDCurses: PDCurses\_3\_4-1642-g4124f52f
+- PDCurses: git-d4e69e63
 - Pthreads-w32: 2.9.1 + some fixes
 - zlib: 1.3
 

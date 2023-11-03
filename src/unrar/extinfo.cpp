@@ -21,8 +21,3 @@ bool ExtractHardlink(CommandData* Cmd, wchar* NameNew, wchar* NameExisting, size
 {
     return false;
 }
-
-bool LinksToDirs(const wchar* SrcName, const wchar* SkipPart, std::wstring& LastChecked)
-{
-    return false;
-}

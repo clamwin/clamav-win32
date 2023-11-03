@@ -526,3 +526,6 @@ SSL_CTX_set_cert_store                  @1233
 X509_STORE_free                         @1234
 X509_STORE_load_locations               @1235
 X509_STORE_up_ref                       @1236
+
+; curl 8.4.0
+X509_ALGOR_get0                         @1237
