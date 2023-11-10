@@ -16,17 +16,13 @@ target_compile_definitions(curl PRIVATE
     HTTP_ONLY
     USE_OPENSSL
     USE_THREADS_WIN32
-    ENABLE_IPV6
 
-    HAVE_GETADDRINFO=1
-    HAVE_GETADDRINFO_THREADSAFE=1
     HAVE_IOCTLSOCKET=1
     HAVE_IOCTLSOCKET_FIONBIO=1
     HAVE_RECV=1
     HAVE_SEND=1
 
     HAVE_WINDOWS_H=1
-    HAVE_WS2TCPIP_H=1
     HAVE_WINSOCK2_H=1
     HAVE_GETHOSTNAME=1
     HAVE_LIBZ=1
@@ -41,7 +37,6 @@ target_compile_definitions(curl PRIVATE
     HAVE_STRICMP=1
     HAVE_STRCMPI=1
     HAVE_CLOSESOCKET=1
-    HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID=1
     HAVE_SIGNAL=1
     STDC_HEADERS=1
 )
@@ -52,4 +47,11 @@ if((MINGW) AND (CLAMAV_ARCH STREQUAL "x86"))
     target_compile_definitions(curl PRIVATE _WIN32_WINNT=0x400)
 else()
     target_link_libraries(curl PRIVATE bcrypt)
+    target_compile_definitions(curl PRIVATE
+        ENABLE_IPV6
+        HAVE_WS2TCPIP_H=1
+        HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID=1
+        HAVE_GETADDRINFO=1
+        HAVE_GETADDRINFO_THREADSAFE=1
+    )
 endif()
