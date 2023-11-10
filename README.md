@@ -34,6 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 - curl: 8.4.0
 - gnulib: old version but still fine for my needs
 - json-c: 0.17-20230812
+- libunicows: 1.1.2 (32bit builds only)
 - libxml2: 2.11.5
 - pcre2: 10.42
 - PDCurses: git-d4e69e63
@@ -53,7 +54,8 @@ Clone repository using:
   paths can be also `REG_EXPAND_SZ`, environment variables are
   allowed here (i.e. you can use paths like `%HomeDrive%\ClamAV`).
 
-- libclamunrar does not work on windows 98
+- libclamunrar needs `unicows.dll` when used on Windows 9x, you can download
+  [Open Layer For Unicode](https://oss.netfarm.it/clamav/files/opencow-0.7.7z)
 
 - On WinNT4 you may need to set OPENSSL\_ia32cap environment variable to 0x16980010 because
   NT4 does not support SSE out of the box (it will crash with illegal instruction).

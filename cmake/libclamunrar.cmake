@@ -36,6 +36,14 @@ set_target_properties(libclamunrar PROPERTIES DEFINE_SYMBOL "" PREFIX "" OUTPUT_
 target_include_directories(libclamunrar PRIVATE ${CLAMAV_DIR}/ ${CLAMWIN_DIR}/resources)
 target_compile_definitions(libclamunrar PRIVATE HAVE_CONFIG_H RARDLL WARN_DLOPEN_FAIL _FILE_OFFSET_BITS=64)
 
+if((MINGW) AND (CLAMAV_ARCH STREQUAL "x86"))
+    find_library(UNICOWS_LIBRARY
+        NAMES libunicows.a unicows libunicows
+        HINTS ${3RDPARTY_DIR}/libunicows
+        NO_DEFAULT_PATH)
+    target_link_libraries(libclamunrar PRIVATE ${UNICOWS_LIBRARY})
+endif()
+
 # libclamunrar_iface
 add_library(libclamunrar_iface SHARED
     ${CLAMAV_DIR}/libclamunrar_iface/unrar_iface.cpp
