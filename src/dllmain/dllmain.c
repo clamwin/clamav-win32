@@ -424,7 +424,9 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
     switch (reason)
     {
         case DLL_PROCESS_ATTACH:
+#ifdef PTW32_STATIC_LIB
             pthread_win32_process_attach_np();
+#endif
             cwi_processattach();
             _set_invalid_parameter_handler(clamavInvalidParameterHandler);
             fix_paths();
@@ -433,15 +435,25 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
             break;
         case DLL_THREAD_ATTACH:
             tls_storage_alloc();
+#ifdef PTW32_STATIC_LIB
             return pthread_win32_thread_attach_np();
+#else
+            return TRUE;
+#endif
         case DLL_THREAD_DETACH:
             tls_storage_free();
+#ifdef PTW32_STATIC_LIB
             return pthread_win32_thread_detach_np();
+#else
+            return TRUE;
+#endif
         case DLL_PROCESS_DETACH:
             tls_storage_free();
             tls_index_free();
+#ifdef PTW32_STATIC_LIB
             pthread_win32_thread_detach_np();
             pthread_win32_process_detach_np();
+#endif
             WSACleanup();
             dynUnLoad();
     }

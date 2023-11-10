@@ -206,28 +206,6 @@ CONFDIR_MILTER                      @178 NONAME DATA
 ; mpool
 mpool_getstats                      @179 NONAME
 
-; Pthreads-win32 @ 200
-pthread_attr_destroy                @200 NONAME
-pthread_attr_init                   @201 NONAME
-pthread_attr_setdetachstate         @202 NONAME
-pthread_cond_broadcast              @203 NONAME
-pthread_cond_destroy                @204 NONAME
-pthread_cond_init                   @205 NONAME
-pthread_cond_signal                 @206 NONAME
-pthread_cond_timedwait              @207 NONAME
-pthread_cond_wait                   @208 NONAME
-pthread_create                      @209 NONAME
-pthread_detach                      @210 NONAME
-pthread_getspecific                 @211 NONAME
-pthread_key_create                  @212 NONAME
-pthread_mutex_destroy               @213 NONAME
-pthread_mutex_init                  @214 NONAME
-pthread_mutex_lock                  @215 NONAME
-pthread_mutex_unlock                @216 NONAME
-pthread_once                        @217 NONAME
-pthread_setspecific                 @218 NONAME
-pthread_join                        @219 NONAME
-
 ; zlib @ 250
 gzclose                             @250 NONAME
 gzdopen                             @251 NONAME

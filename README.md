@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 - [**clamav**] nice icons ;)
 - [**clamscan**] memory scanner (in memory loaded modules are scanned n-disk)
 - [**llvm**] jit dll is optional, and since not supported on old os will be loaded dinamically
-- [**freshclam**] native dns txt query on Win98/ME/NT4 / DnsAPI query on Win2k+
+- [**freshclam**] native dns txt query on NT4 / DnsAPI query on Win2k+
 - [**clamdtop**] curses ui to connect to a running clamd service
 - [**clamd/freshclam**] as Windows Service
 
@@ -106,4 +106,4 @@ Finally start the service with net start clamd
 
 ---
 
-## Please dot report bugs directly to bugs@clamav.net, instead use github issue tracker <https://github.com/clamwin/clamav-win32/issues>
+## Please dot report bugs directly to <bugs@clamav.net>, instead use github issue tracker <https://github.com/clamwin/clamav-win32/issues>

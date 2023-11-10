@@ -6,10 +6,24 @@ set(CLAMAV_DIR ${CLAMWIN_DIR}/clamav)
 set(3RDPARTY_DIR ${CLAMWIN_DIR}/3rdparty)
 
 option(DISABLE_LLVM "Disable LLVM Engine" OFF)
+set(BUILD_PTHREADS TRUE)
 
-if(MSVC)
-
+if(MINGW)
+    execute_process(
+        COMMAND ${CMAKE_C_COMPILER} -dumpversion
+        OUTPUT_VARIABLE GCC_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(${GCC_VERSION} MATCHES "posix$")
+        set(BUILD_PTHREADS FALSE)
+    endif()
 endif()
+
+add_custom_command(
+        OUTPUT libclamav.dev
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/genversion.py
+        ${CMAKE_CURRENT_BINARY_DIR}/viewer_version.hpp
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/genversion.py ${GIT_HEAD} ${BUILD_GRADLE}
+)
 
 set(CLAMWIN_INCLUDES
     ${CLAMWIN_DIR}/resources
@@ -29,7 +43,6 @@ set(CLAMWIN_INCLUDES
     ${3RDPARTY_DIR}/libxml2/include
     ${3RDPARTY_DIR}/openssl/include
     ${3RDPARTY_DIR}/pcre2/src
-    ${3RDPARTY_DIR}/pthreads
 )
 
 set(CLAMWIN_DEFINES
@@ -37,10 +50,19 @@ set(CLAMWIN_DEFINES
     HAVE_CONFIG_H
     WIN32_LEAN_AND_MEAN
     PCRE2_STATIC
-    PTW32_STATIC_LIB
     LIBXML_STATIC
     NOBZ2PREFIX
 )
+
+configure_file(libclamav.def ${CMAKE_BINARY_DIR}/libclamav.def @ONLY)
+
+if(BUILD_PTHREADS)
+    list(APPEND CLAMWIN_INCLUDES ${3RDPARTY_DIR}/pthreads)
+    list(APPEND CLAMWIN_DEFINES PTW32_STATIC_LIB)
+
+    file(READ pthreads.def PTHREADS_CONTENT)
+    file(APPEND ${CMAKE_BINARY_DIR}/libclamav.def "\n${PTHREADS_CONTENT}")
+endif()
 
 if(MINGW)
     link_libraries("-static")

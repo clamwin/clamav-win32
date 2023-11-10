@@ -32,22 +32,21 @@ list(REMOVE_ITEM libclamav_sources
     ${CLAMAV_DIR}/libclamav/tomsfastmath/misc/fp_ident.c)
 
 file(GLOB libclamav_win32_sources ${CLAMWIN_DIR}/src/dllmain/*.c)
-if(MINGW)
-    list(APPEND libclamav_win32_sources ${CLAMWIN_DIR}/src/dllmain/pthread-mingw.c)
-else()
+if(BUILD_PTHREADS AND NOT MINGW)
     list(APPEND libclamav_win32_sources ${3RDPARTY_DIR}/pthreads/pthread.c)
 endif()
 
 file(GLOB_RECURSE libclamav_win32_headers ${CLAMWIN_DIR}/include/*.h)
 
 source_group("Win32 Files" FILES ${libclamav_win32_sources})
+list(APPEND libclamav_win32_sources ${CMAKE_BINARY_DIR}/libclamav.def)
+set_source_files_properties(${CMAKE_BINARY_DIR}/libclamav.def PROPERTIES GENERATED TRUE)
 
 add_library(libclamav SHARED
     ${libclamav_win32_headers}
     ${libclamav_sources}
     ${libclamav_win32_sources}
     ${CLAMWIN_DIR}/resources/libclamav.rc
-    ${CLAMWIN_DIR}/libclamav.def
 )
 
 set_target_properties(libclamav PROPERTIES DEFINE_SYMBOL THIS_IS_LIBCLAMAV PREFIX "" OUTPUT_NAME libclamav)
@@ -77,5 +76,8 @@ endif()
 list(APPEND CLAMAV_INSTALL_TARGETS libclamav)
 
 install(FILES ${3RDPARTY_DIR}/openssl/LICENSE DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME COPYING.openssl)
-install(FILES ${3RDPARTY_DIR}/pthreads/COPYING DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME COPYING.pthreads-win32)
 install(FILES ${3RDPARTY_DIR}/gnulib/COPYING DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME COPYING.gnulib)
+
+if(BUILD_PTHREADS)
+    install(FILES ${3RDPARTY_DIR}/pthreads/COPYING DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME COPYING.pthreads-win32)
+endif()
