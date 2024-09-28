@@ -15,7 +15,7 @@ list(TRANSFORM libxml2_sources PREPEND ${3RDPARTY_DIR}/libxml2/)
 add_library(libxml2 STATIC ${libxml2_headers} ${libxml2_sources})
 set_target_properties(libxml2 PROPERTIES PREFIX "")
 target_include_directories(libxml2 PRIVATE ${CLAMWIN_DIR}/include/libxml2 ${3RDPARTY_DIR}/libxml2/include)
-target_compile_definitions(libxml2 PRIVATE LIBXML_STATIC)
+target_compile_definitions(libxml2 PRIVATE LIBXML_STATIC LIBXML_STATIC_FOR_DLL)
 target_compile_options(libxml2 PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4244 /wd4267>)
 
 install(FILES ${3RDPARTY_DIR}/libxml2/Copyright DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME COPYING.libxml2)
