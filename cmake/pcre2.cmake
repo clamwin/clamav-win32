@@ -1,7 +1,7 @@
 file(GLOB pcre2_headers ${3RDPARTY_DIR}/pcre2/src/*.h ${CLAMWIN_DIR}/include/pcre2/*.h)
 
 set(pcre2_sources
-    pcre2_auto_possess.c pcre2_compile.c pcre2_context.c
+    pcre2_auto_possess.c pcre2_chkdint.c pcre2_compile.c pcre2_context.c
     pcre2_error.c pcre2_find_bracket.c pcre2_jit_compile.c pcre2_match.c pcre2_match_data.c
     pcre2_newline.c pcre2_pattern_info.c pcre2_script_run.c pcre2_string_utils.c
     pcre2_study.c pcre2_tables.c pcre2_ucd.c pcre2_valid_utf.c pcre2posix.c)

@@ -59,6 +59,9 @@ sure both macros are undefined; an emulation function will then be used. */
 /* Define to 1 if you have the `bcopy' function. */
 /* #undef HAVE_BCOPY */
 
+/* Define this if your compiler provides __builtin_mul_overflow() */
+/* #undef  HAVE_BUILTIN_MUL_OVERFLOW */
+
 /* Define to 1 if you have the <bzlib.h> header file. */
 #define HAVE_BZLIB_H 1
 
@@ -80,16 +83,16 @@ sure both macros are undefined; an emulation function will then be used. */
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1
 
-/* Define to 1 if you have the `memfd_create' function. */
+/* Define to 1 if you have the 'memfd_create' function. */
 /* #undef HAVE_MEMFD_CREATE */
 
-/* Define to 1 if you have the `memmove' function. */
+/* Define to 1 if you have the 'memmove' function. */
 #define HAVE_MEMMOVE 1
 
 /* Define to 1 if you have the <minix/config.h> header file. */
 /* #undef HAVE_MINIX_CONFIG_H */
 
-/* Define to 1 if you have the `mkostemp' function. */
+/* Define to 1 if you have the 'mkostemp' function. */
 /* #undef HAVE_MKOSTEMP */
 
 /* Define if you have POSIX threads libraries and header files. */
@@ -110,7 +113,7 @@ sure both macros are undefined; an emulation function will then be used. */
 /* Define to 1 if you have the `realpath' function. */
 /* #undef HAVE_REALPATH */
 
-/* Define to 1 if you have the `secure_getenv' function. */
+/* Define to 1 if you have the 'secure_getenv' function. */
 /* #undef HAVE_SECURE_GETENV */
 
 /* Define to 1 if you have the <stdint.h> header file. */
@@ -122,7 +125,7 @@ sure both macros are undefined; an emulation function will then be used. */
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
 
-/* Define to 1 if you have the `strerror' function. */
+/* Define to 1 if you have the 'strerror' function. */
 #define HAVE_STRERROR 1
 
 /* Define to 1 if you have the <strings.h> header file. */
@@ -158,18 +161,14 @@ sure both macros are undefined; an emulation function will then be used. */
 /* This limits the amount of memory that may be used while matching a pattern.
    It applies to both pcre2_match() and pcre2_dfa_match(). It does not apply
    to JIT matching. The value is in kibibytes (units of 1024 bytes). */
-#ifndef HEAP_LIMIT
 #define HEAP_LIMIT 20000000
-#endif
 
 /* The value of LINK_SIZE determines the number of bytes used to store links
    as offsets within the compiled regex. The default is 2, which allows for
    compiled patterns up to 65535 code units long. This covers the vast
    majority of cases. However, PCRE2 can also be compiled to use 3 or 4 bytes
    instead. This allows for longer patterns in extreme cases. */
-#ifndef LINK_SIZE
 #define LINK_SIZE 2
-#endif
 
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 /* #undef LT_OBJDIR */
@@ -179,11 +178,9 @@ sure both macros are undefined; an emulation function will then be used. */
    matching attempt. The value is also used to limit a loop counter in
    pcre2_dfa_match(). There is a runtime interface for setting a different
    limit. The limit exists in order to catch runaway regular expressions that
-   take for ever to determine that they do not match. The default is set very
+   take forever to determine that they do not match. The default is set very
    large so that it does not accidentally catch legitimate cases. */
-#ifndef MATCH_LIMIT
 #define MATCH_LIMIT 10000000
-#endif
 
 /* The above limit applies to all backtracks, whether or not they are nested.
    In some environments it is desirable to limit the nesting of backtracking
@@ -195,23 +192,21 @@ sure both macros are undefined; an emulation function will then be used. */
    limit. In the case of pcre2_dfa_match(), this limit controls the depth of
    the internal nested function calls that are used for pattern recursions,
    lookarounds, and atomic groups. */
-#ifndef MATCH_LIMIT_DEPTH
 #define MATCH_LIMIT_DEPTH MATCH_LIMIT
-#endif
 
 /* This limit is parameterized just in case anybody ever wants to change it.
    Care must be taken if it is increased, because it guards against integer
    overflow caused by enormously large patterns. */
-#ifndef MAX_NAME_COUNT
 #define MAX_NAME_COUNT 10000
-#endif
 
 /* This limit is parameterized just in case anybody ever wants to change it.
    Care must be taken if it is increased, because it guards against integer
    overflow caused by enormously large patterns. */
-#ifndef MAX_NAME_SIZE
-#define MAX_NAME_SIZE 32
-#endif
+#define MAX_NAME_SIZE 128
+
+/* The value of MAX_VARLOOKBEHIND specifies the default maximum length, in
+   characters, for a variable-length lookbehind assertion. */
+#define MAX_VARLOOKBEHIND 255
 
 /* Defining NEVER_BACKSLASH_C locks out the use of \C in all patterns. */
 /* #undef NEVER_BACKSLASH_C */
@@ -220,9 +215,7 @@ sure both macros are undefined; an emulation function will then be used. */
    sequence. PCRE2 client programs can override this by selecting other values
    at run time. The valid values are 1 (CR), 2 (LF), 3 (CRLF), 4 (ANY), 5
    (ANYCRLF), and 6 (NUL). */
-#ifndef NEWLINE_DEFAULT
 #define NEWLINE_DEFAULT 2
-#endif
 
 /* Name of package */
 #define PACKAGE "pcre2"
@@ -234,7 +227,7 @@ sure both macros are undefined; an emulation function will then be used. */
 #define PACKAGE_NAME "PCRE2"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "PCRE2 10.42"
+#define PACKAGE_STRING "PCRE2 10.44"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "pcre2"
@@ -243,14 +236,12 @@ sure both macros are undefined; an emulation function will then be used. */
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "10.39"
+#define PACKAGE_VERSION "10.44"
 
 /* The value of PARENS_NEST_LIMIT specifies the maximum depth of nested
    parentheses (of any kind) in a pattern. This limits the amount of system
    stack that is used while compiling a pattern. */
-#ifndef PARENS_NEST_LIMIT
 #define PARENS_NEST_LIMIT 250
-#endif
 
 /* The value of PCRE2GREP_BUFSIZE is the starting size of the buffer used by
    pcre2grep to hold parts of the file it is searching. The buffer will be
@@ -258,37 +249,28 @@ sure both macros are undefined; an emulation function will then be used. */
    very long lines. The actual amount of memory used by pcre2grep is three
    times this number, because it allows for the buffering of "before" and
    "after" lines. */
-#ifndef PCRE2GREP_BUFSIZE
 #define PCRE2GREP_BUFSIZE 20480
-#endif
 
 /* The value of PCRE2GREP_MAX_BUFSIZE specifies the maximum size of the buffer
    used by pcre2grep to hold parts of the file it is searching. The actual
    amount of memory used by pcre2grep is three times this number, because it
    allows for the buffering of "before" and "after" lines. */
-#ifndef PCRE2GREP_MAX_BUFSIZE
 #define PCRE2GREP_MAX_BUFSIZE 1048576
-#endif
-
-/* to make a symbol visible */
-/* #undef PCRE2POSIX_EXP_DECL */
-
-/* to make a symbol visible */
-/* #undef PCRE2POSIX_EXP_DEFN */
 
 /* Define to any value to include debugging code. */
 /* #undef PCRE2_DEBUG */
 
 /* to make a symbol visible */
-/* #undef PCRE2_EXP_DECL */
+#define PCRE2_EXPORT
 
 
 /* If you are compiling for a system other than a Unix-like system or
    Win32, and it needs some magic to be inserted before the definition
    of a function that is exported by the library, define this macro to
    contain the relevant magic. If you do not define this macro, a suitable
-    __declspec value is used for Windows systems; in other environments
-   "extern" is used for a C compiler and "extern C" for a C++ compiler.
+   __declspec value is used for Windows systems; in other environments
+   a compiler relevant "extern" is used with any "visibility" related
+   attributes from PCRE2_EXPORT included.
    This macro apears at the start of every exported function that is part
    of the external API. It does not appear on functions that are "external"
    in the C sense, but which are internal to the library. */
@@ -306,10 +288,13 @@ sure both macros are undefined; an emulation function will then be used. */
    unless SUPPORT_JIT is also defined. */
 /* #undef SLJIT_PROT_EXECUTABLE_ALLOCATOR */
 
-/* Define to 1 if all of the C90 standard headers exist (not just the ones
+/* Define to 1 if all of the C89 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
    backward compatibility; new code need not use it. */
 #define STDC_HEADERS 1
+
+/* Define to any value to enable differential fuzzing support. */
+/* #undef SUPPORT_DIFF_FUZZ */
 
 /* Define to any value to enable support for Just-In-Time compiling. */
 /* #undef SUPPORT_JIT */
@@ -358,7 +343,7 @@ sure both macros are undefined; an emulation function will then be used. */
 /* Define to any value for valgrind support to find invalid memory reads. */
 /* #undef SUPPORT_VALGRIND */
 
-/* Enable extensions on AIX 3, Interix.  */
+/* Enable extensions on AIX, Interix, z/OS.  */
 #ifndef _ALL_SOURCE
 # define _ALL_SOURCE 1
 #endif
@@ -419,11 +404,15 @@ sure both macros are undefined; an emulation function will then be used. */
 #ifndef __STDC_WANT_IEC_60559_DFP_EXT__
 # define __STDC_WANT_IEC_60559_DFP_EXT__ 1
 #endif
+/* Enable extensions specified by C23 Annex F.  */
+#ifndef __STDC_WANT_IEC_60559_EXT__
+# define __STDC_WANT_IEC_60559_EXT__ 1
+#endif
 /* Enable extensions specified by ISO/IEC TS 18661-4:2015.  */
 #ifndef __STDC_WANT_IEC_60559_FUNCS_EXT__
 # define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
 #endif
-/* Enable extensions specified by ISO/IEC TS 18661-3:2015.  */
+/* Enable extensions specified by C23 Annex H and ISO/IEC TS 18661-3:2015.  */
 #ifndef __STDC_WANT_IEC_60559_TYPES_EXT__
 # define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
 #endif
@@ -447,20 +436,26 @@ sure both macros are undefined; an emulation function will then be used. */
 
 
 /* Version number of package */
-#define VERSION "10.42"
+#define VERSION "10.44"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
-/* #undef _FILE_OFFSET_BITS */
+#define _FILE_OFFSET_BITS 64
 
-/* Define for large files, on AIX-style hosts. */
+/* Define to 1 on platforms where this makes off_t a 64-bit type. */
 /* #undef _LARGE_FILES */
 
-/* Define to empty if `const' does not conform to ANSI C. */
+/* Number of bits in time_t, on hosts where this is settable. */
+/* #undef _TIME_BITS */
+
+/* Define to 1 on platforms where this makes time_t a 64-bit type. */
+/* #undef __MINGW_USE_VC2005_COMPAT */
+
+/* Define to empty if 'const' does not conform to ANSI C. */
 /* #undef const */
 
 /* Define to the type of a signed integer type of width exactly 64 bits if
    such a type exists and the standard includes do not define it. */
 /* #undef int64_t */
 
-/* Define to `unsigned int' if <sys/types.h> does not define. */
+/* Define as 'unsigned int' if <stddef.h> doesn't define. */
 /* #undef size_t */
