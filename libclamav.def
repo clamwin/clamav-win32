@@ -258,6 +258,9 @@ cli_bytefunc_describe               @367 NONAME
 cli_bytetype_describe               @368 NONAME
 cli_bytevalue_describe              @369 NONAME
 
+; freshclam @ 0.103.12
+__cli_strndup                       @370 NONAME                       
+
 ; openssl @1000
 ASN1_STRING_get0_data                   @1000
 ASN1_STRING_length                      @1001
@@ -507,3 +510,19 @@ X509_STORE_up_ref                       @1236
 
 ; curl 8.4.0
 X509_ALGOR_get0                         @1237
+
+; curl 8.10.1
+OBJ_nid2sn                              @1238
+OBJ_obj2txt                             @1239
+OBJ_find_sigid_algs                     @1240
+EVP_get_digestbyname                    @1241
+EVP_PKEY_bits                           @1242
+EVP_PKEY_security_bits                  @1243
+X509_digest                             @1244
+X509_get_signature_nid                  @1245
+X509_get0_pubkey                        @1246
+i2d_SSL_SESSION                         @1247
+d2i_SSL_SESSION                         @1248
+TLS_method                              @1249
+SSL_get0_verified_chain                 @1250
+EVP_sha512_256                          @1251

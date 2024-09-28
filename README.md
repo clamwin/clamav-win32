@@ -1,6 +1,6 @@
-# ClamAV native win32 port - 0.103.10
+# ClamAV native win32 port - 0.103.12
 
-Copyright (c) 2005-2023 Gianluigi Tiesi <sherpya@netfarm.it>
+Copyright (c) 2005-2024 Gianluigi Tiesi <sherpya@netfarm.it>
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -31,15 +31,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 - OpenSSL: 1.1.1w
 - bzip2: 1.0.8
-- curl: 8.4.0
+- curl: 8.10.1
 - gnulib: old version but still fine for my needs
-- json-c: 0.17-20230812
+- json-c: 0.18-20240915
 - libunicows: 1.1.2 (32bit builds only)
-- libxml2: 2.11.5
-- pcre2: 10.42
-- PDCurses: git-d4e69e63
+- libxml2: 2.13.4
+- pcre2: 10.44
+- PDCurses: git-6ba6df38
 - Pthreads-w32: 2.9.1 + some fixes
-- zlib: 1.3
+- zlib: 1.3.1
 
 ## Getting sources
 
