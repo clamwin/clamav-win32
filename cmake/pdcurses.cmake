@@ -1,6 +1,6 @@
 
 set(PDCURSES ${3RDPARTY_DIR}/PDCurses)
-set(osdir ${PDCURSES}/wingui)
+set(osdir ${PDCURSES}/wincon)
 
 file(GLOB pdcurses_headers
     ${PDCURSES}/*.h
