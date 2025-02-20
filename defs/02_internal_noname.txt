@@ -1,0 +1,125 @@
+cli_ac_chklsig
+cli_chomp
+cli_ctime
+cli_filecopy
+cli_determine_fmap_type
+cli_scan_fmap
+cli_ftw
+cli_gentemp
+cli_gentempfd
+cli_gettmpdir
+cli_hashfile
+cli_hashset_destroy
+cli_hashstream
+cli_hex2str
+cli_hex2ui
+cli_initroots
+cli_isnumber
+cli_ldbtokenize
+cli_matchregex
+cli_ole2_extract
+cli_pcre_perf_events_destroy
+cli_pcre_perf_print
+cli_ppt_vba_read
+cli_readn
+cli_regcomp
+cli_regexec
+cli_regfree
+cli_rndnum
+cli_scancpio_newc
+cli_scancpio_odc
+cli_scancpio_old
+cli_scanmacho
+cli_sigperf_events_destroy
+cli_sigperf_print
+cli_str2hex
+cli_strbcasestr
+cli_strerror
+cli_strtok
+cli_strtokenize
+cli_utf16toascii
+cli_vba_inflate
+cli_vba_readdir
+cli_versig2
+cli_wm_decrypt_macro
+cli_wm_readdir
+cli_writen
+cli_genhash_pe
+cli_free_vba_project
+cli_check_auth_header
+cli_gentemp_with_prefix
+cli_realpath
+cli_strntoul
+cli_get_filepath_from_filedesc
+cli_add_content_match_pattern
+readdb_parse_ldb_subsignature
+
+; 1.4.2
+cli_basename
+cli_infomsg_simple
+cli_dbgmsg
+cli_dbgmsg_no_inline
+cli_safer_strdup
+cli_safer_realloc
+cli_get_debug_flag
+cli_getdsig
+cli_checklimits
+cli_matchmeta
+cli_magic_scan_buff
+
+html_normalise_map
+text_normalize_init
+text_normalize_reset
+text_normalize_map
+uniq_get
+fmap
+
+; mpool
+mpool_getstats
+
+; LLVM
+cli_debug_flag                      DATA
+cli_errmsg
+cli_warnmsg
+
+cli_apicall_maxapi                  DATA
+cli_apicall_maxglobal               DATA
+cli_apicall_maxtypes                DATA
+cli_apicall_types                   DATA
+cli_apicalls                        DATA
+cli_apicalls0                       DATA
+cli_apicalls1                       DATA
+cli_apicalls2                       DATA
+cli_apicalls3                       DATA
+cli_apicalls4                       DATA
+cli_apicalls5                       DATA
+cli_apicalls6                       DATA
+cli_apicalls7                       DATA
+cli_apicalls8                       DATA
+cli_apicalls9                       DATA
+cli_globals                         DATA
+
+; clambc
+cli_bytecode_context_alloc
+cli_bytecode_context_destroy
+cli_bytecode_context_getresult_int
+cli_bytecode_context_set_trace
+cli_bytecode_context_setfile
+cli_bytecode_context_setfuncid
+cli_bytecode_context_setparam_int
+cli_bytecode_debug
+cli_bytecode_debug_printsrc
+cli_bytecode_describe
+cli_bytecode_destroy
+cli_bytecode_done
+cli_bytecode_init
+cli_bytecode_load
+cli_bytecode_prepare2
+cli_bytecode_printversion
+cli_bytecode_run
+cli_bytefunc_describe
+cli_bytetype_describe
+cli_bytevalue_describe
+
+; freshclam @ 0.103.12
+__cli_strndup

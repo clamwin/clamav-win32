@@ -1,8 +1,4 @@
 file(GLOB clambc_sources ${CLAMAV_DIR}/clambc/*.c)
-list(APPEND clambc_sources
-    ${CLAMAV_DIR}/shared/output.c
-    ${CLAMAV_DIR}/shared/misc.c
-)
 
 set(clambc_win32_sources
     ${CLAMWIN_DIR}/src/helpers/cw_main.c
@@ -20,6 +16,6 @@ add_executable(clambc
 
 target_include_directories(clambc PRIVATE ${CLAMWIN_INCLUDES})
 target_compile_definitions(clambc PRIVATE ${CLAMWIN_DEFINES})
-target_link_libraries(clambc PRIVATE libclamav ws2_32)
+target_link_libraries(clambc PRIVATE libclamav ClamAV::libclamav_rust ws2_32)
 
 list(APPEND CLAMAV_INSTALL_TARGETS clambc)

@@ -43,4 +43,7 @@
 #include <sys/types.h>
 extern int ftruncate(int fd, off_t length);
 
+#define getuid() 0
+#define getgid() 0
+
 #endif /* _UNISTD_H */

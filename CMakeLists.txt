@@ -1,11 +1,11 @@
-cmake_minimum_required (VERSION 3.6)
+cmake_minimum_required (VERSION 3.10)
 project(clamav-win32)
 
 set(CLAMWIN_DIR ${CMAKE_SOURCE_DIR})
 set(CLAMAV_DIR ${CLAMWIN_DIR}/clamav)
 set(3RDPARTY_DIR ${CLAMWIN_DIR}/3rdparty)
 
-option(DISABLE_LLVM "Disable LLVM Engine" OFF)
+option(DISABLE_LLVM "Disable LLVM Engine" ON)
 set(BUILD_PTHREADS TRUE)
 
 if(MINGW)
@@ -32,8 +32,10 @@ set(CLAMWIN_INCLUDES
     ${CLAMWIN_DIR}/include/libxml2
     ${CLAMWIN_DIR}/include/pcre2
     ${CLAMAV_DIR}
-    ${CLAMAV_DIR}/shared
+    ${CLAMAV_DIR}/common
+    ${CLAMAV_DIR}/win32/compat
     ${CLAMAV_DIR}/libclamav
+    ${CLAMAV_DIR}/libclamav_rust
     ${CLAMAV_DIR}/libclamunrar_iface
     ${CLAMAV_DIR}/libclammspack/mspack
     ${3RDPARTY_DIR}
@@ -93,6 +95,7 @@ include(cmake/libxml2.cmake)
 include(cmake/libclammspack.cmake)
 
 include(cmake/libclamav.cmake)
+include(cmake/libclamav_common.cmake)
 include(cmake/clambc.cmake)
 include(cmake/clamd.cmake)
 include(cmake/clamdscan.cmake)
@@ -103,6 +106,9 @@ include(cmake/libclamunrar.cmake)
 
 include(cmake/pdcurses.cmake)
 include(cmake/clamdtop.cmake)
+
+include(${CLAMAV_DIR}/cmake/FindRust.cmake)
+add_subdirectory(${CLAMAV_DIR}/libclamav_rust)
 
 if(DISABLE_LLVM)
     message(STATUS "LLVM is DISABLED")

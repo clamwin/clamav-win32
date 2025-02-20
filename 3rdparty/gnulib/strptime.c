@@ -39,6 +39,8 @@ enum ptime_locale_status { not, loc, raw };
 #endif
 
 
+extern struct tm* localtime_r(time_t const* t, struct tm* tp);
+
 
 #define match_char(ch1, ch2) if (ch1 != ch2) return NULL
 #if defined _LIBC && defined __GNUC__ && __GNUC__ >= 2

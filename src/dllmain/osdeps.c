@@ -23,160 +23,6 @@
 #include <dirent.h>
 #include <others.h>
 
-#include <shared/output.h>
-
-/* Get the alternative name for a file, so esotic names/paths can be easily accessed */
-static char *cw_getaltname(const char *filename)
-{
-    size_t len = strlen(filename) + 6;
-    size_t pos = 0;
-    char *lslash = strrchr(filename, '\\');
-    char *name_a = NULL, *fqname_a = NULL;
-    wchar_t *name_w = NULL;
-    HANDLE hf = INVALID_HANDLE_VALUE;
-    WIN32_FIND_DATAW wfdw;
-
-    if (!lslash)
-    {
-        cli_errmsg("[platform] Unexpected path syntax\n");
-        return NULL;
-    }
-
-    CW_CHECKALLOC(name_a, malloc(len), return NULL);
-
-    snprintf(name_a, len - 1, "%s%s", cw_uncprefix(filename), filename);
-
-    if (!(name_w = cw_mb2wc(name_a)))
-    {
-        cli_errmsg("[platform] Error in conversion from ansi to widechar (%d)\n", GetLastError());
-        free(name_a);
-        return NULL;
-    }
-
-    hf = FindFirstFileW(name_w, &wfdw);
-    free(name_w);
-
-    if (hf == INVALID_HANDLE_VALUE)
-    {
-        if (GetLastError() == ERROR_FILE_NOT_FOUND)
-            cli_errmsg("[platform] No such file or directory\n");
-        else
-            cli_errmsg("[platform] FindFirstFileW() failed (%d)\n"
-            "[%s] is not accessible by the OS\n", GetLastError(), name_a);
-        free(name_a);
-        return NULL;
-    }
-
-    FindClose(hf);
-    free(name_a);
-    if (wcslen(wfdw.cAlternateFileName) && (!(name_a = cw_wc2mb(wfdw.cAlternateFileName, 0))))
-    {
-        cli_errmsg("[platform] Error while getting alternate name (%d)\n", GetLastError());
-        free(name_a);
-        return NULL;
-    }
-
-    pos = lslash - filename + 1;
-    len = pos + strlen(name_a) + 2;
-    CW_CHECKALLOC(fqname_a, malloc(len), { free(name_a); return NULL; });
-    strncpy(fqname_a, filename, pos);
-    fqname_a[pos] = 0;
-    strncat(fqname_a, name_a, len - 1 - strlen(fqname_a));
-    free(name_a);
-    return fqname_a;
-}
-
-/* A path is a path... not on Windows... */
-char *cw_normalizepath(const char *path)
-{
-    size_t len = 0;
-    char *plain = NULL, *seek = NULL;
-    char *name_u = NULL;
-    char *filename = NULL, *norm = NULL;
-
-    assert(path);
-    len = strlen(path);
-    /* NULL + trailing \ */
-    CW_CHECKALLOC(filename, malloc(len + 2), return NULL);
-
-    strcpy(filename, path);
-    cw_pathtowin32(filename);
-    cw_rmtrailslashes(filename);
-    len = strlen(filename);
-    plain = PATH_PLAIN(filename);
-
-    if ((strlen(plain) == 2) && (plain[1] == ':')) /* Allow c: d: notation */
-    {
-        strcat(filename, "\\");
-        return filename;
-    }
-    else if (!PATH_ISNET(filename))
-    {
-        /* relative path, then add current directory */
-        if (plain[1] != ':')
-        {
-            char *fq = NULL;
-            size_t clen = 0;
-
-            if (!(fq = cw_getcurrentdir()))
-            {
-                cli_errmsg("[platform] cw_getcurrentdir() failed %d\n", GetLastError());
-                return NULL;
-            }
-
-            clen = len + strlen(fq) + 2;
-
-            /* \path notation */
-            if ((plain[0] == '\\') && ((seek = strchr(fq, ':')))) (*(seek + 1) = 0);
-
-            /* reallocate the string to make room for the filename */
-            CW_CHECKALLOC(fq, realloc(fq, clen + strlen(filename)), return NULL);
-            strncat(fq, "\\", clen - 1 - strlen(fq));
-            strncat(fq, filename, clen - 1 - strlen(fq));
-            free(filename);
-            filename = fq;
-        }
-
-        /* Win9x does not like paths like c:\\something */
-        if (isWin9x())
-        {
-            char *p = NULL, *s = NULL;
-            p = s = filename;
-            while (*s && *p)
-            {
-                *p = *s;
-                if (*s == '\\')
-                {
-                    p++;
-                    while (*s && (*s == '\\')) s++;
-                    continue;
-                }
-                p++; s++;
-            }
-            *p = 0;
-        }
-        else if (!PATH_ISUNC(filename))
-        {
-            len = strlen(filename) + sizeof(UNC_PREFIX) + 1;
-            CW_CHECKALLOC(name_u, malloc(len), return NULL);
-            snprintf(name_u, len - 1, "%s%s", cw_uncprefix(filename), filename);
-            free(filename);
-            filename = name_u;
-        }
-    }
-
-    /* total path len > MAX_PATH, it's valid but some of windows api do not think so */
-    if (len > MAX_PATH)
-        norm = cw_getaltname(filename);
-    else
-        norm = cw_getfullpathname(filename);
-
-    free(filename);
-
-    cli_dbgmsg("\nPath converted from [%s] to [%s]\n", path, norm);
-    return norm;
-}
-
 int cw_movefileex(const char *source, const char *dest, DWORD flags)
 {
     assert(source);
@@ -276,8 +122,8 @@ int cw_getaddrinfo(const char *node, const char *service, const struct addrinfo 
     u_short port = 0;
     int i;
 
-    if (cw_helpers.ws2.ok)
-        return cw_helpers.ws2.getaddrinfo(node, service, hints, res);
+    //if (cw_helpers.ws2.ok)
+    //    return cw_helpers.ws2.getaddrinfo(node, service, hints, res);
 
     if (!(node || service))
         return EAI_NONAME;
@@ -362,13 +208,13 @@ int cw_getaddrinfo(const char *node, const char *service, const struct addrinfo 
 void cw_freeaddrinfo(struct addrinfo *res)
 {
     struct addrinfo *prev;
-
+#if 0
     if (cw_helpers.ws2.ok)
     {
         cw_helpers.ws2.freeaddrinfo(res);
         return;
     }
-
+#endif
     do
     {
         prev = res;
@@ -425,7 +271,7 @@ int cw_rename(const char *oldname, const char *newname)
 #ifndef VOLUME_NAME_NT
 #define VOLUME_NAME_NT 0x2
 #endif
-
+#if 0
 static inline int cw_gfff_vista(int desc, char **filepath)
 {
     DWORD dwRet;
@@ -487,7 +333,7 @@ static inline int cw_gfff_xp(int desc, char **filepath)
     }
 
     if (cw_helpers.psapi.GetMappedFileNameA(GetCurrentProcess(), pMem, filename, MAX_PATH))
-        *filepath = cli_strdup(filename);
+        *filepath = strdup(filename);
     else
     {
         cli_errmsg("cw_gfff_xp: GetMappedFileNameA() failed with %lu\n", GetLastError());
@@ -510,7 +356,7 @@ int cw_get_filepath_from_filedesc(int desc, char **filepath)
         return cw_gfff_xp(desc, filepath);
     return CL_EOPEN;
 }
-
+#endif
 /* A non TLS based and non thread safe canonical rand() implementation */
 /* aCaB <acab@clamav.net> */
 static unsigned long next = 1;

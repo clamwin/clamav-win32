@@ -1,17 +1,11 @@
 file(GLOB clamscan_headers ${CLAMAV_DIR}/clamscan/*.h)
-
 file(GLOB clamscan_sources ${CLAMAV_DIR}/clamscan/*.c)
-list(APPEND clamscan_sources
-    ${CLAMAV_DIR}/shared/output.c
-    ${CLAMAV_DIR}/shared/misc.c
-)
 
 set(clamscan_win32_sources
-    ${CLAMWIN_DIR}/src/shared/win32actions.c
     ${CLAMWIN_DIR}/src/helpers/cw_main.c
     ${CLAMWIN_DIR}/src/helpers/crashdump.c
-    ${CLAMWIN_DIR}/src/helpers/scanmem.c
-    ${CLAMWIN_DIR}/src/helpers/exeScanner.c
+    ${CLAMAV_DIR}/common/scanmem.c
+    ${CLAMAV_DIR}/common/exeScanner.c
 )
 
 source_group("Win32 Files" FILES ${clamscan_win32_sources})

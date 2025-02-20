@@ -38,6 +38,12 @@ endif()
 
 file(GLOB_RECURSE libclamav_win32_headers ${CLAMWIN_DIR}/include/*.h)
 
+list(APPEND libclamav_win32_sources
+    ${CLAMAV_DIR}/win32/compat/dirent.c
+    ${CLAMAV_DIR}/win32/compat/utf8_util.c
+    ${CLAMAV_DIR}/win32/compat/libgen.c
+)
+
 source_group("Win32 Files" FILES ${libclamav_win32_sources})
 list(APPEND libclamav_win32_sources ${CMAKE_BINARY_DIR}/libclamav.def)
 set_source_files_properties(${CMAKE_BINARY_DIR}/libclamav.def PROPERTIES GENERATED TRUE)
@@ -49,8 +55,10 @@ add_library(libclamav SHARED
     ${CLAMWIN_DIR}/resources/libclamav.rc
 )
 
+add_library(ClamAV::libclamav ALIAS libclamav)
+
 set_target_properties(libclamav PROPERTIES DEFINE_SYMBOL THIS_IS_LIBCLAMAV PREFIX "" OUTPUT_NAME libclamav)
-target_include_directories(libclamav PRIVATE ${CLAMWIN_INCLUDES})
+target_include_directories(libclamav PRIVATE ${CLAMWIN_INCLUDES} ${CLAMAV_DIR}/win32/compat)
 target_compile_definitions(libclamav PRIVATE ${CLAMWIN_DEFINES})
 target_compile_options(libclamav PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4267 /wd4333 /wd4334>)
 
@@ -65,6 +73,8 @@ target_link_libraries(libclamav PRIVATE
     ${OPENSSL_SSL_LIBRARY}
     ${OPENSSL_CRYPTO_LIBRARY}
     ws2_32
+    libclamav_common
+    ClamAV::libclamav_rust
 )
 
 if(MSVC)

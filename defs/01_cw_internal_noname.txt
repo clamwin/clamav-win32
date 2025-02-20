@@ -1,0 +1,31 @@
+cw_leerrno
+cw_wseterrno
+cw_get_currentfile
+cw_set_currentfile
+cw_sigcheck
+
+; win32 portability layer
+opendir
+closedir
+readdir
+mkstemp
+tcgetattr
+tcsetattr
+basename
+uncpath
+dirname
+w32_stat
+cli_strdup_to_utf8
+
+; gnulib
+gnulib_snprintf
+gnulib_vsnprintf
+strptime
+ftruncate
+
+; runtime config
+DATADIR DATA
+CONFDIR DATA
+CONFDIR_CLAMD DATA
+CONFDIR_FRESHCLAM DATA
+CONFDIR_MILTER DATA

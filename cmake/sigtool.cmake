@@ -1,12 +1,5 @@
 file(GLOB sigtool_headers ${CLAMAV_DIR}/sigtool/*.h)
-
 file(GLOB sigtool_sources ${CLAMAV_DIR}/sigtool/*.c)
-list(APPEND sigtool_sources
-    ${CLAMAV_DIR}/shared/output.c
-    ${CLAMAV_DIR}/shared/misc.c
-    ${CLAMAV_DIR}/shared/tar.c
-    ${CLAMAV_DIR}/shared/cdiff.c
-)
 
 set(sigtool_win32_sources
     ${CLAMWIN_DIR}/src/helpers/cw_main.c
@@ -25,6 +18,6 @@ add_executable(sigtool
 
 target_include_directories(sigtool PRIVATE ${CLAMWIN_INCLUDES})
 target_compile_definitions(sigtool PRIVATE ${CLAMWIN_DEFINES})
-target_link_libraries(sigtool PRIVATE libclamav ws2_32)
+target_link_libraries(sigtool PRIVATE libclamav ClamAV::libclamav_rust ws2_32)
 
 list(APPEND CLAMAV_INSTALL_TARGETS sigtool)

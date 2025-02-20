@@ -182,7 +182,7 @@ const char *cw_strerror(int errnum)
 void cw_perror(const char *msg)
 {
     assert(msg);
-    fprintf(stderr, "%s: %s\n", PATH_PLAIN(msg), cw_strerror(errno));
+    fprintf(stderr, "%s: %s\n", msg, cw_strerror(errno));
 }
 
 #define WSA(x)      case WSA##x  : return (errno = x)

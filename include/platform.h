@@ -28,7 +28,8 @@
 #undef _WIN32_WINNT
 #define _WIN32_WINNT 0x0501
 
-#include <cwdefs.h>
+#include "cwdefs.h"
+
 #include <winsock2.h>
 #include <windows.h>
 #include <ws2tcpip.h> /* ipv6 */
@@ -39,15 +40,29 @@
 #include <process.h> /* _getpid() */
 #include <malloc.h>  /* _alloca() */
 
-#include <posix-errno.h>
-#include <safe_ctype.h>
-#include <cw_inline.h>
-#include <socket_inline.h>
+#include "posix-errno.h"
+#include "safe_ctype.h"
+#include "cw_inline.h"
+#include "socket_inline.h"
 
 /* re-route main to cw_main to handle some startup code */
 #ifndef CLAMWIN_MAIN_HANDLED
 #define main cw_main
 #endif
+
+#define PATH_MAX 32767
+#define WORDS_BIGENDIAN 0
+#define EAI_SYSTEM 0
+
+WINBASEAPI
+DWORD
+WINAPI
+GetFinalPathNameByHandleW(
+    _In_ HANDLE hFile,
+    _Out_writes_(cchFilePath) LPWSTR lpszFilePath,
+    _In_ DWORD cchFilePath,
+    _In_ DWORD dwFlags
+);
 
 #undef strtok_r /* thanks to pthread.h */
 
@@ -56,17 +71,9 @@
 #define strncasecmp _strnicmp
 
 /* cw */
-extern char *cw_normalizepath(const char *path);
 extern int cw_init(void);
 extern BOOL cw_disablefsredir(void);
 extern BOOL cw_revertfsredir(void);
-
-/* service */
-extern void svc_register(const char *name);
-extern void svc_ready(void);
-extern int svc_checkpoint(const char *type, const char *name, unsigned int custom, void *context);
-extern int svc_install(const char *name, const char *dname, const char *desc);
-extern int svc_uninstall(const char *name, int verbose);
 
 /* ctrl + c handler */
 extern BOOL WINAPI cw_stop_ctrl_handler(DWORD CtrlType);
@@ -74,32 +81,30 @@ extern BOOL WINAPI cw_stop_ctrl_handler(DWORD CtrlType);
 /* gnulib entries */
 #ifndef __cplusplus
 extern char *strtok_r(char *s, const char *delim, char **save_ptr);
-extern struct tm *localtime_r(time_t const *t, struct tm *tp);
 extern char *strptime (const char *buf, const char *format, struct tm *tm);
 #if defined(_MSC_VER) && (_MSC_VER <= 1400)
 extern long long int strtoll(const char *nptr, char **endptr, int base);
 #endif
 #endif
 
-/* Re_routing */
-extern int cw_stat(const char *path, struct stat *buf);
-extern int cw_unlink(const char *pathname);
-extern int cw_rename(const char *oldname, const char *newname);
-extern int cw_rmdirs(const char *dirname);
 
-#define lstat           cw_stat
-#undef stat
-#define stat(p, b)      cw_stat(p, b)
-#define unlink          cw_unlink
+#define lstat stat
+#define stat(path, buf) w32_stat(path, buf)
+extern int w32_stat(const char* path, struct stat* buf);
+
 #define rename          cw_rename
+extern int cw_rename(const char* oldname, const char* newname);
+
+extern int cw_unlink(const char* pathname);
 #define cli_unlink      cw_unlink
+#define unlink          cw_unlink
+
 #define cli_rmdirs      cw_rmdirs
+extern int cw_rmdirs(const char* dirname);
 
 /* errno remap */
 #define strerror cw_strerror
 #define perror cw_perror
-
-extern int cw_get_filepath_from_filedesc(int desc, char **filepath);
 
 /* random */
 extern int cw_rand(void);
@@ -112,22 +117,6 @@ extern void cw_srand(unsigned int seed);
 #endif
 
 #define mkdir(a, b) mkdir(a)
-
-/* no ipv6 on windows < 2000 */
-#ifndef EAI_SYSTEM
-#define EAI_SYSTEM -11
-#endif
-#undef getaddrinfo
-#undef freeaddrinfo
-#undef gai_strerror
-#define getaddrinfo cw_getaddrinfo
-#define freeaddrinfo cw_freeaddrinfo
-#define gai_strerror cw_gai_strerror
-
-extern int cw_getaddrinfo(const char *node, const char *service,
-                          const struct addrinfo *hints, struct addrinfo **res);
-extern void cw_freeaddrinfo(struct addrinfo *res);
-extern const char *cw_gai_strerror(int errcode);
 
 /* <stdio.h> / <stdarg.h> */
 /* Use snprintf and vsnprintf from gnulib, win32 crt has broken a snprintf */
@@ -150,31 +139,6 @@ extern int __cdecl fseeko64 (FILE* stream, off64_t offset, int whence);
 /* tmpfile() on win32 uses root dir, not suitable if non-admin */
 #define tmpfile do_not_use_tmpfile_on_win32
 
-/* <stdlib.h> */
-extern int mkstemp(char *tmpl);
-
-/* missing round() on vs 2005 */
-#if defined(_MSC_VER) && (_MSC_VER <= 1400)
-_CRTIMP double  __cdecl floor(__in double _X);
-inline double round(double x) { return floor(x + 0.5); }
-#endif
-
-#ifndef PATH_MAX
-#define PATH_MAX 260
-#endif
-
-/* UNC Path Handling on win32 */
-#define UNC_PREFIX "\\\\?\\"
-#define UN2_PREFIX "\\??\\"
-#define DEV_PREFIX "\\\\.\\"
-#define NET_PREFIX "\\\\"
-#define UNC_OFFSET(x) (&x[4])
-#define PATH_ISUNC(path)  (!strncmp(path, UNC_PREFIX, 4))
-#define PATH_ISUN2(path)  (!strncmp(path, UN2_PREFIX, 4))
-#define PATH_ISDEV(path)  (!strncmp(path, DEV_PREFIX, 4))
-#define PATH_ISNET(path)  (!strncmp(path, NET_PREFIX, 2))
-#define PATH_PLAIN(path)  (PATH_ISUNC(path) ? UNC_OFFSET(path) : path)
-
 #ifndef MIN
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #endif
@@ -195,39 +159,16 @@ typedef unsigned int in_addr_t;
 #define LIBCLAMAV_EXPORT __declspec(dllimport)
 #endif
 
-/* to set mprintf_disabled libfreshclam variable in freshclam whene running as service*/
-extern void mprintf_disable(short int disable);
-
-/* <arpa/inet.h> */
-extern const char* cw_inet_ntop(int af, const void* a0, char* s, socklen_t l);
-#define inet_ntop cw_inet_ntop
-
 /* win32 headers have DATADIR enum */
 #ifndef __cplusplus
-LIBCLAMAV_EXPORT extern const char *DATADIR;
-LIBCLAMAV_EXPORT extern const char *CONFDIR;
-LIBCLAMAV_EXPORT extern const char *CONFDIR_CLAMD;
-LIBCLAMAV_EXPORT extern const char *CONFDIR_FRESHCLAM;
-LIBCLAMAV_EXPORT extern const char *CONFDIR_MILTER;
+LIBCLAMAV_EXPORT extern const char* DATADIR;
+LIBCLAMAV_EXPORT extern const char* CONFDIR;
+LIBCLAMAV_EXPORT extern const char* CONFDIR_CLAMD;
+LIBCLAMAV_EXPORT extern const char* CONFDIR_FRESHCLAM;
+LIBCLAMAV_EXPORT extern const char* CONFDIR_MILTER;
 #endif
 
-#define cli_to_utf8_maybe_alloc(x) (x)
-#define cli_strdup_to_utf8(x) strdup(x)
-
-#define SEARCH_LIBDIR ""
-
-#ifdef MSPACK_VER_LIBRARY
-/* very ugly hacks, vs2005 does not support struct field assignment ;( */
-
-#if MSPACK_VER_LIBRARY > 0
-#error untested mspack
-#endif
-
-#undef open
-
-#ifdef _MSC_VER
-#define __func__ __FUNCTION__
-#endif
-#endif
+extern const char* cli_to_utf8_maybe_alloc(const char* s);
+extern char* cli_strdup_to_utf8(const char* s);
 
 #endif /* _PLATFORM_H */

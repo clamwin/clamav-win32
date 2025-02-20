@@ -20,7 +20,7 @@
 #include <osdeps.h>
 #include <dirent.h>
 #include <libclamav/others.h>
-#include <shared/output.h>
+//#include <shared/output.h>
 
 int cw_unlink(const char *pathname)
 {

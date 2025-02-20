@@ -101,7 +101,7 @@ double calc_entropy(const unsigned char *data, size_t size)
 #define FILLBYTES(dst) \
     if (IsBadReadPtr(seek, sizeof(dst))) \
     { \
-        logg("!exeScanner: Bad pointer!!!\n"); \
+        elogg("exeScanner: Bad pointer!!!\n"); \
         goto cleanup; \
     } \
     memcpy(&dst, seek, sizeof(dst));

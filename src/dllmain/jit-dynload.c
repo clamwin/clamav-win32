@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <osdeps.h>
+#include "osdeps.h"
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 #define LIBCLAMAV_LLVM "libclamav_llvmd.dll"
@@ -52,12 +52,12 @@
 
 #define JITCALL __cdecl
 
-typedef int (JITCALL *imp_cli_bytecode_prepare_jit)(struct cli_all_bc *);
-typedef int (JITCALL *imp_cli_vm_execute_jit)(const struct cli_all_bc *, struct cli_bc_ctx *, const struct cli_bc_func *);
-typedef int (JITCALL *imp_cli_bytecode_init_jit)(struct cli_all_bc *, unsigned);
-typedef int (JITCALL *imp_cli_bytecode_done_jit)(struct cli_all_bc *, int);
+typedef cl_error_t(JITCALL *imp_cli_bytecode_prepare_jit)(struct cli_all_bc *);
+typedef cl_error_t(JITCALL *imp_cli_vm_execute_jit)(const struct cli_all_bc *, struct cli_bc_ctx *, const struct cli_bc_func *);
+typedef cl_error_t(JITCALL *imp_cli_bytecode_init_jit)(struct cli_all_bc *, unsigned);
+typedef cl_error_t(JITCALL *imp_cli_bytecode_done_jit)(struct cli_all_bc *, int);
 typedef void (JITCALL *imp_cli_bytecode_debug)(int, char **);
-typedef int (JITCALL *imp_bytecode_init)(void);
+typedef cl_error_t(JITCALL *imp_bytecode_init)(void);
 typedef void (JITCALL *imp_cli_bytecode_debug_printsrc)(const struct cli_bc_ctx *);
 typedef void (JITCALL *imp_cli_bytecode_printversion)(void);
 typedef void (JITCALL *imp_cli_printcxxver)();
@@ -68,7 +68,7 @@ static imp_cli_vm_execute_jit pf_cli_vm_execute_jit = NULL;
 static imp_cli_bytecode_init_jit pf_cli_bytecode_init_jit = NULL;
 static imp_cli_bytecode_done_jit pf_cli_bytecode_done_jit = NULL;
 static imp_cli_bytecode_debug pf_cli_bytecode_debug = NULL;
-static imp_bytecode_init pf_bytecode_init = NULL;;
+static imp_bytecode_init pf_bytecode_init = NULL;
 static imp_cli_bytecode_debug_printsrc pf_cli_bytecode_debug_printsrc = NULL;
 static imp_cli_bytecode_printversion pf_cli_bytecode_printversion = NULL;
 static imp_cli_printcxxver pf_cli_printcxxver = NULL;
@@ -132,7 +132,7 @@ static HMODULE llvm = NULL;
 
 void jit_init(void)
 {
-    have_clamjit = 0;
+    bool _have_clamjit = false;
 
     do
     {
@@ -150,11 +150,11 @@ void jit_init(void)
         IMPORT_FUNC(cli_printcxxver);
         IMPORT_FUNC(cli_detect_env_jit);
 
-        have_clamjit = 1;
+        _have_clamjit = true;
     }
     while (0);
 
-    if (!have_clamjit)
+    if (!_have_clamjit)
     {
         if (llvm) FreeLibrary(llvm);
         llvm = NULL;
@@ -174,5 +174,6 @@ void jit_init(void)
 
 void jit_uninit(void)
 {
-    if (llvm) FreeLibrary(llvm);
+    if (llvm)
+        FreeLibrary(llvm);
 }

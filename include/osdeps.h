@@ -54,14 +54,6 @@ extern int cw_movefileex(const char *source, const char *dest, DWORD flags);
 #define isOldOS()           (0)
 #endif
 
-static inline const char *cw_uncprefix(const char *filename)
-{
-    if (PATH_ISUNC(filename) || PATH_ISNET(filename) || isWin9x())
-        return "";
-    else
-        return UNC_PREFIX;
-}
-
 #define ISLOCKED(error) \
     ((error == ERROR_ACCESS_DENIED) || (error == ERROR_SHARING_VIOLATION) || (error == ERROR_LOCK_VIOLATION))
 

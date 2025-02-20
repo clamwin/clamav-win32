@@ -1,7 +1,7 @@
 /*
  * Clamav Native Windows Port
  *
- * Copyright (c) 2020 Gianluigi Tiesi <sherpya@netfarm.it>
+ * Copyright (c) 2020-2025 Gianluigi Tiesi <sherpya@netfarm.it>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -18,10 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <platform.h>
-#include <shared/output.h>
+#include "platform.h"
+#include "output.h"
 
+#if 0
 void mprintf_disable(short int disable)
 {
 	mprintf_disabled = disable;
 }
+#endif

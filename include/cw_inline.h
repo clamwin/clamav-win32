@@ -25,31 +25,31 @@ static inline int gettimeofday(struct timeval *tv, struct timezone *tz)
     return 0;
 }
 
-static inline int cw_open(const char *filename, int oflag, ...)
-{
-    va_list ap;
-    int pmode = 0;
-
-    va_start(ap, oflag);
-    pmode = va_arg(ap, int);
-    va_end(ap);
-
-    if (oflag & _O_CREAT)
-    {
-        oflag |= _O_SHORT_LIVED;
-        pmode |= (_S_IREAD | _S_IWRITE);
-    }
-
-    return _open(filename, oflag, pmode);
-}
-#define open cw_open
-
+extern wchar_t* uncpath(const char* path);
 extern const char *cw_get_currentfile(void);
 extern void cw_set_currentfile(const char *filename);
-static inline int safe_open(const char *filename, int oflag)
+
+static inline int safe_open(const char* path, int flags, ...)
 {
-    cw_set_currentfile(filename);
-    return cw_open(filename, oflag);
+    wchar_t* wpath = uncpath(path);
+    cw_set_currentfile(path);
+    int ret;
+
+    if (!wpath)
+        return -1;
+
+    if (flags & O_CREAT) {
+        int mode;
+        va_list ap;
+        va_start(ap, flags);
+        mode = va_arg(ap, int);
+        va_end(ap);
+        ret = _wopen(wpath, flags, mode);
+    }
+    else
+        ret = _wopen(wpath, flags);
+    free(wpath);
+    return ret;
 }
 
 /* FIXME: check if this function works as expected */

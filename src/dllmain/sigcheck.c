@@ -113,6 +113,7 @@ typedef struct _CMSG_SIGNER_INFO
 #define TRUST_E_NOSIGNATURE 0x800B0100L
 #endif
 
+#if 0
 static BOOL isIssuerTrusted(wchar_t *filename)
 {
     BOOL fResult = FALSE;
@@ -311,6 +312,7 @@ static int sigcheck(int fd, const char *virname, int warnfp)
     cw_set_currentfile(NULL);
     return lsigned;
 }
+#endif
 
 static int sigcheck_dummy(int fd, const char *virname, int warnfp)
 {
@@ -329,6 +331,8 @@ cl_error_t cw_postscan_check(int fd, int result, const char *virname, void *cont
 
 int cw_sig_init(void)
 {
+    return 1;
+#if 0
     if (!cw_helpers.wt.ok || isWin9x()) /* wintrust stuff is b0rk3d on win9x */
         return 1;
 
@@ -341,6 +345,7 @@ int cw_sig_init(void)
     cli_dbgmsg("sigcheck: Engine enabled\n");
     pf_sigcheck = sigcheck;
     return 0;
+#endif
 }
 
 /* exported */

@@ -38,8 +38,8 @@ int main(int argc, char* argv[])
 
     _setmode(_fileno(stdin), O_BINARY);
 
-    if (!SetConsoleCtrlHandler(cw_stop_ctrl_handler, TRUE))
-        fprintf(stderr, "[cw_main] Cannot install Console Ctrl Handler (%d)\n", GetLastError());
+    //if (!SetConsoleCtrlHandler(cw_stop_ctrl_handler, TRUE))
+    //    fprintf(stderr, "[cw_main] Cannot install Console Ctrl Handler (%d)\n", GetLastError());
 
     cw_disablefsredir();
     return cw_main(argc, argv);

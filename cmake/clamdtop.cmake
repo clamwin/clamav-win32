@@ -1,8 +1,4 @@
 file(GLOB clamdtop_sources ${CLAMAV_DIR}/clamdtop/*.c)
-list(APPEND clamdtop_sources
-    ${CLAMAV_DIR}/shared/getopt.c
-    ${CLAMAV_DIR}/shared/misc.c
-)
 
 add_executable(clamdtop
     ${clamdtop_sources}
