@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
 
+
 def main():
     defs_dir = Path(__file__).parent / 'defs'
 
@@ -37,7 +38,12 @@ def main():
     print('; AUTOMATIC GENERATED - DO NOT EDIT\nEXPORTS')
     for left, right in lines:
         padding = maxlen - len(left)
-        print(left + (' ' * padding) + (right or ''))
+        if right:
+            right = (' ' * padding) + right
+        else:
+            right = ''
+        print(left + right)
+
 
 if __name__ == '__main__':
     main()

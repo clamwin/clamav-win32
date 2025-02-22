@@ -1,7 +1,7 @@
 ; AUTOMATIC GENERATED - DO NOT EDIT
 EXPORTS
 
-; openssl                                 
+; openssl
 ASN1_STRING_get0_data                      @1000 NONAME
 ASN1_STRING_length                         @1001 NONAME
 ASN1_STRING_print                          @1002 NONAME
@@ -255,83 +255,83 @@ i2d_SSL_SESSION                            @1249 NONAME
 i2d_X509_PUBKEY                            @1250 NONAME
 i2t_ASN1_OBJECT                            @1251 NONAME
 
-; internal                                
-cli_ac_chklsig                             
-cli_chomp                                  
-cli_ctime                                  
-cli_filecopy                               
-cli_determine_fmap_type                    
-cli_scan_fmap                              
-cli_ftw                                    
-cli_gentemp                                
-cli_gentempfd                              
-cli_gettmpdir                              
-cli_hashfile                               
-cli_hashset_destroy                        
-cli_hashstream                             
-cli_hex2str                                
-cli_hex2ui                                 
-cli_initroots                              
-cli_isnumber                               
-cli_ldbtokenize                            
-cli_matchregex                             
-cli_ole2_extract                           
-cli_pcre_perf_events_destroy               
-cli_pcre_perf_print                        
-cli_ppt_vba_read                           
-cli_readn                                  
-cli_regcomp                                
-cli_regexec                                
-cli_regfree                                
-cli_rndnum                                 
-cli_scancpio_newc                          
-cli_scancpio_odc                           
-cli_scancpio_old                           
-cli_scanmacho                              
-cli_sigperf_events_destroy                 
-cli_sigperf_print                          
-cli_str2hex                                
-cli_strbcasestr                            
-cli_strerror                               
-cli_strtok                                 
-cli_strtokenize                            
-cli_utf16toascii                           
-cli_vba_inflate                            
-cli_vba_readdir                            
-cli_versig2                                
-cli_wm_decrypt_macro                       
-cli_wm_readdir                             
-cli_writen                                 
-cli_genhash_pe                             
-cli_free_vba_project                       
-cli_check_auth_header                      
-cli_gentemp_with_prefix                    
-cli_realpath                               
-cli_strntoul                               
-cli_get_filepath_from_filedesc             
-cli_add_content_match_pattern              
-readdb_parse_ldb_subsignature              
-cli_basename                               
-cli_infomsg_simple                         
-cli_dbgmsg                                 
-cli_dbgmsg_no_inline                       
-cli_safer_strdup                           
-cli_safer_realloc                          
-cli_get_debug_flag                         
-cli_getdsig                                
-cli_checklimits                            
-cli_matchmeta                              
-cli_magic_scan_buff                        
-html_normalise_map                         
-text_normalize_init                        
-text_normalize_reset                       
-text_normalize_map                         
-uniq_get                                   
-fmap                                       
-mpool_getstats                             
+; internal
+cli_ac_chklsig
+cli_chomp
+cli_ctime
+cli_filecopy
+cli_determine_fmap_type
+cli_scan_fmap
+cli_ftw
+cli_gentemp
+cli_gentempfd
+cli_gettmpdir
+cli_hashfile
+cli_hashset_destroy
+cli_hashstream
+cli_hex2str
+cli_hex2ui
+cli_initroots
+cli_isnumber
+cli_ldbtokenize
+cli_matchregex
+cli_ole2_extract
+cli_pcre_perf_events_destroy
+cli_pcre_perf_print
+cli_ppt_vba_read
+cli_readn
+cli_regcomp
+cli_regexec
+cli_regfree
+cli_rndnum
+cli_scancpio_newc
+cli_scancpio_odc
+cli_scancpio_old
+cli_scanmacho
+cli_sigperf_events_destroy
+cli_sigperf_print
+cli_str2hex
+cli_strbcasestr
+cli_strerror
+cli_strtok
+cli_strtokenize
+cli_utf16toascii
+cli_vba_inflate
+cli_vba_readdir
+cli_versig2
+cli_wm_decrypt_macro
+cli_wm_readdir
+cli_writen
+cli_genhash_pe
+cli_free_vba_project
+cli_check_auth_header
+cli_gentemp_with_prefix
+cli_realpath
+cli_strntoul
+cli_get_filepath_from_filedesc
+cli_add_content_match_pattern
+readdb_parse_ldb_subsignature
+cli_basename
+cli_infomsg_simple
+cli_dbgmsg
+cli_dbgmsg_no_inline
+cli_safer_strdup
+cli_safer_realloc
+cli_get_debug_flag
+cli_getdsig
+cli_checklimits
+cli_matchmeta
+cli_magic_scan_buff
+html_normalise_map
+text_normalize_init
+text_normalize_reset
+text_normalize_map
+uniq_get
+fmap
+mpool_getstats
 cli_debug_flag                              DATA
-cli_errmsg                                 
-cli_warnmsg                                
+cli_errmsg
+cli_warnmsg
 cli_apicall_maxapi                          DATA
 cli_apicall_maxglobal                       DATA
 cli_apicall_maxtypes                        DATA
@@ -348,29 +348,29 @@ cli_apicalls7                               DATA
 cli_apicalls8                               DATA
 cli_apicalls9                               DATA
 cli_globals                                 DATA
-cli_bytecode_context_alloc                 
-cli_bytecode_context_destroy               
-cli_bytecode_context_getresult_int         
-cli_bytecode_context_set_trace             
-cli_bytecode_context_setfile               
-cli_bytecode_context_setfuncid             
-cli_bytecode_context_setparam_int          
-cli_bytecode_debug                         
-cli_bytecode_debug_printsrc                
-cli_bytecode_describe                      
-cli_bytecode_destroy                       
-cli_bytecode_done                          
-cli_bytecode_init                          
-cli_bytecode_load                          
-cli_bytecode_prepare2                      
-cli_bytecode_printversion                  
-cli_bytecode_run                           
-cli_bytefunc_describe                      
-cli_bytetype_describe                      
-cli_bytevalue_describe                     
-__cli_strndup                              
+cli_bytecode_context_alloc
+cli_bytecode_context_destroy
+cli_bytecode_context_getresult_int
+cli_bytecode_context_set_trace
+cli_bytecode_context_setfile
+cli_bytecode_context_setfuncid
+cli_bytecode_context_setparam_int
+cli_bytecode_debug
+cli_bytecode_debug_printsrc
+cli_bytecode_describe
+cli_bytecode_destroy
+cli_bytecode_done
+cli_bytecode_init
+cli_bytecode_load
+cli_bytecode_prepare2
+cli_bytecode_printversion
+cli_bytecode_run
+cli_bytefunc_describe
+cli_bytetype_describe
+cli_bytevalue_describe
+__cli_strndup
 
-; common                                  
+; common
 action                                     @1252 NONAME DATA
 actsetup                                   @1253 NONAME
 notremoved                                 @1254 NONAME DATA
@@ -424,97 +424,97 @@ svc_checkpoint                             @1301 NONAME
 prelude_logging                            @1302 NONAME
 scanmem                                    @1303 NONAME
 
-; public                                  
-;cl_engine_set_clcb_progress               
+; public
+;cl_engine_set_clcb_progress
 cl_always_gen_section_hash                  @1
-cl_countsigs                               
-cl_cvdfree                                 
-cl_cvdgetage                               
-cl_cvdhead                                 
-cl_cvdparse                                
-cl_cvdunpack                               
-cl_cvdverify                               
-cl_debug                                   
-cl_engine_addref                           
-cl_engine_compile                          
-cl_engine_free                             
-cl_engine_get_num                          
-cl_engine_get_str                          
-cl_engine_new                              
-cl_engine_set_clcb_engine_compile_progress 
-cl_engine_set_clcb_file_props              
-cl_engine_set_clcb_hash                    
-cl_engine_set_clcb_meta                    
-cl_engine_set_clcb_post_scan               
-cl_engine_set_clcb_pre_cache               
-cl_engine_set_clcb_pre_scan                
-cl_engine_set_clcb_sigload                 
-cl_engine_set_clcb_sigload_progress        
-cl_engine_set_clcb_stats_add_sample        
-cl_engine_set_clcb_stats_decrement_count   
-cl_engine_set_clcb_stats_flush             
-cl_engine_set_clcb_stats_get_hostid        
-cl_engine_set_clcb_stats_get_num           
-cl_engine_set_clcb_stats_get_size          
-cl_engine_set_clcb_stats_remove_sample     
-cl_engine_set_clcb_stats_submit            
-cl_engine_set_clcb_vba                     
-cl_engine_set_clcb_virus_found             
-cl_engine_set_num                          
-cl_engine_set_stats_set_cbdata             
-cl_engine_set_str                          
-cl_engine_settings_apply                   
-cl_engine_settings_copy                    
-cl_engine_settings_free                    
-cl_engine_stats_enable                     
-cl_finish_hash                             
-cl_fmap_close                              
-cl_fmap_open_handle                        
-cl_fmap_open_memory                        
-cl_hash_data                               
-cl_hash_destroy                            
-cl_hash_init                               
-cl_init                                    
-cl_initialize_crypto                       
-cl_load                                    
-cl_retdbdir                                
-cl_retflevel                               
-cl_retver                                  
-cl_scandesc                                
-cl_scandesc_callback                       
-cl_scanfile                                
-cl_scanfile_callback                       
-cl_scanmap_callback                        
-cl_set_clcb_msg                            
-cl_statchkdir                              
-cl_statfree                                
-cl_statinidir                              
-cl_strerror                                
-cl_update_hash                             
-lsig_increment_subsig_match                
-lsig_sub_matched                           
-cw_disablefsredir                          
-cw_freeaddrinfo                            
-cw_gai_strerror                            
-cw_getaddrinfo                             
-;cw_inet_ntop                              
-;cw_init                                   
-;cw_iswow64                                
-cw_movefile                                
-cw_movefileex                              
-cw_perror                                  
-cw_rename                                  
-cw_revertfsredir                           
-cw_rmdirs                                  
-;cw_stat                                   
-cw_strerror                                
-cw_unlink                                  
+cl_countsigs
+cl_cvdfree
+cl_cvdgetage
+cl_cvdhead
+cl_cvdparse
+cl_cvdunpack
+cl_cvdverify
+cl_debug
+cl_engine_addref
+cl_engine_compile
+cl_engine_free
+cl_engine_get_num
+cl_engine_get_str
+cl_engine_new
+cl_engine_set_clcb_engine_compile_progress
+cl_engine_set_clcb_file_props
+cl_engine_set_clcb_hash
+cl_engine_set_clcb_meta
+cl_engine_set_clcb_post_scan
+cl_engine_set_clcb_pre_cache
+cl_engine_set_clcb_pre_scan
+cl_engine_set_clcb_sigload
+cl_engine_set_clcb_sigload_progress
+cl_engine_set_clcb_stats_add_sample
+cl_engine_set_clcb_stats_decrement_count
+cl_engine_set_clcb_stats_flush
+cl_engine_set_clcb_stats_get_hostid
+cl_engine_set_clcb_stats_get_num
+cl_engine_set_clcb_stats_get_size
+cl_engine_set_clcb_stats_remove_sample
+cl_engine_set_clcb_stats_submit
+cl_engine_set_clcb_vba
+cl_engine_set_clcb_virus_found
+cl_engine_set_num
+cl_engine_set_stats_set_cbdata
+cl_engine_set_str
+cl_engine_settings_apply
+cl_engine_settings_copy
+cl_engine_settings_free
+cl_engine_stats_enable
+cl_finish_hash
+cl_fmap_close
+cl_fmap_open_handle
+cl_fmap_open_memory
+cl_hash_data
+cl_hash_destroy
+cl_hash_init
+cl_init
+cl_initialize_crypto
+cl_load
+cl_retdbdir
+cl_retflevel
+cl_retver
+cl_scandesc
+cl_scandesc_callback
+cl_scanfile
+cl_scanfile_callback
+cl_scanmap_callback
+cl_set_clcb_msg
+cl_statchkdir
+cl_statfree
+cl_statinidir
+cl_strerror
+cl_update_hash
+lsig_increment_subsig_match
+lsig_sub_matched
+cw_disablefsredir
+cw_freeaddrinfo
+cw_gai_strerror
+cw_getaddrinfo
+;cw_inet_ntop
+;cw_init
+;cw_iswow64
+cw_movefile
+cw_movefileex
+cw_perror
+cw_rename
+cw_revertfsredir
+cw_rmdirs
+;cw_stat
+cw_strerror
+cw_unlink
 
-; gzip                                    
+; gzip
 gzopen                                     @1304 NONAME
 gzclose                                    @1305 NONAME
 
-; cw_internal                             
+; cw_internal
 cw_leerrno                                 @1306 NONAME
 cw_wseterrno                               @1307 NONAME
 cw_get_currentfile                         @1308 NONAME
