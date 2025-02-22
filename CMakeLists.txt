@@ -1,12 +1,40 @@
 cmake_minimum_required (VERSION 3.10)
-project(clamav-win32)
+project(clamav-win32 VERSION "1.4.2")
 
 set(CLAMWIN_DIR ${CMAKE_SOURCE_DIR})
 set(CLAMAV_DIR ${CLAMWIN_DIR}/clamav)
 set(3RDPARTY_DIR ${CLAMWIN_DIR}/3rdparty)
 
 option(DISABLE_LLVM "Disable LLVM Engine" ON)
+option(WINXP "Enable support for WINXP" OFF)
+
 set(BUILD_PTHREADS TRUE)
+
+include(${CLAMAV_DIR}/cmake/Version.cmake)
+
+set(PACKAGE_NAME      "${PROJECT_NAME}")
+set(PACKAGE_VERSION   "${PROJECT_VERSION}")
+set(PACKAGE_STRING    "${PROJECT_NAME} ${PROJECT_VERSION}${VERSION_SUFFIX}")
+set(PACKAGE_BUGREPORT "https://github.com/clamwin/clamav-win32")
+set(PACKAGE_URL       "https://oss.netfarm.it/clamav/")
+HexVersion(PACKAGE_VERSION_NUM ${PROJECT_VERSION_MAJOR} ${PROJECT_VERSION_MINOR} ${PROJECT_VERSION_PATCH})
+
+# libtool library versioning rules: http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+set(LIBCLAMAV_CURRENT  12)
+set(LIBCLAMAV_REVISION 3)
+set(LIBCLAMAV_AGE      0)
+
+math(EXPR LIBCLAMAV_SOVERSION "${LIBCLAMAV_CURRENT} - ${LIBCLAMAV_AGE}")
+set(LIBCLAMAV_VERSION "${LIBCLAMAV_SOVERSION}.${LIBCLAMAV_AGE}.${LIBCLAMAV_REVISION}")
+HexVersion(LIBCLAMAV_VERSION_NUM ${LIBCLAMAV_CURRENT} ${LIBCLAMAV_REVISION} ${LIBCLAMAV_AGE})
+
+set(LIBFRESHCLAM_CURRENT  3)
+set(LIBFRESHCLAM_REVISION 2)
+set(LIBFRESHCLAM_AGE      0)
+
+math(EXPR LIBFRESHCLAM_SOVERSION "${LIBFRESHCLAM_CURRENT} - ${LIBFRESHCLAM_AGE}")
+set(LIBFRESHCLAM_VERSION "${LIBFRESHCLAM_SOVERSION}.${LIBFRESHCLAM_AGE}.${LIBFRESHCLAM_REVISION}")
+HexVersion(LIBFRESHCLAM_VERSION_NUM ${LIBFRESHCLAM_CURRENT} ${LIBFRESHCLAM_REVISION} ${LIBFRESHCLAM_AGE})
 
 if(MINGW)
     execute_process(
@@ -26,6 +54,7 @@ add_custom_command(
 )
 
 set(CLAMWIN_INCLUDES
+    ${CMAKE_BINARY_DIR}
     ${CLAMWIN_DIR}/resources
     ${CLAMWIN_DIR}/include
     ${CLAMWIN_DIR}/include/json-c
@@ -53,10 +82,12 @@ set(CLAMWIN_DEFINES
     WIN32_LEAN_AND_MEAN
     PCRE2_STATIC
     LIBXML_STATIC
-    NOBZ2PREFIX
 )
 
 configure_file(libclamav.def ${CMAKE_BINARY_DIR}/libclamav.def @ONLY)
+configure_file(${CLAMAV_DIR}/target.h.cmake.in ${CMAKE_BINARY_DIR}/target.h)
+configure_file(${CLAMAV_DIR}/clamav-version.h.in ${CMAKE_BINARY_DIR}/clamav-version.h)
+
 
 if(BUILD_PTHREADS)
     list(APPEND CLAMWIN_INCLUDES ${3RDPARTY_DIR}/pthreads)
@@ -93,7 +124,6 @@ include(cmake/pcre2.cmake)
 include(cmake/json-c.cmake)
 include(cmake/libxml2.cmake)
 include(cmake/libclammspack.cmake)
-
 include(cmake/libclamav.cmake)
 include(cmake/libclamav_common.cmake)
 include(cmake/clambc.cmake)
@@ -108,7 +138,12 @@ include(cmake/pdcurses.cmake)
 include(cmake/clamdtop.cmake)
 
 include(${CLAMAV_DIR}/cmake/FindRust.cmake)
+set(RUST_NATIVE_STATIC_LIBS "-lntdll -lws2_32 -lpsapi")
 add_subdirectory(${CLAMAV_DIR}/libclamav_rust)
+
+if(WINXP)
+    include(cmake/winxp.cmake)
+endif()
 
 if(DISABLE_LLVM)
     message(STATUS "LLVM is DISABLED")

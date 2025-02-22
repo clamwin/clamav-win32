@@ -39,7 +39,7 @@
  *
  * @param filename
  */
-extern void (*action)(const char *);
+LIBCLAMAV_EXPORT extern void (*action)(const char *);
 
 /**
  * @brief Select the appropriate callback function based on the configuration options.

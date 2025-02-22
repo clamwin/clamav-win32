@@ -114,7 +114,7 @@
  *
  * Whether the xmlWriter saving interface is configured in
  */
-#if 1
+#ifndef LIBXML_WRITER_ENABLED
 #define LIBXML_WRITER_ENABLED
 #endif
 

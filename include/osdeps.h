@@ -35,13 +35,14 @@
 #include <cwhelpers.h>
 
 #define DATADIRBASEKEY  "Software\\ClamAV"
-
+#if 0
 LIBCLAMAV_EXPORT extern uint32_t cw_platform;
 LIBCLAMAV_EXPORT extern helpers_t cw_helpers;
+#endif
 
 extern int cw_movefile(const char *source, const char *dest, int reboot);
 extern int cw_movefileex(const char *source, const char *dest, DWORD flags);
-
+#if 0
 #if defined(__MINGW32__) && !defined(__MINGW64__)
 #define PlatformId          ((cw_platform >> 16) & 0x000000ff)
 #define PlatformMajor       ((cw_platform >> 8 ) & 0x000000ff)
@@ -52,6 +53,7 @@ extern int cw_movefileex(const char *source, const char *dest, DWORD flags);
 #else
 #define isWin9x()           (0)
 #define isOldOS()           (0)
+#endif
 #endif
 
 #define ISLOCKED(error) \
@@ -93,7 +95,7 @@ static inline char *cw_wc2mb(const wchar_t *wc, DWORD flags)
     char *mb = NULL;
 
     /* NT4 does not like WC_NO_BEST_FIT_CHARS */
-    if (isOldOS()) flags &= ~WC_NO_BEST_FIT_CHARS;
+    //if (isOldOS()) flags &= ~WC_NO_BEST_FIT_CHARS;
 
     len = WideCharToMultiByte(CP_ACP, flags, wc, -1, NULL, 0, NULL, &invalid);
     if (!len && (GetLastError() != ERROR_INSUFFICIENT_BUFFER))

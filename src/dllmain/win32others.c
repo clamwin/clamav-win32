@@ -1,6 +1,6 @@
 /*
  * Clamav Native Windows Port: others.c hook
- * Copyright (c) 2009 Gianluigi Tiesi <sherpya@netfarm.it>
+ * Copyright (c) 2009-2025 Gianluigi Tiesi <sherpya@netfarm.it>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,12 +17,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <osdeps.h>
-#include <dirent.h>
-#include <libclamav/others.h>
-//#include <shared/output.h>
+#include <direct.h> /* mkdir */
 
-int cw_unlink(const char *pathname)
+#include "osdeps.h"
+#include "dirent.h"
+#include "others.h"
+
+#define isWin9x() (0)
+
+cl_error_t cw_unlink(const char *pathname)
 {
     FIXATTRS(pathname);
     if (!DeleteFileA(pathname))

@@ -23,6 +23,8 @@
 #include <dirent.h>
 #include <others.h>
 
+#define isWin9x() (0)
+
 int cw_movefileex(const char *source, const char *dest, DWORD flags)
 {
     assert(source);

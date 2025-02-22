@@ -60,10 +60,6 @@ typedef enum _CW_HEAP_INFORMATION_CLASS { CW_HeapCompatibilityInformation } CW_H
 typedef BOOL (WINAPI *imp_HeapSetInformation)(HANDLE, CW_HEAP_INFORMATION_CLASS, PVOID, SIZE_T);
 typedef BOOL (WINAPI *imp_ChangeServiceConfig2A)(SC_HANDLE, DWORD, LPVOID);
 
-typedef BOOL (WINAPI *imp_IsWow64Process) (HANDLE, PBOOL);
-typedef BOOL (WINAPI *imp_Wow64DisableWow64FsRedirection)(LPVOID *OldValue);
-typedef BOOL (WINAPI *imp_Wow64RevertWow64FsRedirection)(LPVOID *OldValue);
-
 typedef BOOL (WINAPI *imp_RegisterWaitForSingleObject)(PHANDLE, HANDLE, WAITORTIMERCALLBACK, PVOID, ULONG, ULONG);
 typedef BOOL (WINAPI *imp_UnregisterWaitEx)(HANDLE, HANDLE);
 
@@ -133,13 +129,6 @@ typedef struct _kernel32_t
     imp_Module32Next Module32Next;
     imp_CreateRemoteThread CreateRemoteThread;
     imp_GetFinalPathNameByHandleA GetFinalPathNameByHandleA;
-
-    /* optional */
-    imp_HeapSetInformation HeapSetInformation;
-    imp_Wow64DisableWow64FsRedirection Wow64DisableWow64FsRedirection;
-    imp_Wow64RevertWow64FsRedirection Wow64RevertWow64FsRedirection;
-    imp_IsWow64Process IsWow64Process;
-    BOOL wow64;
 
     imp_RegisterWaitForSingleObject RegisterWaitForSingleObject;
     imp_UnregisterWaitEx UnregisterWaitEx;

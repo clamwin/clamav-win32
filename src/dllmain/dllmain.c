@@ -31,16 +31,9 @@ extern void tls_storage_free(void);
 extern void jit_init(void);
 extern void jit_uninit(void);
 
-BOOL cw_iswow64(void)
-{
-    BOOL bIsWow64 = FALSE;
-
-    if (IsWow64Process(GetCurrentProcess(), &bIsWow64))
-        return bIsWow64;
-
-    fprintf(stderr, "[dllmain] IsWow64Process() failed %d\n", GetLastError());
-    return FALSE;
-}
+#ifndef _WIN64
+BOOL bIsWow64 = FALSE;
+#endif
 
 /* avoid bombing in stupid msvcrt checks - msvcrt8 only */
 #ifdef _MSC_VER
@@ -66,6 +59,10 @@ static void cwi_processattach(void)
     ULONG HeapFragValue = 2;
     WSADATA wsaData;
 
+#ifndef _WIN64
+    if (!IsWow64Process(GetCurrentProcess(), &bIsWow64))
+        fprintf(stderr, "[dllmain] IsWow64Process() failed %d\n", GetLastError());
+#endif
     jit_init();
 
     if (!IsDebuggerPresent())
@@ -73,7 +70,8 @@ static void cwi_processattach(void)
         if (!HeapSetInformation(GetProcessHeap(), HeapCompatibilityInformation, &HeapFragValue, sizeof(HeapFragValue)))
         {
             DWORD le = GetLastError();
-            if ((le != ERROR_NOT_SUPPORTED) && (le != ERROR_CALL_NOT_IMPLEMENTED))
+            /* ERROR_GEN_FAILURE on wine */
+            if ((le != ERROR_NOT_SUPPORTED) && (le != ERROR_CALL_NOT_IMPLEMENTED) && (le != ERROR_GEN_FAILURE))
                 fprintf(stderr, "[DllMain] Error setting up low-fragmentation heap: le=%d\n", le);
         }
     }
@@ -81,10 +79,11 @@ static void cwi_processattach(void)
     if (WSAStartup(MAKEWORD(2,2), &wsaData) != NO_ERROR)
         fprintf(stderr, "[DllMain] Error at WSAStartup(): %d\n", WSAGetLastError());
 
+#ifndef _WIN64
     /* Some of Windows API tries to load dll from system32 and if fs redirection
        is disabled it will fail because the image loaded is 64bit, so we will preload
        needed ones (I hope :D) */
-    if (cw_iswow64())
+    if (bIsWow64)
     {
         /* winsock */
         LoadLibrary("mswsock.dll");
@@ -94,6 +93,7 @@ static void cwi_processattach(void)
         /* wintrust for sigcheck */
         LoadLibrary("rsaenh.dll");
     }
+#endif
 }
 
 extern int cw_sig_init(void);
@@ -101,10 +101,6 @@ int cw_init(void)
 {
     return cw_sig_init();
 }
-
-#ifndef KEY_WOW64_64KEY
-#define KEY_WOW64_64KEY 0x0100
-#endif
 
 static int cw_getregvalue(const char *key, char *path)
 {
@@ -114,8 +110,10 @@ static int cw_getregvalue(const char *key, char *path)
     unsigned char data[MAX_PATH];
     DWORD datalen = sizeof(data);
 
-    if (cw_iswow64())
-        flags |= KEY_WOW64_64KEY;
+#ifndef _WIN64
+    if (bIsWow64)
+        flags |= 0x0100; /* KEY_WOW64_64KEY */
+#endif
 
     /* First look in HKCU then in HKLM */
     if ((RegOpenKeyExA(HKEY_CURRENT_USER, DATADIRBASEKEY, 0, flags, &hKey) != ERROR_SUCCESS) &&

@@ -18,9 +18,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <osdeps.h>
-#include <others.h>
+#include "osdeps.h"
+#include "others.h"
 #include <assert.h>
+
+#ifndef _WIN64
+extern BOOL bIsWow64;
+#endif
 
 #define REDIR_COOKIE (PVOID) 0xdeedee13
 //#define DEBUG_TLS
@@ -58,7 +62,7 @@ static BOOL disablefsredir(void)
         return FALSE;
     }
 
-    result = cw_helpers.k32.Wow64DisableWow64FsRedirection(state);
+    result = Wow64DisableWow64FsRedirection(state);
     return result;
 }
 
@@ -83,7 +87,7 @@ static BOOL revertfsredir(void)
         return FALSE;
     }
 
-    result = cw_helpers.k32.Wow64RevertWow64FsRedirection(state);
+    result = Wow64RevertWow64FsRedirection(state);
     *state = REDIR_COOKIE;
     return result;
 }
@@ -121,7 +125,7 @@ void tls_index_alloc(void)
     }
 
 #ifndef _WIN64
-    if (cw_iswow64())
+    if (bIsWow64)
     {
         pf_disablefsredir = disablefsredir;
         pf_revertfsredir = revertfsredir;

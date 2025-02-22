@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <direct.h>  /* _mkdir()  */
+//#include <direct.h>  /* _mkdir()  */
 #include <process.h> /* _getpid() */
 #include <malloc.h>  /* _alloca() */
 
@@ -50,19 +50,13 @@
 #define main cw_main
 #endif
 
-#define PATH_MAX 32767
+#ifndef PATH_MAX
+#define PATH_MAX 260 // 32767
+#endif
 #define WORDS_BIGENDIAN 0
 #define EAI_SYSTEM 0
 
-WINBASEAPI
-DWORD
-WINAPI
-GetFinalPathNameByHandleW(
-    _In_ HANDLE hFile,
-    _Out_writes_(cchFilePath) LPWSTR lpszFilePath,
-    _In_ DWORD cchFilePath,
-    _In_ DWORD dwFlags
-);
+extern DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 
 #undef strtok_r /* thanks to pthread.h */
 
@@ -92,10 +86,9 @@ extern long long int strtoll(const char *nptr, char **endptr, int base);
 #define stat(path, buf) w32_stat(path, buf)
 extern int w32_stat(const char* path, struct stat* buf);
 
-#define rename          cw_rename
+//#define rename          cw_rename
 extern int cw_rename(const char* oldname, const char* newname);
 
-extern int cw_unlink(const char* pathname);
 #define cli_unlink      cw_unlink
 #define unlink          cw_unlink
 
@@ -148,6 +141,10 @@ extern int __cdecl fseeko64 (FILE* stream, off64_t offset, int whence);
 
 typedef unsigned short in_port_t;
 typedef unsigned int in_addr_t;
+
+/* <arpa/inet.h> */
+extern const char* cw_inet_ntop(int af, const void* a0, char* s, socklen_t l);
+#define inet_ntop cw_inet_ntop
 
 #undef IMAGE_DOS_SIGNATURE
 
