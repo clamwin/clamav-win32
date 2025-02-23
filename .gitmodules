@@ -25,3 +25,7 @@
 [submodule "3rdparty/mingw-w64"]
 	path = 3rdparty/mingw-w64
 	url = git://git.code.sf.net/p/mingw-w64/mingw-w64
+[submodule "clamav"]
+	path = clamav
+	url = ../clamav.git
+	branch = 1.4.2
