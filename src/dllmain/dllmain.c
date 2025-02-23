@@ -48,6 +48,10 @@ BOOL WINAPI dummy_Wow64RevertWow64FsRedirection(PVOID OlValue)
     return TRUE;
 }
 
+imp_IsWow64Process pIsWow64Process;
+imp_Wow64DisableWow64FsRedirection pWow64DisableWow64FsRedirection;
+imp_Wow64RevertWow64FsRedirection pWow64RevertWow64FsRedirection;
+
 /* avoid bombing in stupid msvcrt checks - msvcrt8 only */
 #ifdef _MSC_VER
 void clamavInvalidParameterHandler(const wchar_t* expression,
