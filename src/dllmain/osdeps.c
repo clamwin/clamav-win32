@@ -1,7 +1,7 @@
 /*
  * Clamav Native Windows Port: platform specific helpers
  *
- * Copyright (c) 2005-2008 Gianluigi Tiesi <sherpya@netfarm.it>
+ * Copyright (c) 2005-2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -18,347 +18,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <platform.h>
-#include <osdeps.h>
-#include <dirent.h>
-#include <others.h>
+#include "platform.h"
+#include "osdeps.h"
 
-#define isWin9x() (0)
+#include "clamav.h"
+#include "others.h"
 
-int cw_movefileex(const char *source, const char *dest, DWORD flags)
+int cw_unlink(const char *pathname)
 {
-    assert(source);
-    if (!source)
-    {
-        SetLastError(ERROR_BAD_ARGUMENTS);
-        return 0;
-    }
-    if (!isWin9x()) return (MoveFileExA(source, dest, flags));
+    LPCWSTR fname = mb2wc(pathname);
 
-    /* Yuppi, MoveFileEx on Win9x */
-
-    if (flags & MOVEFILE_REPLACE_EXISTING)
-        DeleteFileA(dest);
-
-    if (flags & MOVEFILE_DELAY_UNTIL_REBOOT)
-    {
-        char WinInitIni[MAX_PATH] = "";
-        char ssource[MAX_PATH] = "";
-        GetWindowsDirectoryA(WinInitIni, MAX_PATH - 1);
-        WinInitIni[MAX_PATH - 1] = 0;
-        strncat(WinInitIni, "\\wininit.ini", MAX_PATH - 1 - strlen(WinInitIni));
-        WinInitIni[MAX_PATH - 1] = 0;
-
-        /* Currently first copy the file to the destination, then schedule the remove.
-           I cannot known the 8.3 path before having the file, so wininit stuff
-           will fail, and windows 98 needs to be rebooted two times, since the first
-           time freezes for me */
-
-        if (dest) CopyFileA(source, dest, 0);
-
-        if (!GetShortPathNameA(source, ssource, MAX_PATH - 1))
-        {
-            cli_warnmsg("GetShortPathNameA() for %s failed %d\n", source, GetLastError());
-            return 0;
-        }
-        ssource[MAX_PATH - 1] = 0;
-        return (WritePrivateProfileStringA("rename", "NUL", ssource, WinInitIni));
-    }
-
-    return (MoveFileA(source, dest));
-}
-
-int cw_movefile(const char *source, const char *dest, int reboot)
-{
-    if (!reboot)
-    {
-        FIXATTRS(source);
-        FIXATTRS(dest);
-        if (cw_movefileex(source, dest, MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
-            return 1;
-        if (!ISLOCKED(GetLastError()))
-        {
-            cli_warnmsg("%s cannot be moved (%lu)\n", source, GetLastError());
-            return 0;
-        }
-        cli_warnmsg("%s cannot be moved (%lu), scheduling the move operation for next reboot\n", source, GetLastError());
-    }
-    if (cw_movefileex(source, dest, MOVEFILE_DELAY_UNTIL_REBOOT | MOVEFILE_REPLACE_EXISTING))
+    if (!fname)
         return 1;
-    cli_warnmsg("error scheduling the move operation for reboot (%lu)\n", GetLastError());
-    return 0;
-}
 
-static inline struct addrinfo *new_ai(int socktype, int protocol, int port, int address)
-{
-    struct addrinfo *ai;
-    struct sockaddr_in *ai_addr;
+    DWORD dwAttrs = GetFileAttributesW(fname);
+    SetFileAttributesW(fname, dwAttrs & ~(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_HIDDEN));
 
-    if (!(ai = calloc(1, sizeof(struct addrinfo))))
-        return NULL;
-
-    if (!(ai_addr = calloc(1, sizeof(struct sockaddr_in))))
-        return NULL;
-
-    ai_addr->sin_family = AF_INET;
-    ai_addr->sin_port = port;
-    ai_addr->sin_addr.s_addr = address;
-
-    ai->ai_family = PF_INET;
-    ai->ai_socktype = socktype;
-    ai->ai_protocol = protocol;
-    ai->ai_addrlen = sizeof(struct sockaddr_in);
-    ai->ai_addr = (struct sockaddr *) ai_addr;
-
-//    fprintf(stderr, "-> [%d.%d.%d.%d]\n", ((unsigned char *) &address)[0], ((unsigned char *) &address)[1], ((unsigned char *) &address)[2], ((unsigned char *) &address)[3]);
-
-    return ai;
-}
-
-int cw_getaddrinfo(const char *node, const char *service, const struct addrinfo *hints, struct addrinfo **res)
-{
-    struct hostent *he;
-    struct addrinfo **p_ai_next = res;
-    struct addrinfo default_hints;
-    char **p_addr;
-    u_short port = 0;
-    int i;
-
-    //if (cw_helpers.ws2.ok)
-    //    return cw_helpers.ws2.getaddrinfo(node, service, hints, res);
-
-    if (!(node || service))
-        return EAI_NONAME;
-
-    if (hints == NULL)
-    {
-        memset(&default_hints, 0, sizeof(default_hints));
-        default_hints.ai_family = AF_UNSPEC;
-        hints = &default_hints;
-    }
-
-    // only AI_PASSIVE flag is supported
-    if (hints->ai_flags & ~AI_PASSIVE)
-    {
-        fprintf(stderr, "[getaddrinfo] unsupported ai_flags: 0x%x, please report\n", hints->ai_flags);
-        return EAI_BADFLAGS;
-    }
-
-    if ((hints->ai_family != AF_UNSPEC) && (hints->ai_family != AF_INET))
-        return EAI_FAMILY;
-
-    // only numeric services are supported
-    if (service)
-    {
-        char *p;
-        port = htons(strtoul(service, &p, 10));
-        if (*p)
-            return EAI_NONAME;
-    }
-
-    if (!node) // TODO: or numeric
-    {
-        int address;
-
-        if (hints->ai_flags & ~AI_PASSIVE)
-            return EAI_BADFLAGS;
-
-        address = htonl((hints->ai_flags & AI_PASSIVE) ? INADDR_ANY : INADDR_LOOPBACK);
-        if (!(*res = new_ai(hints->ai_socktype, hints->ai_protocol, port, address)))
-            return EAI_MEMORY;
-
+    if (DeleteFileW(fname))
         return 0;
-    }
 
-    if (!(he = gethostbyname(node)))
-    {
-        switch (h_errno)
-        {
-            case HOST_NOT_FOUND:
-            case NO_DATA:
-                errno = 63;
-                break;
-            case TRY_AGAIN:
-                errno = 64;
-                break;
-            case NO_RECOVERY:
-            default:
-                errno = 65;
-        }
-        return EAI_SYSTEM;
-    }
+    cli_errmsg("%s cannot be deleted, scheduling for deletetion at next reboot\n", pathname);
 
-    // WARNING: no loop over cnames
-    if ((he->h_addrtype != AF_INET) || (he->h_length != sizeof(struct in_addr)))
-    {
-        fprintf(stderr, "[getaddrinfo] looping over cnames is not implemented\n");
-        return EAI_SYSTEM;
-    }
-
-    *p_ai_next = NULL;
-    for (p_addr = he->h_addr_list; *p_addr; p_addr++)
-    {
-        *p_ai_next = new_ai(hints->ai_socktype, hints->ai_protocol, port, ((struct in_addr *) *p_addr)->s_addr);
-        if (!*p_ai_next)
-            return EAI_MEMORY;
-        p_ai_next = &((*p_ai_next)->ai_next);
+    if (!MoveFileExW(fname, NULL, MOVEFILE_DELAY_UNTIL_REBOOT)) {
+        cli_errmsg("%s cannot be scheduling for deletetion at next reboot\n", pathname);
+        return 1;
     }
 
     return 0;
 }
 
-void cw_freeaddrinfo(struct addrinfo *res)
-{
-    struct addrinfo *prev;
-#if 0
-    if (cw_helpers.ws2.ok)
-    {
-        cw_helpers.ws2.freeaddrinfo(res);
-        return;
-    }
-#endif
-    do
-    {
-        prev = res;
-        res = res->ai_next;
-        if (prev->ai_addr) free(prev->ai_addr);
-        free(prev);
-    } while (res);
-}
-
-const char *cw_gai_strerror(int errcode)
-{
-    switch (errcode)
-    {
-/*
-        case EAI_ADDRFAMILY:
-            return "Address family for hostname not supported";
-*/
-        case EAI_AGAIN:
-            return "Temporary failure in name resolution";
-        case EAI_BADFLAGS:
-            return "Bad value for ai_flags";
-        case EAI_FAIL:
-            return "Non-recoverable failure in name resolution";
-        case EAI_FAMILY:
-            return "ai_family not supported";
-        case EAI_MEMORY:
-            return "Memory allocation failure";
-        case EAI_NODATA:
-            return "No address associated with hostname";
-/*
-        case EAI_NONAME:
-            return "Name or service not known";
-*/
-        case EAI_SERVICE:
-            return "Servname not supported for ai_socktype";
-        case EAI_SOCKTYPE:
-            return "ai_socktype not supported";
-        case EAI_SYSTEM:
-        default:
-            return "System error";
-    }
-}
-
-/* on Win32 rename() fails if newname exists, and yes this function is not atomic*/
-#undef rename
-int cw_rename(const char *oldname, const char *newname)
-{
-    FIXATTRS(newname);
-    if (!DeleteFileA(newname) && (GetLastError() != ERROR_FILE_NOT_FOUND))
-        return -1;
-    return rename(oldname, newname);
-}
-
-#ifndef VOLUME_NAME_NT
-#define VOLUME_NAME_NT 0x2
-#endif
-#if 0
-static inline int cw_gfff_vista(int desc, char **filepath)
-{
-    DWORD dwRet;
-    HANDLE hFile = (HANDLE) _get_osfhandle(desc);
-
-    if (!(dwRet = cw_helpers.k32.GetFinalPathNameByHandleA(hFile, NULL, 0, VOLUME_NAME_NT)))
-    {
-        cli_errmsg("cw_gfff_vista: Failed to resolve filename for descriptor %d\n", desc);
-        return CL_EOPEN;
-    }
-
-    ;
-    if (!(*filepath = calloc(dwRet + 1, 1)))
-    {
-        cli_errmsg("cw_gfff_vista: Failed to allocate %u bytes to store filename\n", dwRet + 1);
-        return CL_EMEM;
-    }
-
-    if (!cw_helpers.k32.GetFinalPathNameByHandleA(hFile, *filepath, dwRet + 1, VOLUME_NAME_NT))
-    {
-        cli_errmsg("cw_gfff_vista: Failed to resolve filename for descriptor %d\n", desc);
-        free(*filepath);
-        *filepath = NULL;
-        return CL_EOPEN;
-    }
-
-    return CL_SUCCESS;
-}
-
-static inline int cw_gfff_xp(int desc, char **filepath)
-{
-    DWORD dwRet;
-    int status = CL_SUCCESS;
-    HANDLE hFileMap = NULL;
-    HANDLE hFile = (HANDLE) _get_osfhandle(desc);
-    char filename[MAX_PATH + 1];
-    void *pMem;
-
-    DWORD dwFileSizeHi = 0;
-    DWORD dwFileSizeLo = GetFileSize(hFile, &dwFileSizeHi); 
-
-    if ((dwFileSizeLo == 0) && (dwFileSizeHi == 0))
-    {
-        cli_errmsg("cw_gfff_xp: Cannot map a file with a length of zero\n");
-        return CL_EOPEN;
-    }
-
-    if (!(hFileMap = CreateFileMappingA(hFile, NULL, PAGE_READONLY, 0,  1, NULL)))
-    {
-        cli_errmsg("cw_gfff_xp: CreateFileMapping() failed with %lu\n", GetLastError());
-        return CL_EOPEN;
-    }
-
-    if (!(pMem = MapViewOfFile(hFileMap, FILE_MAP_READ, 0, 0, 1)))
-    {
-        cli_errmsg("cw_gfff_xp: MapViewOfFile() failed with %lu\n", GetLastError());
-        status = CL_EMEM;
-        goto done;
-    }
-
-    if (cw_helpers.psapi.GetMappedFileNameA(GetCurrentProcess(), pMem, filename, MAX_PATH))
-        *filepath = strdup(filename);
-    else
-    {
-        cli_errmsg("cw_gfff_xp: GetMappedFileNameA() failed with %lu\n", GetLastError());
-        status = CL_EOPEN;
-    }
-
-done:
-    if (pMem)
-        UnmapViewOfFile(pMem);
-    if (hFileMap)
-        CloseHandle(hFileMap);
-    return status;
-}
-
-int cw_get_filepath_from_filedesc(int desc, char **filepath)
-{
-    if (cw_helpers.k32.GetFinalPathNameByHandleA)
-        return cw_gfff_vista(desc, filepath);
-    else if (cw_helpers.psapi.ok)
-        return cw_gfff_xp(desc, filepath);
-    return CL_EOPEN;
-}
-#endif
 /* A non TLS based and non thread safe canonical rand() implementation */
 /* aCaB <acab@clamav.net> */
 static unsigned long next = 1;

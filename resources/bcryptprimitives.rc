@@ -1,0 +1,2 @@
+#define __MODULE__	"bcryptprimitives.dll"
+#include "winxp.rc"

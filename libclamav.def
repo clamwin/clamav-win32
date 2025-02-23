@@ -283,6 +283,7 @@ cli_readn
 cli_regcomp
 cli_regexec
 cli_regfree
+cli_rmdirs
 cli_rndnum
 cli_scancpio_newc
 cli_scancpio_odc
@@ -308,6 +309,7 @@ cli_check_auth_header
 cli_gentemp_with_prefix
 cli_realpath
 cli_strntoul
+cli_unlink
 cli_get_filepath_from_filedesc
 cli_add_content_match_pattern
 readdb_parse_ldb_subsignature
@@ -493,20 +495,7 @@ cl_strerror
 cl_update_hash
 lsig_increment_subsig_match
 lsig_sub_matched
-cw_disablefsredir
-cw_freeaddrinfo
-cw_gai_strerror
-cw_getaddrinfo
-;cw_inet_ntop
-;cw_init
-;cw_iswow64
-cw_movefile
-cw_movefileex
 cw_perror
-cw_rename
-cw_revertfsredir
-cw_rmdirs
-;cw_stat
 cw_strerror
 cw_unlink
 
@@ -531,13 +520,12 @@ uncpath                                    @1318 NONAME
 dirname                                    @1319 NONAME
 w32_stat                                   @1320 NONAME
 cli_strdup_to_utf8                         @1321 NONAME
-cw_inet_ntop                               @1322 NONAME
-gnulib_snprintf                            @1323 NONAME
-gnulib_vsnprintf                           @1324 NONAME
-strptime                                   @1325 NONAME
-ftruncate                                  @1326 NONAME
-DATADIR                                    @1327 NONAME DATA
-CONFDIR                                    @1328 NONAME DATA
-CONFDIR_CLAMD                              @1329 NONAME DATA
-CONFDIR_FRESHCLAM                          @1330 NONAME DATA
-CONFDIR_MILTER                             @1331 NONAME DATA
+gnulib_snprintf                            @1322 NONAME
+gnulib_vsnprintf                           @1323 NONAME
+strptime                                   @1324 NONAME
+ftruncate                                  @1325 NONAME
+DATADIR                                    @1326 NONAME DATA
+CONFDIR                                    @1327 NONAME DATA
+CONFDIR_CLAMD                              @1328 NONAME DATA
+CONFDIR_FRESHCLAM                          @1329 NONAME DATA
+CONFDIR_MILTER                             @1330 NONAME DATA

@@ -1,2 +1,2 @@
 #define __MODULE__	"libfreshclam.dll"
-#include <clamav.rc>
+#include "clamav.rc"

@@ -1,4 +1,5 @@
 file(GLOB libclamav_common_sources
+    ${CLAMWIN_DIR}/src/common/*.c
     ${CLAMAV_DIR}/common/*.c
 )
 

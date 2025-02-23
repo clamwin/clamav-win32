@@ -52,37 +52,25 @@ static inline int safe_open(const char* path, int flags, ...)
     return ret;
 }
 
-/* FIXME: check if this function works as expected */
-static inline ssize_t pread(int fd, void *buf, size_t count, off_t offset)
+static inline wchar_t *mb2wc(const char *mb)
 {
-    off_t lastpos = _lseek(fd, offset, SEEK_SET);
-    ssize_t res;
-    if (lastpos == -1) return -1;
-    res = (ssize_t) _read(fd, buf, (unsigned int) count);
-    return ((_lseek(fd, lastpos, SEEK_SET) == -1) ? -1 : res);
-}
+    wchar_t *wc;
+    DWORD len = 0;
 
-#define CW_CHECKALLOC(var, alloc, ret) \
-do \
-{ \
-    if (!(var = alloc)) \
-    { \
-        fprintf(stderr, #alloc" failed\n"); \
-        ret; \
-    } \
-} while (0)
+    if (!(len = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, mb, -1, NULL, 0)))
+        return NULL;
 
-#define NORMALIZE_PATH(path, free_src, fail)                        \
-{                                                                   \
-    char *swap = cw_normalizepath((char *) path);                   \
-    if (free_src) free((void *) path);                              \
-    if (!swap) { fail; }                                            \
-    if (free_src)                                                   \
-        CW_CHECKALLOC(path, malloc(strlen(swap) + 1), fail);        \
-    else                                                            \
-        CW_CHECKALLOC(path, alloca(strlen(swap) + 1), fail);        \
-    strcpy((char *) path, swap);                                    \
-    free(swap); swap = NULL;                                        \
+    if (!(wc = (wchar_t *) malloc(len * sizeof(wchar_t))))
+    {
+        fprintf(stderr, "mb2wc: OOM\n");
+        return NULL;
+    }
+
+    if (MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, mb, -1, wc, len))
+        return wc;
+
+    free(wc);
+    return NULL;
 }
 
 #endif /* _CW_INLINE_H */

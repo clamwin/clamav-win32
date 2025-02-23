@@ -23,17 +23,34 @@
 #include <stdbool.h>
 #include <pthread.h>
 
+#define DATADIRBASEKEY  "Software\\ClamAV"
+
 extern void tls_index_alloc(void);
 extern void tls_index_free(void);
 extern void tls_storage_alloc(void);
 extern void tls_storage_free(void);
 
-extern void jit_init(void);
-extern void jit_uninit(void);
-
-#ifndef _WIN64
 BOOL bIsWow64 = FALSE;
-#endif
+
+WINBOOL WINAPI dummy_IsWow64Process(HANDLE hProcess, PBOOL Wow64Process)
+{
+    *Wow64Process = FALSE;
+    return TRUE;
+}
+
+WINBOOL WINAPI dummy_Wow64DisableWow64FsRedirection(PVOID OldValue)
+{
+    return TRUE;
+}
+
+WINBOOL WINAPI dummy_Wow64RevertWow64FsRedirection(PVOID OlValue)
+{
+    return TRUE;
+}
+
+imp_IsWow64Process pIsWow64Process = dummy_IsWow64Process;
+imp_Wow64DisableWow64FsRedirection pWow64DisableWow64FsRedirection = dummy_Wow64DisableWow64FsRedirection;
+imp_Wow64RevertWow64FsRedirection pWow64RevertWow64FsRedirection = dummy_Wow64RevertWow64FsRedirection;
 
 /* avoid bombing in stupid msvcrt checks - msvcrt8 only */
 #ifdef _MSC_VER
@@ -54,16 +71,27 @@ void clamavInvalidParameterHandler(const wchar_t* expression,
 #define _set_invalid_parameter_handler(x)
 #endif
 
+#define Q(string) # string
+#define IMPORT_KERNEL32_FUNC(x) p##x = (( imp_##x ) GetProcAddress(kernel32, Q(x)))
+
 static void cwi_processattach(void)
 {
     ULONG HeapFragValue = 2;
     WSADATA wsaData;
 
 #ifndef _WIN64
-    if (!IsWow64Process(GetCurrentProcess(), &bIsWow64))
-        fprintf(stderr, "[dllmain] IsWow64Process() failed %d\n", GetLastError());
+    HMODULE kernel32 = GetModuleHandleA("kernel32");
+    if (IMPORT_KERNEL32_FUNC(IsWow64Process))
+    {
+        if (!pIsWow64Process(GetCurrentProcess(), &bIsWow64))
+            fprintf(stderr, "[dllmain] IsWow64Process() failed %d\n", GetLastError());
+        else if (bIsWow64)
+        {
+            IMPORT_KERNEL32_FUNC(Wow64DisableWow64FsRedirection);
+            IMPORT_KERNEL32_FUNC(Wow64RevertWow64FsRedirection);
+        }
+    }
 #endif
-    jit_init();
 
     if (!IsDebuggerPresent())
     {
@@ -193,9 +221,6 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
     switch (reason)
     {
     case DLL_PROCESS_ATTACH:
-#ifdef PTW32_STATIC_LIB
-        pthread_win32_process_attach_np();
-#endif
         cwi_processattach();
         _set_invalid_parameter_handler(clamavInvalidParameterHandler);
         fix_paths();
@@ -204,27 +229,14 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
         break;
     case DLL_THREAD_ATTACH:
         tls_storage_alloc();
-#ifdef PTW32_STATIC_LIB
-        return pthread_win32_thread_attach_np();
-#else
         return TRUE;
-#endif
     case DLL_THREAD_DETACH:
         tls_storage_free();
-#ifdef PTW32_STATIC_LIB
-        return pthread_win32_thread_detach_np();
-#else
         return TRUE;
-#endif
     case DLL_PROCESS_DETACH:
         tls_storage_free();
         tls_index_free();
-#ifdef PTW32_STATIC_LIB
-        pthread_win32_thread_detach_np();
-        pthread_win32_process_detach_np();
-#endif
         WSACleanup();
-        jit_uninit();
     }
     return TRUE;
 }

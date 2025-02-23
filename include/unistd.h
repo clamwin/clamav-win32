@@ -21,6 +21,9 @@
 #ifndef _UNISTD_H
 #define _UNISTD_H
 
+#include <io.h>
+
+
 #ifndef __GNUC__
 #define R_OK    4   /* Test for read permission */
 #define W_OK    2   /* Test for write permission */

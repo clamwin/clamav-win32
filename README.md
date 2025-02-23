@@ -1,6 +1,6 @@
-# ClamAV native win32 port - 0.103.12
+# ClamAV native win32 port - 1.4.2
 
-Copyright (c) 2005-2024 Gianluigi Tiesi <sherpya@netfarm.it>
+Copyright (c) 2005-2025 Gianluigi Tiesi <sherpya@gmail.com>
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -34,11 +34,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 - curl: 8.10.1
 - gnulib: old version but still fine for my needs
 - json-c: 0.18-20240915
-- libunicows: 1.1.2 (32bit builds only)
 - libxml2: 2.13.4
 - pcre2: 10.44
 - PDCurses: git-6ba6df38
-- Pthreads-w32: 2.9.1 + some fixes
+- Winpthreads: git-9c006fc7
 - zlib: 1.3.1
 
 ## Getting sources
@@ -53,23 +52,6 @@ Clone repository using:
   clamav.reg file (I may make a nsis installer in the future),
   paths can be also `REG_EXPAND_SZ`, environment variables are
   allowed here (i.e. you can use paths like `%HomeDrive%\ClamAV`).
-
-- libclamunrar needs `unicows.dll` when used on Windows 9x, you can download
-  [Open Layer For Unicode](https://oss.netfarm.it/clamav/files/opencow-0.7.7z)
-
-- On WinNT4 you may need to set OPENSSL\_ia32cap environment variable to 0x16980010 because
-  NT4 does not support SSE out of the box (it will crash with illegal instruction).
-
-  Support for SSE is included in SP6a using Intel SSE driver (intlfxsr.sys),
-  but the installer does not always install it.
-
-  You can manually install the driver from unpacked SP6a:
-
-  `rundll32 setupapi.dll,InstallHinfSection IntelSection 132 "<path-to-extracted-sp6a-files>\update\update.inf"`,
-
-  then point it to path-to-extracted-sp6a-files and reboot.
-
-  Thanks Zachary for these infos.
 
   If you get SSL Certificates problems when launching **freshclam** you need to install
   [Baltimore CyberTrust Root](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt)

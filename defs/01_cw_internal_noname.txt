@@ -16,7 +16,6 @@ uncpath
 dirname
 w32_stat
 cli_strdup_to_utf8
-cw_inet_ntop
 
 ; gnulib
 gnulib_snprintf

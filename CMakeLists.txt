@@ -5,10 +5,8 @@ set(CLAMWIN_DIR ${CMAKE_SOURCE_DIR})
 set(CLAMAV_DIR ${CLAMWIN_DIR}/clamav)
 set(3RDPARTY_DIR ${CLAMWIN_DIR}/3rdparty)
 
-option(DISABLE_LLVM "Disable LLVM Engine" ON)
+option(ENABLE_LLVM "Enable JIT using LLVM Engine" ON)
 option(WINXP "Enable support for WINXP" OFF)
-
-set(BUILD_PTHREADS TRUE)
 
 include(${CLAMAV_DIR}/cmake/Version.cmake)
 
@@ -36,16 +34,6 @@ math(EXPR LIBFRESHCLAM_SOVERSION "${LIBFRESHCLAM_CURRENT} - ${LIBFRESHCLAM_AGE}"
 set(LIBFRESHCLAM_VERSION "${LIBFRESHCLAM_SOVERSION}.${LIBFRESHCLAM_AGE}.${LIBFRESHCLAM_REVISION}")
 HexVersion(LIBFRESHCLAM_VERSION_NUM ${LIBFRESHCLAM_CURRENT} ${LIBFRESHCLAM_REVISION} ${LIBFRESHCLAM_AGE})
 
-if(MINGW)
-    execute_process(
-        COMMAND ${CMAKE_C_COMPILER} -dumpversion
-        OUTPUT_VARIABLE GCC_VERSION
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if(${GCC_VERSION} MATCHES "posix$")
-        set(BUILD_PTHREADS FALSE)
-    endif()
-endif()
-
 add_custom_command(
         OUTPUT libclamav.dev
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/genversion.py
@@ -55,7 +43,6 @@ add_custom_command(
 
 set(CLAMWIN_INCLUDES
     ${CMAKE_BINARY_DIR}
-    ${CLAMWIN_DIR}/resources
     ${CLAMWIN_DIR}/include
     ${CLAMWIN_DIR}/include/json-c
     ${CLAMWIN_DIR}/include/libxml2
@@ -84,18 +71,13 @@ set(CLAMWIN_DEFINES
     LIBXML_STATIC
 )
 
+
 configure_file(libclamav.def ${CMAKE_BINARY_DIR}/libclamav.def @ONLY)
 configure_file(${CLAMAV_DIR}/target.h.cmake.in ${CMAKE_BINARY_DIR}/target.h)
 configure_file(${CLAMAV_DIR}/clamav-version.h.in ${CMAKE_BINARY_DIR}/clamav-version.h)
 
-
-if(BUILD_PTHREADS)
-    list(APPEND CLAMWIN_INCLUDES ${3RDPARTY_DIR}/pthreads)
-    list(APPEND CLAMWIN_DEFINES PTW32_STATIC_LIB)
-
-    file(READ pthreads.def PTHREADS_CONTENT)
-    file(APPEND ${CMAKE_BINARY_DIR}/libclamav.def "\n${PTHREADS_CONTENT}")
-endif()
+set(WINPTHREADS_DIR ${3RDPARTY_DIR}/mingw-w64/mingw-w64-libraries/winpthreads)
+list(APPEND CLAMWIN_INCLUDES ${WINPTHREADS_DIR}/include)
 
 if(MINGW)
     link_libraries("-static")
@@ -115,6 +97,13 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set (CLAMAV_ARCH x64)
 elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
     set (CLAMAV_ARCH x86)
+endif()
+
+if(ENABLE_LLVM)
+    message(STATUS "LLVM is ENABLED")
+    include(cmake/llvm.cmake)
+else()
+    message(STATUS "LLVM is DISABLED")
 endif()
 
 include(cmake/gnulib.cmake)
@@ -143,13 +132,6 @@ add_subdirectory(${CLAMAV_DIR}/libclamav_rust)
 
 if(WINXP)
     include(cmake/winxp.cmake)
-endif()
-
-if(DISABLE_LLVM)
-    message(STATUS "LLVM is DISABLED")
-else()
-    message(STATUS "LLVM is ENABLED")
-    include(cmake/llvm.cmake)
 endif()
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT clamscan)

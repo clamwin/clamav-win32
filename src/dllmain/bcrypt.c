@@ -1,3 +1,4 @@
+/* Needed by libxml2 */
 #if defined(__MINGW32__) && !defined(__MINGW64__)
 #include <windows.h>
 #include <ntstatus.h>

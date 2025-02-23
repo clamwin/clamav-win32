@@ -1,7 +1,7 @@
 /*
  * Clamav Native Windows Port
  *
- * Copyright (c) 2005-2011 Gianluigi Tiesi <sherpya@netfarm.it>
+ * Copyright (c) 2005-2025 Gianluigi Tiesi <sherpya@netfarm.it>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 #ifndef _OSDEPS_H_
 #define _OSDEPS_H_
 
-#include <platform.h>
+#include "platform.h"
 
 /* undefined in platform.h to avoid redefinition, but needed again for win32 specific stuff */
 #ifndef OUT
@@ -32,132 +32,18 @@
 #include <stdarg.h>
 #include <string.h>
 #include <sys/types.h>
-#include <cwhelpers.h>
 
-#define DATADIRBASEKEY  "Software\\ClamAV"
-#if 0
-LIBCLAMAV_EXPORT extern uint32_t cw_platform;
-LIBCLAMAV_EXPORT extern helpers_t cw_helpers;
+#ifndef _WIN64
+typedef WINBOOL (WINAPI *imp_IsWow64Process)(HANDLE hProcess, PBOOL Wow64Process);
+typedef WINBOOL (WINAPI *imp_Wow64DisableWow64FsRedirection)(PVOID OldValue);
+typedef WINBOOL (WINAPI *imp_Wow64RevertWow64FsRedirection)(PVOID OldValue);
+
+extern imp_IsWow64Process pIsWow64Process;
+extern imp_Wow64DisableWow64FsRedirection pWow64DisableWow64FsRedirection;
+extern imp_Wow64RevertWow64FsRedirection pWow64RevertWow64FsRedirection;
 #endif
 
-extern int cw_movefile(const char *source, const char *dest, int reboot);
-extern int cw_movefileex(const char *source, const char *dest, DWORD flags);
-#if 0
-#if defined(__MINGW32__) && !defined(__MINGW64__)
-#define PlatformId          ((cw_platform >> 16) & 0x000000ff)
-#define PlatformMajor       ((cw_platform >> 8 ) & 0x000000ff)
-#define PlatformMinor       (cw_platform & 0x000000ff)
-#define PlatformVersion     (cw_platform & 0x0000ffff)
-#define isWin9x()           (PlatformId == VER_PLATFORM_WIN32_WINDOWS)
-#define isOldOS()           (PlatformVersion <= 0x400)
-#else
-#define isWin9x()           (0)
-#define isOldOS()           (0)
-#endif
-#endif
-
-#define ISLOCKED(error) \
-    ((error == ERROR_ACCESS_DENIED) || (error == ERROR_SHARING_VIOLATION) || (error == ERROR_LOCK_VIOLATION))
-
-#define FIXATTRS(filename) \
-{ \
-    DWORD dwAttrs = GetFileAttributes(filename); \
-    SetFileAttributes(filename, dwAttrs & ~ (FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_HIDDEN)); \
-}
-
-extern BOOL cw_iswow64(void);
-
-static inline wchar_t *cw_mb2wc(const char *mb)
-{
-    wchar_t *wc = NULL;
-    DWORD len = 0;
-
-    if (!(len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, mb, -1, NULL, 0)))
-        return NULL;
-
-    CW_CHECKALLOC(wc, malloc(len * sizeof(wchar_t)), return NULL);
-
-    if (MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, mb, -1, wc, len))
-        return wc;
-
-    free(wc);
-    return NULL;
-}
-
-#ifndef WC_NO_BEST_FIT_CHARS
-#define WC_NO_BEST_FIT_CHARS 1024
-#endif
-
-static inline char *cw_wc2mb(const wchar_t *wc, DWORD flags)
-{
-    BOOL invalid = FALSE;
-    DWORD len = 0, res = 0;
-    char *mb = NULL;
-
-    /* NT4 does not like WC_NO_BEST_FIT_CHARS */
-    //if (isOldOS()) flags &= ~WC_NO_BEST_FIT_CHARS;
-
-    len = WideCharToMultiByte(CP_ACP, flags, wc, -1, NULL, 0, NULL, &invalid);
-    if (!len && (GetLastError() != ERROR_INSUFFICIENT_BUFFER))
-    {
-        fprintf(stderr, "WideCharToMultiByte() failed with %d\n", GetLastError());
-        return NULL;
-    }
-
-    CW_CHECKALLOC(mb, malloc(len), return NULL);
-
-    res = WideCharToMultiByte(CP_ACP, flags, wc, -1, mb, len, NULL, &invalid);
-    if (res && ((!invalid || (flags != WC_NO_BEST_FIT_CHARS)))) return mb;
-    free(mb);
-    return NULL;
-}
-
-static inline char *cw_getfullpathname(const char *path)
-{
-    char *fp = NULL;
-    size_t len = (size_t) GetFullPathNameA(path, 0, NULL, NULL);
-    if (!len) return NULL;
-
-    CW_CHECKALLOC(fp, malloc(len + 1), return NULL);
-
-    if (GetFullPathNameA(path, len, fp, NULL))
-        return fp;
-    free(fp);
-    return NULL;
-}
-
-static inline char *cw_getcurrentdir(void)
-{
-    DWORD len = GetCurrentDirectoryA(0, NULL);
-    char *cwd = NULL;
-    if (!len) return NULL;
-    len++;
-
-    CW_CHECKALLOC(cwd, malloc(len), return NULL);
-
-    len = GetCurrentDirectoryA(len - 1, cwd);
-    if (len) return cwd;
-    free(cwd);
-    return NULL;
-}
-
-static inline void cw_pathtowin32(char *name)
-{
-    /* UNC Paths need to have only backslashes */
-    char *p = name;
-    while (*p)
-    {
-        if (*p == '/') *p = '\\';
-        p++;
-    }
-}
-
-static inline void cw_rmtrailslashes(char *path)
-{
-    size_t i = strlen(path) - 1;
-    while ((i > 0) && ((path[i] == '/') || (path[i] == '\\')))
-        path[i--] = 0;
-}
+extern int cw_unlink(const char *pathname);
 
 static volatile const char portrev_rodata[] =
 {

@@ -22,9 +22,7 @@
 #include "others.h"
 #include <assert.h>
 
-#ifndef _WIN64
 extern BOOL bIsWow64;
-#endif
 
 #define REDIR_COOKIE (PVOID) 0xdeedee13
 //#define DEBUG_TLS
@@ -43,10 +41,15 @@ static DWORD __currentfile_idx = TLS_OUT_OF_INDEXES;
 #ifndef _WIN64
 static DWORD __fsredir_idx = TLS_OUT_OF_INDEXES;
 
-static BOOL disablefsredir(void)
+LIBCLAMAV_EXPORT BOOL disablefsredir(void)
 {
     BOOL result;
-    PVOID *state = TlsGetValue(__fsredir_idx);
+    PVOID *state;
+
+    if (!bIsWow64)
+        return TRUE;
+
+    state = TlsGetValue(__fsredir_idx);
 
     TRACE("disablefsredir() T:%d R:IDX:%d S:0x%p\n", GetCurrentThreadId(), __fsredir_idx, state);
 
@@ -62,14 +65,19 @@ static BOOL disablefsredir(void)
         return FALSE;
     }
 
-    result = Wow64DisableWow64FsRedirection(state);
+    result = pWow64DisableWow64FsRedirection(state);
     return result;
 }
 
-static BOOL revertfsredir(void)
+LIBCLAMAV_EXPORT BOOL revertfsredir(void)
 {
     BOOL result;
-    PVOID *state = TlsGetValue(__fsredir_idx);
+    PVOID *state;
+
+    if (!bIsWow64)
+        return TRUE;
+
+    state = TlsGetValue(__fsredir_idx);
     TRACE("revertfsredir() T:%d R:IDX:%d S:0x%p\n", GetCurrentThreadId(), __fsredir_idx, state);
 
     if (!state)
@@ -87,32 +95,11 @@ static BOOL revertfsredir(void)
         return FALSE;
     }
 
-    result = Wow64RevertWow64FsRedirection(state);
+    result = pWow64RevertWow64FsRedirection(state);
     *state = REDIR_COOKIE;
     return result;
 }
-#endif
-
-static BOOL dummyredir(void)
-{
-    TRACE("dummyredir() T:%d R:IDX:%d\n", GetCurrentThreadId(), __fsredir_idx);
-    return TRUE;
-}
-
-typedef BOOL (*fsredirfunc)(void);
-
-static fsredirfunc pf_disablefsredir = dummyredir;
-static fsredirfunc pf_revertfsredir = dummyredir;
-
-BOOL cw_disablefsredir(void)
-{
-    return pf_disablefsredir();
-}
-
-BOOL cw_revertfsredir(void)
-{
-    return pf_revertfsredir();
-}
+#endif /* _WIN64 */
 
 void tls_index_alloc(void)
 {
@@ -124,20 +111,12 @@ void tls_index_alloc(void)
         exit(1);
     }
 
-#ifndef _WIN64
-    if (bIsWow64)
-    {
-        pf_disablefsredir = disablefsredir;
-        pf_revertfsredir = revertfsredir;
-    }
-
     assert(__fsredir_idx == TLS_OUT_OF_INDEXES);
     if ((__fsredir_idx = TlsAlloc()) == TLS_OUT_OF_INDEXES)
     {
         cli_errmsg("[tls] Unable to allocate Tls slot for fsredir state storage: %d\n", GetLastError());
         exit(1);
     }
-#endif
 
     TRACE("tls_index_alloc() T:%d F:IDX:%d R:IDX:%d\n", GetCurrentThreadId(), __currentfile_idx, __fsredir_idx);
 }

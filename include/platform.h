@@ -66,8 +66,6 @@ extern DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath,
 
 /* cw */
 extern int cw_init(void);
-extern BOOL cw_disablefsredir(void);
-extern BOOL cw_revertfsredir(void);
 
 /* ctrl + c handler */
 extern BOOL WINAPI cw_stop_ctrl_handler(DWORD CtrlType);
@@ -81,19 +79,9 @@ extern long long int strtoll(const char *nptr, char **endptr, int base);
 #endif
 #endif
 
-
 #define lstat stat
 #define stat(path, buf) w32_stat(path, buf)
 extern int w32_stat(const char* path, struct stat* buf);
-
-//#define rename          cw_rename
-extern int cw_rename(const char* oldname, const char* newname);
-
-#define cli_unlink      cw_unlink
-#define unlink          cw_unlink
-
-#define cli_rmdirs      cw_rmdirs
-extern int cw_rmdirs(const char* dirname);
 
 /* errno remap */
 #define strerror cw_strerror
@@ -143,15 +131,15 @@ typedef unsigned short in_port_t;
 typedef unsigned int in_addr_t;
 
 /* <arpa/inet.h> */
-extern const char* cw_inet_ntop(int af, const void* a0, char* s, socklen_t l);
-#define inet_ntop cw_inet_ntop
+extern const char *w32_inet_ntop(int af, const void *src, char *dst, socklen_t size);
+#define inet_ntop w32_inet_ntop
 
 #undef IMAGE_DOS_SIGNATURE
 
 #define PATHSEP "\\"
 
 #if defined(THIS_IS_LIBCLAMAV)
-#define LIBCLAMAV_EXPORT
+#define LIBCLAMAV_EXPORT __declspec(dllexport)
 #else
 #define LIBCLAMAV_EXPORT __declspec(dllimport)
 #endif
@@ -164,6 +152,9 @@ LIBCLAMAV_EXPORT extern const char* CONFDIR_CLAMD;
 LIBCLAMAV_EXPORT extern const char* CONFDIR_FRESHCLAM;
 LIBCLAMAV_EXPORT extern const char* CONFDIR_MILTER;
 #endif
+
+LIBCLAMAV_EXPORT extern BOOL disablefsredir(void);
+LIBCLAMAV_EXPORT extern BOOL revertfsredir(void);
 
 extern const char* cli_to_utf8_maybe_alloc(const char* s);
 extern char* cli_strdup_to_utf8(const char* s);

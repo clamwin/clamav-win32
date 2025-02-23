@@ -67,20 +67,6 @@ cl_update_hash
 lsig_increment_subsig_match
 lsig_sub_matched
 
-
-cw_disablefsredir
-cw_freeaddrinfo
-cw_gai_strerror
-cw_getaddrinfo
-;cw_inet_ntop
-;cw_init
-;cw_iswow64
-cw_movefile
-cw_movefileex
 cw_perror
-cw_rename
-cw_revertfsredir
-cw_rmdirs
-;cw_stat
 cw_strerror
 cw_unlink

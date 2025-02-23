@@ -1,36 +1,88 @@
-file(GLOB_RECURSE llvm_headers ${CLAMWIN_DIR}/include/llvm/*.h)
+set(LLVM_DIR ${3RDPARTY_DIR}/llvm-project/llvm)
+set(LLVM_ENABLE_THREADS 1)
 
-include(cmake/llvm-sources.cmake)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(CMAKE_CL_64)
-    enable_language(ASM_MASM)
-    set(llvm_sources ${llvm_sources} llvm/lib/Target/X86/X86CompilationCallback_Win64.asm)
-endif()
+file(GLOB_RECURSE llvm_headers ${LLVM_DIR}/include/llvm/*.h)
 
-list(TRANSFORM llvm_sources PREPEND ${CLAMAV_DIR}/libclamav/c++/)
+file(GLOB llvm_sources
+    ${LLVM_DIR}/lib/Analysis/*.cpp
+    ${LLVM_DIR}/lib/AsmParser/*.cpp
+    ${LLVM_DIR}/lib/Bitcode/Reader/*.cpp
+    ${LLVM_DIR}/lib/BinaryFormat/*.cpp
+    ${LLVM_DIR}/lib/CodeGen/*.cpp
+    ${LLVM_DIR}/lib/CodeGen/AsmPrinter/*.cpp
+    ${LLVM_DIR}/lib/CodeGen/GlobalISel/*.cpp
+    ${LLVM_DIR}/lib/CodeGen/MIRParser/*.cpp
+    ${LLVM_DIR}/lib/CodeGen/SelectionDAG/*.cpp
+    ${LLVM_DIR}/lib/DebugInfo/CodeView/*.cpp
+    ${LLVM_DIR}/lib/Demangle/ItaniumDemangle.cpp
+    ${LLVM_DIR}/lib/ExecutionEngine/*.cpp
+    ${LLVM_DIR}/lib/ExecutionEngine/MCJIT/*.cpp
+    ${LLVM_DIR}/lib/ExecutionEngine/RuntimeDyld/*.cpp
+    ${LLVM_DIR}/lib/ExecutionEngine/RuntimeDyld/Targets/*.cpp
+    ${LLVM_DIR}/lib/Linker/*.cpp
+    ${LLVM_DIR}/lib/MC/*.cpp
+    ${LLVM_DIR}/lib/MC/MCDisassembler/*.cpp
+    ${LLVM_DIR}/lib/MC/MCParser/*.cpp
+    ${LLVM_DIR}/lib/Object/*.cpp
+    ${LLVM_DIR}/lib/IR/*.cpp
+    ${LLVM_DIR}/lib/IRReader/*.cpp
+    ${LLVM_DIR}/lib/ProfileData/*.cpp
+    ${LLVM_DIR}/lib/Target/*.cpp
+    ${LLVM_DIR}/lib/Target/X86/*.cpp
+    ${LLVM_DIR}/lib/Target/X86/AsmParser/*.cpp
+    ${LLVM_DIR}/lib/Target/X86/MCTargetDesc/*.cpp
+    ${LLVM_DIR}/lib/Target/X86/InstPrinter/*.cpp
+    ${LLVM_DIR}/lib/Target/X86/TargetInfo/*.cpp
+    ${LLVM_DIR}/lib/Target/X86/Utils/*.cpp
+    ${LLVM_DIR}/lib/Transforms/AggressiveInstCombine/*.cpp
+    ${LLVM_DIR}/lib/Transforms/InstCombine/*.cpp
+    ${LLVM_DIR}/lib/Transforms/Instrumentation/*.cpp
+    ${LLVM_DIR}/lib/Transforms/IPO/*.cpp
+    ${LLVM_DIR}/lib/Transforms/ObjCARC/*.cpp
+    ${LLVM_DIR}/lib/Transforms/Scalar/*.cpp
+    ${LLVM_DIR}/lib/Transforms/Utils/*.cpp
+    ${LLVM_DIR}/lib/Transforms/Vectorize/*.cpp
+    ${LLVM_DIR}/lib/Support/*.cpp
+    ${LLVM_DIR}/lib/Support/*.c
+)
 
-add_library(libclamav_llvm SHARED
+add_library(llvm STATIC
     ${llvm_headers}
     ${llvm_sources}
-    ${CLAMWIN_DIR}/resources/libclamav_llvm.rc
-    ${CLAMWIN_DIR}/libclamav_llvm.def
+)
+set_target_properties(llvm PROPERTIES LINKER_LANGUAGE CXX)
+
+set(HAVE_ERRNO_H 1)
+set(HAVE_PTHREAD_H 1)
+set(HAVE_LIBPTHREAD 1)
+set(HAVE_UNISTD_H 1)
+set(PACKAGE_VERSION "8.0.1")
+
+configure_file(
+  ${LLVM_DIR}/include/llvm/Config/config.h.cmake
+  ${CMAKE_BINARY_DIR}/llvm/Config/config.h)
+configure_file(
+  ${LLVM_DIR}/include/llvm/Config/abi-breaking.h.cmake
+  ${CMAKE_BINARY_DIR}/llvm/Config/abi-breaking.h)
+
+target_include_directories(llvm PRIVATE
+    ${CLAMWIN_DIR}/include
+    ${CLAMWIN_DIR}/include/llvm/lib/IR
+    ${CLAMWIN_DIR}/include/llvm/lib/Target/X86
+    ${CLAMWIN_DIR}/include/llvm/lib/Transforms/InstCombine
+    ${LLVM_DIR}/include
+    ${LLVM_DIR}/lib/Target/X86
+    ${CMAKE_BINARY_DIR}
 )
 
-target_include_directories(libclamav_llvm PRIVATE
-    ${CLAMWIN_DIR}/include/llvm
-    ${CLAMAV_DIR}/libclamav/c++
-    ${CLAMAV_DIR}/libclamav/c++/llvm/include
-    ${CLAMAV_DIR}/libclamav/c++/llvm/lib/Target/X86
-    ${CLAMWIN_INCLUDES}
-)
-
-target_compile_definitions(libclamav_llvm PRIVATE ${CLAMWIN_DEFINES} __STDC_LIMIT_MACROS __STDC_CONSTANT_MACROS)
-target_link_libraries(libclamav_llvm PRIVATE libclamav imagehlp psapi)
-set_target_properties(libclamav_llvm PROPERTIES DEFINE_SYMBOL THIS_IS_LIBCLAMAV PREFIX "" OUTPUT_NAME libclamav_llvm)
-
-target_compile_options(libclamav_llvm PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-deprecated-declarations>)
-if(MSVC)
-    target_compile_options(libclamav_llvm PRIVATE $<$<COMPILE_LANGUAGE:CXX>:/wd4065 /wd4146 /wd4244 /wd4267 /wd4312 /wd4319 /wd4334 /wd4624 /wd4838>)
+if(WINXP)
+  target_compile_definitions(llvm PRIVATE PSAPI_VERSION=1)
 endif()
 
-list(APPEND CLAMAV_INSTALL_TARGETS libclamav_llvm)
+target_compile_options(llvm PRIVATE
+    $<$<AND:$<CXX_COMPILER_ID:GNU>,$<COMPILE_LANGUAGE:CXX>>:-Wno-deprecated-declarations -Wno-missing-template-keyword -Wno-init-list-lifetime>
+    $<$<CXX_COMPILER_ID:MSVC>:/wd4065 /wd4146 /wd4244 /wd4267 /wd4312 /wd4319 /wd4334 /wd4624 /wd4838>
+)

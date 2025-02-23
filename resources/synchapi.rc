@@ -1,0 +1,2 @@
+#define __MODULE__	"api-ms-win-core-synch-l1-2-0.dll"
+#include "winxp.rc"

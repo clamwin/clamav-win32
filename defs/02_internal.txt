@@ -25,6 +25,7 @@ cli_readn
 cli_regcomp
 cli_regexec
 cli_regfree
+cli_rmdirs
 cli_rndnum
 cli_scancpio_newc
 cli_scancpio_odc
@@ -50,6 +51,7 @@ cli_check_auth_header
 cli_gentemp_with_prefix
 cli_realpath
 cli_strntoul
+cli_unlink
 cli_get_filepath_from_filedesc
 cli_add_content_match_pattern
 readdb_parse_ldb_subsignature

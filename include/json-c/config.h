@@ -279,4 +279,3 @@ extern int gnulib_snprintf(char* str, size_t size, const char* format, ...);
 
 extern int rpl_vasprintf(char** resultp, const char* format, ...);
 #define vasprintf rpl_vasprintf
-
