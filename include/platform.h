@@ -35,6 +35,7 @@
 #include <ws2tcpip.h> /* ipv6 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <errno.h>
 #include <process.h> /* _getpid() */
 #include <malloc.h>  /* _alloca() */

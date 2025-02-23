@@ -21,26 +21,6 @@
 #ifndef _OSDEPS_H_
 #define _OSDEPS_H_
 
-#include "platform.h"
-
-/* undefined in platform.h to avoid redefinition, but needed again for win32 specific stuff */
-#ifndef OUT
-#define OUT
-#endif
-
-#include <assert.h>
-#include <stdarg.h>
-#include <string.h>
-#include <sys/types.h>
-
-typedef BOOL (WINAPI *imp_IsWow64Process)(HANDLE hProcess, PBOOL Wow64Process);
-typedef BOOL (WINAPI *imp_Wow64DisableWow64FsRedirection)(PVOID OldValue);
-typedef BOOL (WINAPI *imp_Wow64RevertWow64FsRedirection)(PVOID OldValue);
-
-extern imp_IsWow64Process pIsWow64Process;
-extern imp_Wow64DisableWow64FsRedirection pWow64DisableWow64FsRedirection;
-extern imp_Wow64RevertWow64FsRedirection pWow64RevertWow64FsRedirection;
-
 extern int cw_unlink(const char *pathname);
 
 static volatile const char portrev_rodata[] =

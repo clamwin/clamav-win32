@@ -18,14 +18,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "osdeps.h"
+#include "platform.h"
 
-#include <stdbool.h>
-#include <pthread.h>
+#include <windows.h>
+#include <winsock2.h>
+#include <stdio.h>
 
 #define DATADIRBASEKEY  "Software\\ClamAV"
 
 #ifndef _WIN64
+
+typedef BOOL (WINAPI *imp_IsWow64Process)(HANDLE hProcess, PBOOL Wow64Process);
+typedef BOOL (WINAPI *imp_Wow64DisableWow64FsRedirection)(PVOID OldValue);
+
 BOOL bIsWow64 = FALSE;
 
 static imp_IsWow64Process pIsWow64Process;

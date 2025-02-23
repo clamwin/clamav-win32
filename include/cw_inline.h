@@ -2,6 +2,7 @@
 #define _CW_INLINE_H
 
 #include <stdio.h>
+#include <time.h>
 #include <sys/timeb.h>
 #include <fcntl.h>
 #include <io.h>
