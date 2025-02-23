@@ -43,7 +43,9 @@
 #define HAVE_STDLIB_H
 
 /* Define to 1 if you have the <strings.h> header file. */
-/* #undef HAVE_STRINGS_H */
+#ifdef __GNUC__
+#define HAVE_STRINGS_H
+#endif
 
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H
@@ -52,10 +54,14 @@
 /* #undef HAVE_SYSLOG_H */
 
 /* Define to 1 if you have the <sys/cdefs.h> header file. */
-/* #undef HAVE_SYS_CDEFS_H */
+#ifdef __GNUC__
+#define HAVE_SYS_CDEFS_H
+#endif
 
 /* Define to 1 if you have the <sys/param.h> header file. */
-/* #undef HAVE_SYS_PARAM_H */
+#ifdef __GNUC__
+#define HAVE_SYS_PARAM_H 1
+#endif
 
 /* Define to 1 if you have the <sys/random.h> header file. */
 /* #undef HAVE_SYS_RANDOM_H */
@@ -113,7 +119,9 @@
 #define HAVE_DECL__ISNAN
 
 /* Define to 1 if you have the `open' function. */
-/* #undef HAVE_OPEN */
+#ifdef __GNUC__
+#define HAVE_OPEN
+#endif
 
 /* Define to 1 if you have the `realloc' function. */
 #define HAVE_REALLOC
@@ -122,11 +130,15 @@
 #define HAVE_SETLOCALE
 
 /* Define to 1 if you have the `snprintf' function. */
-/* #undef HAVE_SNPRINTF */
+#ifdef __GNUC__
+#define HAVE_SNPRINTF
+#endif
 
 
 /* Define to 1 if you have the `strcasecmp' function. */
-/* #undef HAVE_STRCASECMP */
+#ifdef __GNUC__
+#define HAVE_STRCASECMP 1
+#endif
 
 /* Define to 1 if you have the `strdup' function. */
 #define HAVE_STRDUP
@@ -135,7 +147,9 @@
 #define HAVE_STRERROR
 
 /* Define to 1 if you have the `strncasecmp' function. */
-/* #undef HAVE_STRNCASECMP */
+#ifdef __GNUC__
+#define HAVE_STRNCASECMP 1
+#endif
 
 /* Define to 1 if you have the `uselocale' function. */
 /* #undef HAVE_USELOCALE */
@@ -174,7 +188,9 @@
 #endif
 
 /* Have __thread */
-/* #undef HAVE___THREAD */
+#ifdef __GNUC__
+#define HAVE___THREAD
+#endif
 
 /* Public define for json_inttypes.h */
 #define JSON_C_HAVE_INTTYPES_H 1
@@ -244,6 +260,3 @@
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
-
-/* open/close/read/write */
-#include <io.h>
