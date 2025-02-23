@@ -1,7 +1,7 @@
 /*
  * Clamav Native Windows Port: Crash Dumper Helper
  *
- * Copyright (c) 2005-2010 Gianluigi Tiesi <sherpya@netfarm.it>
+ * Copyright (c) 2005-2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -18,10 +18,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <platform.h>
-#include <osdeps.h>
-
 #ifdef _MSC_VER
+
+#include "platform.h"
+#include "osdeps.h"
+
+#include <dbghelp.h>
+
+//#pragma warning (push)
+//#pragma warning (disable:4091)
+//#pragma warning (pop)
+
+#define MINDUMP_FLAGS (MINIDUMP_TYPE) \
+    (MiniDumpWithDataSegs  | MiniDumpWithIndirectlyReferencedMemory | MiniDumpFilterModulePaths)
+typedef BOOL(WINAPI* pMiniDumpWriteDumpFunc)(HANDLE, DWORD, HANDLE, MINIDUMP_TYPE,
+    CONST PMINIDUMP_EXCEPTION_INFORMATION,
+    CONST PMINIDUMP_USER_STREAM_INFORMATION,
+    CONST PMINIDUMP_CALLBACK_INFORMATION);
+
+extern LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs);
 
 typedef struct _crashdata_t
 {

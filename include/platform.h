@@ -36,9 +36,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-//#include <direct.h>  /* _mkdir()  */
 #include <process.h> /* _getpid() */
 #include <malloc.h>  /* _alloca() */
+
+#ifdef _MSC_VER
+#include <direct.h>  /* _mkdir()  */
+#endif
 
 #include "posix-errno.h"
 #include "safe_ctype.h"

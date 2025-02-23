@@ -1,7 +1,7 @@
 /*
  * Clamav Native Windows Port: stdint.h replacement
  *
- * Copyright (c) 2008-2018 Gianluigi Tiesi <sherpya@netfarm.it>
+ * Copyright (c) 2008-2025 Gianluigi Tiesi <sherpya@netfarm.it>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -63,11 +63,6 @@ typedef unsigned int       uint_fast32_t;
 typedef unsigned long long uint_fast64_t;
 #endif
 
-#ifndef __cplusplus
-#undef mode_t
-typedef uint32_t mode_t;
-#endif
-
 #ifndef ssize_t
 #ifdef  _WIN64
 typedef __int64 ssize_t;
@@ -113,7 +108,6 @@ typedef int ssize_t;
 #define PTRDIFF_MAX	INT32_MAX
 #endif
 
-#ifdef __cplusplus
 /* Certain compatibility updates to VC++ introduce the `cstdint'
  * header, which defines the INT*_C macros. On default installs they
  * are absent. */
@@ -140,7 +134,6 @@ typedef int ssize_t;
 #endif
 #ifndef UINT64_C
 # define UINT64_C(C) C##ui64
-#endif
 #endif
 
 #endif /* _STDINT_H_ */

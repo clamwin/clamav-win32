@@ -32,18 +32,18 @@ extern void tls_storage_free(void);
 
 BOOL bIsWow64 = FALSE;
 
-WINBOOL WINAPI dummy_IsWow64Process(HANDLE hProcess, PBOOL Wow64Process)
+BOOL WINAPI dummy_IsWow64Process(HANDLE hProcess, PBOOL Wow64Process)
 {
     *Wow64Process = FALSE;
     return TRUE;
 }
 
-WINBOOL WINAPI dummy_Wow64DisableWow64FsRedirection(PVOID OldValue)
+BOOL WINAPI dummy_Wow64DisableWow64FsRedirection(PVOID OldValue)
 {
     return TRUE;
 }
 
-WINBOOL WINAPI dummy_Wow64RevertWow64FsRedirection(PVOID OlValue)
+BOOL WINAPI dummy_Wow64RevertWow64FsRedirection(PVOID OlValue)
 {
     return TRUE;
 }

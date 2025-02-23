@@ -130,7 +130,9 @@ include(cmake/pdcurses.cmake)
 include(cmake/clamdtop.cmake)
 
 include(${CLAMAV_DIR}/cmake/FindRust.cmake)
-set(RUST_NATIVE_STATIC_LIBS "-lntdll -lws2_32 -lpsapi")
+if(MINGW)
+    set(RUST_NATIVE_STATIC_LIBS "-lntdll -lws2_32 -lpsapi")
+endif()
 add_subdirectory(${CLAMAV_DIR}/libclamav_rust)
 
 if(WINXP)
