@@ -71,6 +71,13 @@ set(CLAMWIN_DEFINES
     LIBXML_STATIC
 )
 
+configure_file(libclamav.def ${CMAKE_BINARY_DIR}/libclamav.def @ONLY)
+
+if(MSVC)
+    file(READ winpthreads.def WINPTHREADS_CONTENT)
+    file(APPEND ${CMAKE_BINARY_DIR}/libclamav.def "\n${NPTHREADS_CONTENT}")
+endif()
+
 if(WINXP)
     list(APPEND CLAMWIN_DEFINES WINXP)
 endif()

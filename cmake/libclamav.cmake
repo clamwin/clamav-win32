@@ -51,17 +51,19 @@ if (MINGW AND WINXP)
     list(APPEND libclamav_win32_sources ${CLAMWIN_DIR}/src/dllmain/dll_dependency.S)
 endif()
 
-file(GLOB winpthreads_sources ${WINPTHREADS_DIR}/src/*.c)
-source_group("Winpthreads Files" FILES ${winpthreads_sources})
-
 list(APPEND libclamav_win32_sources ${CMAKE_BINARY_DIR}/libclamav.def)
 source_group("Win32 Files" FILES ${libclamav_win32_sources})
+
+if (MSVC)
+    file(GLOB winpthreads_sources ${WINPTHREADS_DIR}/src/*.c)
+    source_group("Winpthreads Files" FILES ${winpthreads_sources})
+    list(APPEND libclamav_win32_sources ${winpthreads_sources})
+endif()
 
 add_library(libclamav SHARED
     ${libclamav_win32_headers}
     ${libclamav_sources}
     ${libclamav_win32_sources}
-    ${winpthreads_sources}
     ${CLAMWIN_DIR}/resources/libclamav.rc
 )
 
