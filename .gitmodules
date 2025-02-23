@@ -1,10 +1,6 @@
 [submodule "3rdparty/openssl"]
 	path = 3rdparty/openssl
 	url = ../openssl.git
-[submodule "clamav"]
-	path = clamav
-	url = ../clamav.git
-	branch = 0.103.0-r1
 [submodule "3rdparty/curl"]
 	path = 3rdparty/curl
 	url = https://github.com/curl/curl.git
