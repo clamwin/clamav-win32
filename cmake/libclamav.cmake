@@ -43,8 +43,11 @@ file(GLOB_RECURSE libclamav_win32_headers ${CLAMWIN_DIR}/include/*.h)
 file(GLOB libclamav_win32_sources ${CLAMWIN_DIR}/src/dllmain/*.c)
 list(APPEND libclamav_win32_sources
     ${CLAMAV_DIR}/win32/compat/dirent.c
-    ${CLAMAV_DIR}/win32/compat/utf8_util.c
     ${CLAMAV_DIR}/win32/compat/libgen.c
+    ${CLAMAV_DIR}/win32/compat/random.c
+    ${CLAMAV_DIR}/win32/compat/strptime.c
+    ${CLAMAV_DIR}/win32/compat/utf8_util.c
+    ${CLAMAV_DIR}/win32/compat/w32_stat.c
 )
 
 if (MINGW AND WINXP)
@@ -58,6 +61,7 @@ if (MSVC)
     file(GLOB winpthreads_sources ${WINPTHREADS_DIR}/src/*.c)
     source_group("Winpthreads Files" FILES ${winpthreads_sources})
     list(APPEND libclamav_win32_sources ${winpthreads_sources})
+    install(FILES ${WINPTHREADS_DIR}/COPYING DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME COPYING.winpthreads)
 endif()
 
 add_library(libclamav SHARED
@@ -84,7 +88,6 @@ target_link_libraries(libclamav PRIVATE
     json-c
     libxml2
     clammspack
-    gnulib
     ${OPENSSL_SSL_LIBRARY}
     ${OPENSSL_CRYPTO_LIBRARY}
     libclamav_common
@@ -108,5 +111,3 @@ endif()
 list(APPEND CLAMAV_INSTALL_TARGETS libclamav)
 
 install(FILES ${3RDPARTY_DIR}/openssl/LICENSE DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME COPYING.openssl)
-install(FILES ${3RDPARTY_DIR}/gnulib/COPYING DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME COPYING.gnulib)
-install(FILES ${WINPTHREADS_DIR}/COPYING DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME COPYING.winpthreads)

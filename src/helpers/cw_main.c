@@ -1,7 +1,7 @@
 /*
  * main() wrapper to handle startup code
  *
- * Copyright (c) 2008-2010 Gianluigi Tiesi <sherpya@netfarm.it>
+ * Copyright (c) 2008-2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -18,8 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <platform.h>
-#include <cwhelpers.h>
+#include "platform.h"
+#include "crashdump.h"
 
 /* Disable crt globbing, it's broken */
 #ifdef __MINGW32__
@@ -41,7 +41,11 @@ int main(int argc, char* argv[])
     SetUnhandledExceptionFilter(CrashHandlerExceptionFilter);
 #endif
 
-    _setmode(_fileno(stdin), O_BINARY);
+    if (_setmode(_fileno(stdin), O_BINARY) == -1)
+    {
+        perror("_setmode");
+        abort();
+    }
 
     //if (!SetConsoleCtrlHandler(cw_stop_ctrl_handler, TRUE))
     //    fprintf(stderr, "[cw_main] Cannot install Console Ctrl Handler (%d)\n", GetLastError());

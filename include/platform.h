@@ -1,7 +1,7 @@
 /*
  * Clamav Native Windows Port: platform specific helpers
  *
- * Copyright (c) 2005-2010 Gianluigi Tiesi <sherpya@netfarm.it>
+ * Copyright (c) 2005-2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -43,6 +43,8 @@
 #include <direct.h>  /* _mkdir()  */
 #endif
 
+#include <io.h>
+
 #include "posix-errno.h"
 #include "safe_ctype.h"
 #include "cw_inline.h"
@@ -61,61 +63,46 @@
 
 WINBASEAPI DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 
-#undef strtok_r /* thanks to pthread.h */
-
 /* <strings.h> */
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
-
-/* cw */
-extern int cw_init(void);
-
 /* ctrl + c handler */
 extern BOOL WINAPI cw_stop_ctrl_handler(DWORD CtrlType);
 
-/* gnulib entries */
+#define ftruncate _chsize
+
 #ifndef __cplusplus
-extern char *strtok_r(char *s, const char *delim, char **save_ptr);
+//extern char *strtok_r(char *s, const char *delim, char **save_ptr);
 extern char *strptime (const char *buf, const char *format, struct tm *tm);
-#if defined(_MSC_VER) && (_MSC_VER <= 1400)
-extern long long int strtoll(const char *nptr, char **endptr, int base);
 #endif
-#endif
+
+extern wchar_t* uncpath(const char* path);
 
 #define lstat stat
 #define stat(path, buf) w32_stat(path, buf)
 extern int w32_stat(const char* path, struct stat* buf);
+extern int safe_open(const char* path, int flags, ...);
 
 /* errno remap */
 #define strerror cw_strerror
 #define perror cw_perror
 
-/* random */
-extern int cw_rand(void);
-extern void cw_srand(unsigned int seed);
+extern int w32_rand(void);
+extern void w32_srand(unsigned int seed);
 
 /* avoid redefining std::rand */
 #ifndef __cplusplus
-#define rand cw_rand
-#define srand cw_srand
+#define srand w32_srand
+#define rand w32_rand
 #endif
 
 #define mkdir(a, b) mkdir(a)
-
-/* <stdio.h> / <stdarg.h> */
-/* Use snprintf and vsnprintf from gnulib, win32 crt has broken a snprintf */
-#undef snprintf
-#undef vsnprintf
-#define snprintf gnulib_snprintf
-#define vsnprintf gnulib_vsnprintf
-extern int gnulib_snprintf(char *str, size_t size, const char *format, ...);
-extern int gnulib_vsnprintf(char *str, size_t size, const char *format, va_list args);
 
 #if defined(_MSC_VER)
 #define fseeko _fseeki64
 #elif defined(__GNUC__)
 #define fseeko fseeko64
-extern int __cdecl fseeko64 (FILE* stream, off64_t offset, int whence);
+extern int __cdecl fseeko64(FILE* stream, off64_t offset, int whence);
 #else
 #undef HAVE_FSEEKO
 #endif
@@ -157,7 +144,6 @@ LIBCLAMAV_EXPORT extern const char* CONFDIR_MILTER;
 #endif
 
 LIBCLAMAV_EXPORT extern BOOL disablefsredir(void);
-LIBCLAMAV_EXPORT extern BOOL revertfsredir(void);
 
 extern const char* cli_to_utf8_maybe_alloc(const char* s);
 extern char* cli_strdup_to_utf8(const char* s);

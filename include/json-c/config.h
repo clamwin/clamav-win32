@@ -19,37 +19,34 @@
 /* #undef HAVE_ENDIAN_H */
 
 /* Define to 1 if you have the <fcntl.h> header file. */
-#define HAVE_FCNTL_H 1
+#define HAVE_FCNTL_H
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#define HAVE_INTTYPES_H 1
+#define HAVE_INTTYPES_H
 
 /* Define to 1 if you have the <limits.h> header file. */
-#define HAVE_LIMITS_H 1
+#define HAVE_LIMITS_H
 
 /* Define to 1 if you have the <locale.h> header file. */
-#define HAVE_LOCALE_H 1
+#define HAVE_LOCALE_H
 
 /* Define to 1 if you have the <memory.h> header file. */
-#define HAVE_MEMORY_H 1
+#define HAVE_MEMORY_H
 
 /* Define to 1 if you have the <stdarg.h> header file. */
-#define HAVE_STDARG_H 1
+#define HAVE_STDARG_H
 
 /* Define to 1 if you have the <stdint.h> header file. */
-#define HAVE_STDINT_H 1
+#define HAVE_STDINT_H
 
 /* Define to 1 if you have the <stdlib.h> header file. */
-#define HAVE_STDLIB_H 1
-
+#define HAVE_STDLIB_H
 
 /* Define to 1 if you have the <strings.h> header file. */
-#ifdef __GNUC__
-#define HAVE_STRINGS_H 1
-#endif
+/* #undef HAVE_STRINGS_H */
 
 /* Define to 1 if you have the <string.h> header file. */
-#define HAVE_STRING_H 1
+#define HAVE_STRING_H
 
 /* Define to 1 if you have the <syslog.h> header file. */
 /* #undef HAVE_SYSLOG_H */
@@ -58,9 +55,7 @@
 /* #undef HAVE_SYS_CDEFS_H */
 
 /* Define to 1 if you have the <sys/param.h> header file. */
-#ifdef __GNUC__
-#define HAVE_SYS_PARAM_H 1
-#endif
+/* #undef HAVE_SYS_PARAM_H */
 
 /* Define to 1 if you have the <sys/random.h> header file. */
 /* #undef HAVE_SYS_RANDOM_H */
@@ -69,7 +64,7 @@
 /* #undef HAVE_SYS_RESOURCE_H */
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
-#define HAVE_SYS_STAT_H 1
+#define HAVE_SYS_STAT_H
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #define HAVE_SYS_TYPES_H 1
@@ -91,65 +86,56 @@
 
 /* Has atomic builtins */
 #ifdef __GNUC__
-#define HAVE_ATOMIC_BUILTINS 1
+#define HAVE_ATOMIC_BUILTINS
 #endif
 
 /* Define to 1 if you have the declaration of `INFINITY', and to 0 if you
    don't. */
-#if !(defined(_MSC_VER) && (_MSC_VER < 1800))
-#define HAVE_DECL_INFINITY 1
-#endif
+#define HAVE_DECL_INFINITY
 
 /* Define to 1 if you have the declaration of `isinf', and to 0 if you don't.
    */
-#if !(defined(_MSC_VER) && (_MSC_VER < 1800))
-#define HAVE_DECL_ISINF 1
-#endif
+#define HAVE_DECL_ISINF
 
 /* Define to 1 if you have the declaration of `isnan', and to 0 if you don't.
    */
-#if !(defined(_MSC_VER) && (_MSC_VER < 1800))
-#define HAVE_DECL_ISNAN 1
-#endif
+#define HAVE_DECL_ISNAN
 
 /* Define to 1 if you have the declaration of `nan', and to 0 if you don't. */
-#if !(defined(_MSC_VER) && (_MSC_VER < 1800))
-#define HAVE_DECL_NAN 1
-#endif
+#define HAVE_DECL_NAN
 
 /* Define to 1 if you have the declaration of `_finite', and to 0 if you
    don't. */
-#define HAVE_DECL__FINITE 0
+#define HAVE_DECL__FINITE
 
 /* Define to 1 if you have the declaration of `_isnan', and to 0 if you don't.
    */
-#define HAVE_DECL__ISNAN 0
+#define HAVE_DECL__ISNAN
 
 /* Define to 1 if you have the `open' function. */
-#define HAVE_OPEN 1
+/* #undef HAVE_OPEN */
 
 /* Define to 1 if you have the `realloc' function. */
-#define HAVE_REALLOC 1
+#define HAVE_REALLOC
 
 /* Define to 1 if you have the `setlocale' function. */
-#define HAVE_SETLOCALE 1
+#define HAVE_SETLOCALE
 
 /* Define to 1 if you have the `snprintf' function. */
-#define HAVE_SNPRINTF 1
+/* #undef HAVE_SNPRINTF */
+
 
 /* Define to 1 if you have the `strcasecmp' function. */
-#define HAVE_STRCASECMP 1
+/* #undef HAVE_STRCASECMP */
 
 /* Define to 1 if you have the `strdup' function. */
-#define HAVE_STRDUP 1
+#define HAVE_STRDUP
 
 /* Define to 1 if you have the `strerror' function. */
-#define HAVE_STRERROR 1
+#define HAVE_STRERROR
 
 /* Define to 1 if you have the `strncasecmp' function. */
-#ifdef __GNUC__
-#define HAVE_STRNCASECMP 1
-#endif
+/* #undef HAVE_STRNCASECMP */
 
 /* Define to 1 if you have the `uselocale' function. */
 /* #undef HAVE_USELOCALE */
@@ -158,13 +144,13 @@
 /* #undef NEWLOCALE_NEEDS_FREELOCALE */
 
 /* Define to 1 if you have the `vasprintf' function. */
-#define HAVE_VASPRINTF 1
+/* #undef HAVE_VASPRINTF */
 
 /* Define to 1 if you have the `vprintf' function. */
-#define HAVE_VPRINTF 1
+#define HAVE_VPRINTF
 
 /* Define to 1 if you have the `vsnprintf' function. */
-#define HAVE_VSNPRINTF 1
+#define HAVE_VSNPRINTF
 
 /* Define to 1 if you have the `vsyslog' function. */
 /* #undef HAVE_VSYSLOG */
@@ -177,24 +163,18 @@
 
 #define HAVE_STRTOLL
 #if !defined(HAVE_STRTOLL)
-#if defined(_MSC_VER) && (_MSC_VER < 1800)
-#define json_c_strtoll strtoll
-#else
 #define strtoll strtoll
-#endif
+/* #define json_c_strtoll strtoll*/
 #endif
 
 #define HAVE_STRTOULL
 #if !defined(HAVE_STRTOULL)
-#if defined(_MSC_VER) && (_MSC_VER < 1800)
-#define json_c_strtoull strtoull
-#else
 #define strtoull strtoull
-#endif
+/* #define json_c_strtoull strtoull */
 #endif
 
 /* Have __thread */
-#define HAVE___THREAD 1
+/* #undef HAVE___THREAD */
 
 /* Public define for json_inttypes.h */
 #define JSON_C_HAVE_INTTYPES_H 1
@@ -254,7 +234,7 @@
 #endif
 
 /* Define to 1 if you have the ANSI C header files. */
-#define STDC_HEADERS 1
+#define STDC_HEADERS
 
 /* Version number of package */
 #define VERSION "0.18."
@@ -267,15 +247,3 @@
 
 /* open/close/read/write */
 #include <io.h>
-
-/* gnulib */
-#if !defined(_MSC_VER) || (_MSC_VER < 1700)
-extern long long int strtoll(const char *nptr, char **endptr, int base);
-#endif
-
-#include <stdio.h>
-extern int gnulib_snprintf(char* str, size_t size, const char* format, ...);
-#define snprintf gnulib_snprintf
-
-extern int rpl_vasprintf(char** resultp, const char* format, ...);
-#define vasprintf rpl_vasprintf

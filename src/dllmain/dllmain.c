@@ -1,7 +1,7 @@
 /*
  * Clamav Native Windows Port: dllmain
  *
- * Copyright (c) 2005-2025 Gianluigi Tiesi <sherpya@netfarm.it>
+ * Copyright (c) 2005-2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -25,32 +25,20 @@
 
 #define DATADIRBASEKEY  "Software\\ClamAV"
 
-extern void tls_index_alloc(void);
-extern void tls_index_free(void);
-extern void tls_storage_alloc(void);
-extern void tls_storage_free(void);
-
+#ifndef _WIN64
 BOOL bIsWow64 = FALSE;
 
-BOOL WINAPI dummy_IsWow64Process(HANDLE hProcess, PBOOL Wow64Process)
+static imp_IsWow64Process pIsWow64Process;
+static imp_Wow64DisableWow64FsRedirection pWow64DisableWow64FsRedirection;
+
+LIBCLAMAV_EXPORT BOOL disablefsredir(void)
 {
-    *Wow64Process = FALSE;
+    PVOID OldValue = NULL;
+    if (pIsWow64Process)
+        return pWow64DisableWow64FsRedirection(&OldValue);
     return TRUE;
 }
-
-BOOL WINAPI dummy_Wow64DisableWow64FsRedirection(PVOID OldValue)
-{
-    return TRUE;
-}
-
-BOOL WINAPI dummy_Wow64RevertWow64FsRedirection(PVOID OlValue)
-{
-    return TRUE;
-}
-
-imp_IsWow64Process pIsWow64Process;
-imp_Wow64DisableWow64FsRedirection pWow64DisableWow64FsRedirection;
-imp_Wow64RevertWow64FsRedirection pWow64RevertWow64FsRedirection;
+#endif
 
 /* avoid bombing in stupid msvcrt checks - msvcrt8 only */
 #ifdef _MSC_VER
@@ -74,14 +62,10 @@ void clamavInvalidParameterHandler(const wchar_t* expression,
 #define Q(string) # string
 #define IMPORT_KERNEL32_FUNC(x) p##x = (( imp_##x ) GetProcAddress(kernel32, Q(x)))
 
-static void cwi_processattach(void)
+static void processattach(void)
 {
     ULONG HeapFragValue = 2;
     WSADATA wsaData;
-
-    imp_IsWow64Process pIsWow64Process = dummy_IsWow64Process;
-    imp_Wow64DisableWow64FsRedirection pWow64DisableWow64FsRedirection = dummy_Wow64DisableWow64FsRedirection;
-    imp_Wow64RevertWow64FsRedirection pWow64RevertWow64FsRedirection = dummy_Wow64RevertWow64FsRedirection;
 
 #ifndef _WIN64
     HMODULE kernel32 = GetModuleHandleA("kernel32");
@@ -92,7 +76,6 @@ static void cwi_processattach(void)
         else if (bIsWow64)
         {
             IMPORT_KERNEL32_FUNC(Wow64DisableWow64FsRedirection);
-            IMPORT_KERNEL32_FUNC(Wow64RevertWow64FsRedirection);
         }
     }
 #endif
@@ -126,12 +109,6 @@ static void cwi_processattach(void)
         LoadLibrary("rsaenh.dll");
     }
 #endif
-}
-
-extern int cw_sig_init(void);
-int cw_init(void)
-{
-    return cw_sig_init();
 }
 
 static int cw_getregvalue(const char *key, char *path)
@@ -225,21 +202,15 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
     switch (reason)
     {
     case DLL_PROCESS_ATTACH:
-        cwi_processattach();
+        processattach();
         _set_invalid_parameter_handler(clamavInvalidParameterHandler);
         fix_paths();
-        tls_index_alloc();
-        tls_storage_alloc();
         break;
     case DLL_THREAD_ATTACH:
-        tls_storage_alloc();
         return TRUE;
     case DLL_THREAD_DETACH:
-        tls_storage_free();
         return TRUE;
     case DLL_PROCESS_DETACH:
-        tls_storage_free();
-        tls_index_free();
         WSACleanup();
     }
     return TRUE;

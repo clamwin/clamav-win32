@@ -25,10 +25,6 @@
 
 #include <dbghelp.h>
 
-//#pragma warning (push)
-//#pragma warning (disable:4091)
-//#pragma warning (pop)
-
 #define MINDUMP_FLAGS (MINIDUMP_TYPE) \
     (MiniDumpWithDataSegs  | MiniDumpWithIndirectlyReferencedMemory | MiniDumpFilterModulePaths)
 typedef BOOL(WINAPI* pMiniDumpWriteDumpFunc)(HANDLE, DWORD, HANDLE, MINIDUMP_TYPE,
@@ -164,14 +160,11 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS *pExPtrs)
     /* Spawn a new thread this should improve the dump */
     HANDLE cProc;
     DWORD tid = 0, res = -1;
-    const char *filename = cw_get_currentfile();
 
     crashdata_t cdata;
     cdata.pExPtrs = pExPtrs;
     memset(cdata.filename, 0, sizeof(cdata.filename));
 
-    if (filename)
-        memcpy(cdata.filename, filename, MIN(strlen(filename), MAX_PATH - 1));
 
     cProc = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) CrashMiniDumpWriteDumpProc, (LPVOID) &cdata, 0, &tid);
 

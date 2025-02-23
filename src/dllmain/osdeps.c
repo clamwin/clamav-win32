@@ -46,17 +46,3 @@ int cw_unlink(const char *pathname)
 
     return 0;
 }
-
-/* A non TLS based and non thread safe canonical rand() implementation */
-/* aCaB <acab@clamav.net> */
-static unsigned long next = 1;
-int cw_rand(void)
-{
-    next = next * 1103515245 + 12345;
-    return((unsigned)(next/65536) % (RAND_MAX+1));
-}
-
-void cw_srand(unsigned int seed)
-{
-    next = seed;
-}

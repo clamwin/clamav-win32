@@ -195,7 +195,7 @@
 #define HAVE_MALLOC_H 1
 
 /* Define to 1 if you have the `mkstemp' function. */
-#define HAVE_MKSTEMP 1
+/* #undef HAVE_MKSTEMP */
 
 /* Define to 1 if you have a working `mmap' system call that supports
    MAP_PRIVATE. */

@@ -23,8 +23,9 @@
 #ifndef _SYS_SOCKET_H
 #define _SYS_SOCKET_H
 
+#include <stdint.h>
+
 extern int cw_wseterrno(void);
-extern int gnulib_snprintf(char *str, size_t size, const char *format, ...);
 
 typedef int socklen_t;
 

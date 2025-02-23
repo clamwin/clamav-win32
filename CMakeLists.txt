@@ -71,23 +71,21 @@ set(CLAMWIN_DEFINES
     LIBXML_STATIC
 )
 
-configure_file(libclamav.def ${CMAKE_BINARY_DIR}/libclamav.def @ONLY)
+configure_file(${CLAMWIN_DIR}/libclamav.def ${CMAKE_BINARY_DIR}/libclamav.def @ONLY)
 
 if(MSVC)
-    file(READ winpthreads.def WINPTHREADS_CONTENT)
-    file(APPEND ${CMAKE_BINARY_DIR}/libclamav.def "\n${NPTHREADS_CONTENT}")
+    set(WINPTHREADS_DIR ${3RDPARTY_DIR}/mingw-w64/mingw-w64-libraries/winpthreads)
+    list(APPEND CLAMWIN_INCLUDES ${WINPTHREADS_DIR}/include)
+    file(READ ${CLAMWIN_DIR}/winpthreads.def WINPTHREADS_CONTENT)
+    file(APPEND ${CMAKE_BINARY_DIR}/libclamav.def "\n${WINPTHREADS_CONTENT}")
 endif()
 
 if(WINXP)
     list(APPEND CLAMWIN_DEFINES WINXP)
 endif()
 
-configure_file(libclamav.def ${CMAKE_BINARY_DIR}/libclamav.def @ONLY)
 configure_file(${CLAMAV_DIR}/target.h.cmake.in ${CMAKE_BINARY_DIR}/target.h)
 configure_file(${CLAMAV_DIR}/clamav-version.h.in ${CMAKE_BINARY_DIR}/clamav-version.h)
-
-set(WINPTHREADS_DIR ${3RDPARTY_DIR}/mingw-w64/mingw-w64-libraries/winpthreads)
-list(APPEND CLAMWIN_INCLUDES ${WINPTHREADS_DIR}/include)
 
 if(MINGW)
     link_libraries("-static")
@@ -116,7 +114,6 @@ else()
     message(STATUS "LLVM is DISABLED")
 endif()
 
-include(cmake/gnulib.cmake)
 include(cmake/zlib.cmake)
 include(cmake/bzip2.cmake)
 include(cmake/pcre2.cmake)
