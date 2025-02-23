@@ -561,7 +561,7 @@
 #endif
 
 /* Define to `int' if <sys/types.h> does not define. */
-#ifndef SSIZE_T_DEFINED
+#if !defined(SSIZE_T_DEFINED) && !defined(_SSIZE_T_DEFINED)
    #if defined(_MSC_VER)
       #include <BaseTsd.h>
       typedef SSIZE_T ssize_t;
@@ -569,11 +569,11 @@
       typedef int ssize_t;
    #endif
    # define SSIZE_T_DEFINED
+   # define _SSIZE_T_DEFINED
 #endif
 
 /* Define to `long int' if <sys/types.h> does not define. */
 #ifndef OFF_T_DEFINED
-   
    #define OFF_T_DEFINED
 #endif
 

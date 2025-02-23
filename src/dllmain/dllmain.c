@@ -48,10 +48,6 @@ WINBOOL WINAPI dummy_Wow64RevertWow64FsRedirection(PVOID OlValue)
     return TRUE;
 }
 
-imp_IsWow64Process pIsWow64Process = dummy_IsWow64Process;
-imp_Wow64DisableWow64FsRedirection pWow64DisableWow64FsRedirection = dummy_Wow64DisableWow64FsRedirection;
-imp_Wow64RevertWow64FsRedirection pWow64RevertWow64FsRedirection = dummy_Wow64RevertWow64FsRedirection;
-
 /* avoid bombing in stupid msvcrt checks - msvcrt8 only */
 #ifdef _MSC_VER
 void clamavInvalidParameterHandler(const wchar_t* expression,
@@ -78,6 +74,10 @@ static void cwi_processattach(void)
 {
     ULONG HeapFragValue = 2;
     WSADATA wsaData;
+
+    imp_IsWow64Process pIsWow64Process = dummy_IsWow64Process;
+    imp_Wow64DisableWow64FsRedirection pWow64DisableWow64FsRedirection = dummy_Wow64DisableWow64FsRedirection;
+    imp_Wow64RevertWow64FsRedirection pWow64RevertWow64FsRedirection = dummy_Wow64RevertWow64FsRedirection;
 
 #ifndef _WIN64
     HMODULE kernel32 = GetModuleHandleA("kernel32");

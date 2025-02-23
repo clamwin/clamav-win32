@@ -71,6 +71,9 @@ set(CLAMWIN_DEFINES
     LIBXML_STATIC
 )
 
+if(WINXP)
+    list(APPEND CLAMWIN_DEFINES WINXP)
+endif()
 
 configure_file(libclamav.def ${CMAKE_BINARY_DIR}/libclamav.def @ONLY)
 configure_file(${CLAMAV_DIR}/target.h.cmake.in ${CMAKE_BINARY_DIR}/target.h)

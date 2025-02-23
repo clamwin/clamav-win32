@@ -1,5 +1,5 @@
 /* Needed by libxml2 */
-#if defined(__MINGW32__) && !defined(__MINGW64__)
+#ifdef WINXP
 #include <windows.h>
 #include <ntstatus.h>
 #include <wincrypt.h>

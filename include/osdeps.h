@@ -33,7 +33,6 @@
 #include <string.h>
 #include <sys/types.h>
 
-#ifndef _WIN64
 typedef WINBOOL (WINAPI *imp_IsWow64Process)(HANDLE hProcess, PBOOL Wow64Process);
 typedef WINBOOL (WINAPI *imp_Wow64DisableWow64FsRedirection)(PVOID OldValue);
 typedef WINBOOL (WINAPI *imp_Wow64RevertWow64FsRedirection)(PVOID OldValue);
@@ -41,7 +40,6 @@ typedef WINBOOL (WINAPI *imp_Wow64RevertWow64FsRedirection)(PVOID OldValue);
 extern imp_IsWow64Process pIsWow64Process;
 extern imp_Wow64DisableWow64FsRedirection pWow64DisableWow64FsRedirection;
 extern imp_Wow64RevertWow64FsRedirection pWow64RevertWow64FsRedirection;
-#endif
 
 extern int cw_unlink(const char *pathname);
 

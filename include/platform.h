@@ -56,7 +56,7 @@
 #define WORDS_BIGENDIAN 0
 #define EAI_SYSTEM 0
 
-extern DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
+WINBASEAPI DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 
 #undef strtok_r /* thanks to pthread.h */
 

@@ -1,3 +1,17 @@
+#ifdef _WIN64
+.global GetFinalPathNameByHandleW
+.global __imp_GetFinalPathNameByHandleW
+.global SetFileInformationByHandle
+.global __imp_SetFileInformationByHandle
+
+.align 8
+__imp_GetFinalPathNameByHandleW:
+    .quad GetFinalPathNameByHandleW
+
+__imp_SetFileInformationByHandle:
+    .quad SetFileInformationByHandle
+
+#else
 .global __imp__GetFinalPathNameByHandleW@16
 .global __imp__SetFileInformationByHandle@16
 .global __imp__RegGetValueW@28
@@ -24,3 +38,4 @@ _SHGetKnownFolderPath:
 
 _SHGetKnownFolderPath@16:
     .long _SHGetKnownFolderPath
+#endif

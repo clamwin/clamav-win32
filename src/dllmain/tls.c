@@ -37,10 +37,9 @@ extern BOOL bIsWow64;
 #endif
 
 static DWORD __currentfile_idx = TLS_OUT_OF_INDEXES;
-
-#ifndef _WIN64
 static DWORD __fsredir_idx = TLS_OUT_OF_INDEXES;
 
+#ifndef _WIN64
 LIBCLAMAV_EXPORT BOOL disablefsredir(void)
 {
     BOOL result;
@@ -111,12 +110,14 @@ void tls_index_alloc(void)
         exit(1);
     }
 
+#ifndef _WIN64
     assert(__fsredir_idx == TLS_OUT_OF_INDEXES);
     if ((__fsredir_idx = TlsAlloc()) == TLS_OUT_OF_INDEXES)
     {
         cli_errmsg("[tls] Unable to allocate Tls slot for fsredir state storage: %d\n", GetLastError());
         exit(1);
     }
+#endif
 
     TRACE("tls_index_alloc() T:%d F:IDX:%d R:IDX:%d\n", GetCurrentThreadId(), __currentfile_idx, __fsredir_idx);
 }
