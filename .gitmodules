@@ -26,6 +26,3 @@
 [submodule "3rdparty/llvm-project"]
 	path = 3rdparty/llvm-project
 	url = https://github.com/llvm/llvm-project.git
-[submodule "3rdparty/mingw-w64"]
-	path = 3rdparty/mingw-w64
-	url = git://git.code.sf.net/p/mingw-w64/mingw-w64
