@@ -71,12 +71,12 @@ set(CLAMWIN_DEFINES
     LIBXML_STATIC
 )
 
-configure_file(${CLAMWIN_DIR}/libclamav.def ${CMAKE_BINARY_DIR}/libclamav.def @ONLY)
+configure_file(libclamav.def ${CMAKE_BINARY_DIR}/libclamav.def @ONLY)
 
 if(MSVC)
     set(WINPTHREADS_DIR ${3RDPARTY_DIR}/mingw-w64/mingw-w64-libraries/winpthreads)
     list(APPEND CLAMWIN_INCLUDES ${WINPTHREADS_DIR}/include)
-    file(READ ${CLAMWIN_DIR}/winpthreads.def WINPTHREADS_CONTENT)
+    file(READ winpthreads.def WINPTHREADS_CONTENT)
     file(APPEND ${CMAKE_BINARY_DIR}/libclamav.def "\n${WINPTHREADS_CONTENT}")
 endif()
 
