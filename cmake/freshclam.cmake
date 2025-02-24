@@ -32,7 +32,15 @@ add_library(libfreshclam SHARED
 set_target_properties(libfreshclam PROPERTIES PREFIX "" OUTPUT_NAME libfreshclam)
 target_include_directories(libfreshclam PRIVATE ${CLAMWIN_INCLUDES} ${3RDPARTY_DIR}/curl/include)
 target_compile_definitions(libfreshclam PRIVATE ${CLAMWIN_DEFINES} CURL_STATICLIB)
-target_link_libraries(libfreshclam PRIVATE ClamAV::libclamav_rust curl libclamav libclamav_common crypt32 ws2_32 iphlpapi dnsapi)
+target_link_libraries(libfreshclam PRIVATE
+    ClamAV::libclamav_rust
+    curl
+    libclamav_common
+    libclamav
+    crypt32
+    ws2_32
+    iphlpapi
+    dnsapi)
 
 # freshclam
 file(GLOB freshclam_headers ${CLAMAV_DIR}/freshclam/*.h)
@@ -54,6 +62,6 @@ add_executable(freshclam
 
 target_include_directories(freshclam PRIVATE ${CLAMWIN_INCLUDES} ${CLAMAV_DIR}/libfreshclam)
 target_compile_definitions(freshclam PRIVATE ${CLAMWIN_DEFINES})
-target_link_libraries(freshclam libfreshclam libclamav libclamav_common ws2_32)
+target_link_libraries(freshclam libfreshclam libclamav_common libclamav ws2_32)
 
 list(APPEND CLAMAV_INSTALL_TARGETS freshclam libfreshclam)

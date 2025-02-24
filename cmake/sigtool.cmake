@@ -18,6 +18,6 @@ add_executable(sigtool
 
 target_include_directories(sigtool PRIVATE ${CLAMWIN_INCLUDES})
 target_compile_definitions(sigtool PRIVATE ${CLAMWIN_DEFINES})
-target_link_libraries(sigtool PRIVATE ClamAV::libclamav_rust libclamav libclamav_common zlib ws2_32)
+target_link_libraries(sigtool PRIVATE ClamAV::libclamav_rust libclamav_common libclamav zlib ws2_32)
 
 list(APPEND CLAMAV_INSTALL_TARGETS sigtool)

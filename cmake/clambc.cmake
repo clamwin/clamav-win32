@@ -16,6 +16,6 @@ add_executable(clambc
 
 target_include_directories(clambc PRIVATE ${CLAMWIN_INCLUDES})
 target_compile_definitions(clambc PRIVATE ${CLAMWIN_DEFINES})
-target_link_libraries(clambc PRIVATE ClamAV::libclamav_rust libclamav libclamav_common ws2_32)
+target_link_libraries(clambc PRIVATE ClamAV::libclamav_rust libclamav_common libclamav ws2_32)
 
 list(APPEND CLAMAV_INSTALL_TARGETS clambc)
