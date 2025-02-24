@@ -81,7 +81,9 @@ if(MSVC)
 endif()
 
 if(WINXP)
-    list(APPEND CLAMWIN_DEFINES WINXP)
+    list(APPEND CLAMWIN_DEFINES _WIN32_WINNT=_WIN32_WINNT_WINXP)
+else()
+    list(APPEND CLAMWIN_DEFINES _WIN32_WINNT=_WIN32_WINNT_VISTA)
 endif()
 
 configure_file(${CLAMAV_DIR}/target.h.cmake.in ${CMAKE_BINARY_DIR}/target.h)

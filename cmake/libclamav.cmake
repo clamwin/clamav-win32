@@ -75,7 +75,7 @@ add_library(ClamAV::libclamav ALIAS libclamav)
 
 set_target_properties(libclamav PROPERTIES DEFINE_SYMBOL THIS_IS_LIBCLAMAV PREFIX "" OUTPUT_NAME libclamav)
 target_include_directories(libclamav PRIVATE ${CLAMWIN_INCLUDES} ${CLAMAV_DIR}/win32/compat)
-target_compile_definitions(libclamav PRIVATE _WIN32_WINNT=0x0501 ${CLAMWIN_DEFINES})
+target_compile_definitions(libclamav PRIVATE ${CLAMWIN_DEFINES})
 target_compile_options(libclamav PRIVATE
     $<$<AND:$<CXX_COMPILER_ID:GNU>,$<COMPILE_LANGUAGE:CXX>>:-Wno-missing-template-keyword -Wno-init-list-lifetime>
     $<$<C_COMPILER_ID:MSVC>:/wd4267 /wd4333 /wd4334>
@@ -94,6 +94,10 @@ target_link_libraries(libclamav PRIVATE
     psapi
     clamav_rust
 )
+
+if (NOT WINXP)
+    target_link_libraries(libclamav PRIVATE bcrypt)
+endif()
 
 if(ENABLE_LLVM)
     target_compile_definitions(libclamav PRIVATE LLVM_VERSION=80)

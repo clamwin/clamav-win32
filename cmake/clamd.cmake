@@ -16,9 +16,13 @@ add_executable(clamd
     ${CLAMWIN_DIR}/resources/clamd.rc
 )
 
+# clamav/win32/compat/net.c needs poll api
+set(CLAMD_DEFINES ${CLAMWIN_DEFINES})
+list(FILTER CLAMD_DEFINES EXCLUDE REGEX "^_WIN32_WINNT=.*$")
+list(APPEND CLAMD_DEFINES _WIN32_WINNT=0x0600)
+
 target_include_directories(clamd PRIVATE ${CLAMWIN_INCLUDES})
-target_compile_definitions(clamd PRIVATE ${CLAMWIN_DEFINES})
-target_compile_definitions(clamd PRIVATE _WIN32_WINNT=0x0600)  # poll api
+target_compile_definitions(clamd PRIVATE ${CLAMD_DEFINES})
 target_link_libraries(clamd PRIVATE libclamav_common libclamav ws2_32)
 
 list(APPEND CLAMAV_INSTALL_TARGETS clamd)

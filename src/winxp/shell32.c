@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+#error "Please define _WIN32_WINNT < _WIN32_WINNT_VISTA (0x0600)"
+#endif
+
 // Define KF_FLAG_CREATE if not already defined.
 #ifndef KF_FLAG_CREATE
 #define KF_FLAG_CREATE 0x00008000

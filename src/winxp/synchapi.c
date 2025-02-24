@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+#error "Please define _WIN32_WINNT < _WIN32_WINNT_VISTA (0x0600)"
+#endif
+
 // --- Fallback WaitOnAddress / WakeByAddress Implementation ---
 
 // Each waiting thread inserts a Waiter node into a global list.

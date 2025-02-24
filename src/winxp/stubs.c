@@ -1,7 +1,8 @@
-#define _WIN32_WINNT 0x0501
-#define _SYNCHAPI_H_
-
 #include <windows.h>
+
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+#error "Please define _WIN32_WINNT < _WIN32_WINNT_VISTA (0x0600)"
+#endif
 
 BOOLEAN APIENTRY CreateSymbolicLinkW(LPCWSTR lpSymlinkFileName, LPCWSTR lpTargetFileName, DWORD dwFlags)
 {

@@ -18,6 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <windows.h>
+
 #if _WIN32_WINNT >= 0x0600
 #include "common/actions.c"
 #else

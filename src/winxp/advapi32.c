@@ -1,6 +1,10 @@
 #include <windows.h>
 #include <string.h>
 
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+#error "Please define _WIN32_WINNT < _WIN32_WINNT_VISTA (0x0600)"
+#endif
+
 // Define flags if not already defined
 #ifndef RRF_ZEROONFAILURE
 #define RRF_ZEROONFAILURE 0x20000000

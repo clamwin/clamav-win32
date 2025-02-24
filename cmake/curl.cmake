@@ -39,19 +39,16 @@ target_compile_definitions(curl PRIVATE
     HAVE_CLOSESOCKET=1
     HAVE_SIGNAL=1
     STDC_HEADERS=1
+
+    ENABLE_IPV6
+    HAVE_WS2TCPIP_H=1
+    HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID=1
+    HAVE_GETADDRINFO=1
+    HAVE_GETADDRINFO_THREADSAFE=1
 )
 
 target_link_libraries(curl PRIVATE zlib)
 
-if((MINGW) AND (CLAMAV_ARCH STREQUAL "x86"))
-    target_compile_definitions(curl PRIVATE _WIN32_WINNT=0x400)
-else()
-    target_link_libraries(curl PRIVATE bcrypt)
-    target_compile_definitions(curl PRIVATE
-        ENABLE_IPV6
-        HAVE_WS2TCPIP_H=1
-        HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID=1
-        HAVE_GETADDRINFO=1
-        HAVE_GETADDRINFO_THREADSAFE=1
-    )
+if(WINXP)
+    target_compile_definitions(curl PRIVATE _WIN32_WINNT=_WIN32_WINNT_WINXP)
 endif()

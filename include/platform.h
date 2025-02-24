@@ -21,12 +21,9 @@
 #ifndef _PLATFORM_H
 #define _PLATFORM_H
 
-/* IsDebuggerPresent 0x0500 */
-/* RegisterWaitForSingleObject 0x0500 */
-/* UnregisterWaitEx 0x0500 */
-/* HeapCompatibilityInformation 0x0501 */
-#undef _WIN32_WINNT
-#define _WIN32_WINNT 0x0501
+#ifndef _WIN32_WINNT
+#error "Please make sure _WIN32_WINNT is defined"
+#endif
 
 #include "cwdefs.h"
 
@@ -62,10 +59,8 @@
 #define WORDS_BIGENDIAN 0
 #define EAI_SYSTEM 0
 
-#ifdef WINXP
-extern DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
-#else
-WINBASEAPI DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 #endif
 
 /* <strings.h> */

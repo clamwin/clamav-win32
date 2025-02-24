@@ -9,6 +9,8 @@ add_library(clamav_compat STATIC
     ${clamav_compat_sources}
 )
 
+target_compile_definitions(clamav_compat PRIVATE _WIN32_WINNT=0x0501)
+
 file(GLOB synchapi_sources
     ${CLAMWIN_DIR}/src/winxp/synchapi.c
     ${CLAMWIN_DIR}/resources/synchapi.rc
