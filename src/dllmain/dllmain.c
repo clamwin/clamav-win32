@@ -36,7 +36,7 @@ static imp_Wow64DisableWow64FsRedirection pWow64DisableWow64FsRedirection;
 LIBCLAMAV_EXPORT BOOL disablefsredir(void)
 {
     PVOID OldValue = NULL;
-    if (pIsWow64Process)
+    if (bIsWow64)
         return pWow64DisableWow64FsRedirection(&OldValue);
     return TRUE;
 }
