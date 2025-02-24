@@ -19,6 +19,6 @@ add_executable(clamd
 target_include_directories(clamd PRIVATE ${CLAMWIN_INCLUDES})
 target_compile_definitions(clamd PRIVATE ${CLAMWIN_DEFINES})
 target_compile_definitions(clamd PRIVATE _WIN32_WINNT=0x0600)  # poll api
-target_link_libraries(clamd PRIVATE libclamav ws2_32)
+target_link_libraries(clamd PRIVATE libclamav libclamav_common ws2_32)
 
 list(APPEND CLAMAV_INSTALL_TARGETS clamd)

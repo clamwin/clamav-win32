@@ -6,7 +6,6 @@ file(GLOB libclamav_common_sources
 list(REMOVE_ITEM libclamav_common_sources
     ${CLAMAV_DIR}/common/actions.c
     ${CLAMAV_DIR}/common/cert_util.c
-    ${CLAMAV_DIR}/common/optparser.c
 )
 
 add_library(libclamav_common STATIC ${libclamav_common_sources})

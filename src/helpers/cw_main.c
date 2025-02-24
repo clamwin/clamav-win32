@@ -26,11 +26,6 @@
 int _CRT_glob = 0;
 #endif
 
-/* FIXME: find a better way */
-#ifdef _MSC_VER
-void (*action)(const char*) = NULL;
-#endif
-
 extern int cw_main(int argc, char *argv[]);
 
 #undef main

@@ -135,15 +135,6 @@ extern const char *w32_inet_ntop(int af, const void *src, char *dst, socklen_t s
 #define LIBCLAMAV_EXPORT __declspec(dllimport)
 #endif
 
-/* win32 headers have DATADIR enum */
-#ifndef __cplusplus
-LIBCLAMAV_EXPORT extern const char* DATADIR;
-LIBCLAMAV_EXPORT extern const char* CONFDIR;
-LIBCLAMAV_EXPORT extern const char* CONFDIR_CLAMD;
-LIBCLAMAV_EXPORT extern const char* CONFDIR_FRESHCLAM;
-LIBCLAMAV_EXPORT extern const char* CONFDIR_MILTER;
-#endif
-
 LIBCLAMAV_EXPORT extern BOOL disablefsredir(void);
 
 extern const char* cli_to_utf8_maybe_alloc(const char* s);

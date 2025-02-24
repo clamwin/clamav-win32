@@ -90,7 +90,6 @@ target_link_libraries(libclamav PRIVATE
     clammspack
     ${OPENSSL_SSL_LIBRARY}
     ${OPENSSL_CRYPTO_LIBRARY}
-    libclamav_common
     ws2_32
     psapi
     clamav_rust

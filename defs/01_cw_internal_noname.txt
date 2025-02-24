@@ -14,10 +14,3 @@ tcgetattr
 tcsetattr
 uncpath
 w32_stat
-
-; runtime config
-DATADIR DATA
-CONFDIR DATA
-CONFDIR_CLAMD DATA
-CONFDIR_FRESHCLAM DATA
-CONFDIR_MILTER DATA

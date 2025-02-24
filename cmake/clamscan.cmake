@@ -19,6 +19,6 @@ add_executable(clamscan
 
 target_include_directories(clamscan PRIVATE ${CLAMWIN_INCLUDES})
 target_compile_definitions(clamscan PRIVATE ${CLAMWIN_DEFINES})
-target_link_libraries(clamscan PRIVATE libclamav ws2_32 iphlpapi psapi)
+target_link_libraries(clamscan PRIVATE libclamav libclamav_common ws2_32 iphlpapi psapi)
 
 list(APPEND CLAMAV_INSTALL_TARGETS clamscan)

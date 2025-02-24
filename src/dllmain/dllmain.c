@@ -24,10 +24,7 @@
 #include <winsock2.h>
 #include <stdio.h>
 
-#define DATADIRBASEKEY  "Software\\ClamAV"
-
 #ifndef _WIN64
-
 typedef BOOL (WINAPI *imp_IsWow64Process)(HANDLE hProcess, PBOOL Wow64Process);
 typedef BOOL (WINAPI *imp_Wow64DisableWow64FsRedirection)(PVOID OldValue);
 
@@ -116,92 +113,6 @@ static void processattach(void)
 #endif
 }
 
-static int cw_getregvalue(const char *key, char *path)
-{
-    HKEY hKey = NULL;
-    DWORD dwType = 0;
-    DWORD flags = KEY_QUERY_VALUE;
-    unsigned char data[MAX_PATH];
-    DWORD datalen = sizeof(data);
-
-#ifndef _WIN64
-    if (bIsWow64)
-        flags |= 0x0100; /* KEY_WOW64_64KEY */
-#endif
-
-    /* First look in HKCU then in HKLM */
-    if ((RegOpenKeyExA(HKEY_CURRENT_USER, DATADIRBASEKEY, 0, flags, &hKey) != ERROR_SUCCESS) &&
-        (RegOpenKeyExA(HKEY_LOCAL_MACHINE, DATADIRBASEKEY, 0, flags, &hKey) != ERROR_SUCCESS))
-        return 0;
-
-    if ((RegQueryValueExA(hKey, key, NULL, &dwType, data, &datalen) == ERROR_SUCCESS) &&
-            datalen && ((dwType == REG_SZ) || dwType == REG_EXPAND_SZ))
-    {
-        path[0] = 0;
-        ExpandEnvironmentStrings((LPCSTR) data, path, MAX_PATH - 1);
-        path[MAX_PATH - 1] = 0;
-        RegCloseKey(hKey);
-        return 1;
-    }
-
-    RegCloseKey(hKey);
-    return 0;
-}
-
-/* look at win32/compat/libclamav_main.c for more info */
-char _DATADIR[MAX_PATH] = "db";
-char _CONFDIR[MAX_PATH] = ".";
-char _CONFDIR_CLAMD[MAX_PATH] = "clamd.conf";
-char _CONFDIR_FRESHCLAM[MAX_PATH] = "freshclam.conf";
-char _CONFDIR_MILTER[MAX_PATH] = "clamav-milter.conf";
-
-#undef DATADIR
-#undef CONFDIR
-const char *DATADIR = _DATADIR;
-const char *CONFDIR = _CONFDIR;
-const char *CONFDIR_CLAMD = _CONFDIR_CLAMD;
-const char *CONFDIR_FRESHCLAM = _CONFDIR_FRESHCLAM;
-const char *CONFDIR_MILTER = _CONFDIR_MILTER;
-
-#define DATADIR _DATADIR
-#define CONFDIR _CONFDIR
-#define CONFDIR_CLAMD _CONFDIR_CLAMD
-#define CONFDIR_FRESHCLAM _CONFDIR_FRESHCLAM
-#define CONFDIR_MILTER _CONFDIR_MILTER
-
-#include "common/optparser.c"
-
-void fix_paths()
-{
-    if (!cw_getregvalue("ConfigDir", _CONFDIR))
-    {
-        char dirname[MAX_PATH] = "";
-        char *lSlash;
-        if (!GetModuleFileNameA(NULL, dirname, MAX_PATH - 1))
-        {
-            fprintf(stderr, "Please don't launch the executable from a so long path\n");
-            abort();
-        }
-
-        if ((lSlash = strrchr(dirname, '\\')))
-            *lSlash = 0;
-
-        strncpy(_CONFDIR, dirname, MAX_PATH);
-        _CONFDIR[MAX_PATH - 1] = 0;
-    }
-
-    if (!cw_getregvalue("DataDir", _DATADIR))
-    {
-        strncpy(_DATADIR, _CONFDIR, MAX_PATH);
-        _DATADIR[MAX_PATH - 1] = 0;
-        strncat(_DATADIR, "\\db", MAX_PATH - strlen(_DATADIR) - 1);
-    }
-
-    snprintf(_CONFDIR_CLAMD, sizeof(_CONFDIR_CLAMD), "%s\\%s", _CONFDIR, "clamd.conf");
-    snprintf(_CONFDIR_FRESHCLAM, sizeof(_CONFDIR_FRESHCLAM), "%s\\%s", _CONFDIR, "freshclam.conf");
-    snprintf(_CONFDIR_MILTER, sizeof(_CONFDIR_MILTER), "%s\\%s", _CONFDIR, "clamav-milter.conf");
-}
-
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
 {
     switch (reason)
@@ -209,7 +120,6 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
     case DLL_PROCESS_ATTACH:
         processattach();
         _set_invalid_parameter_handler(clamavInvalidParameterHandler);
-        fix_paths();
         break;
     case DLL_THREAD_ATTACH:
         return TRUE;
