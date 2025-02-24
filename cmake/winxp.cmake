@@ -1,7 +1,4 @@
-enable_language(C ASM)
-
 file(GLOB clamav_compat_sources
-    ${CLAMWIN_DIR}/src/winxp/*.S
     ${CLAMWIN_DIR}/src/winxp/stubs.c
     ${CLAMWIN_DIR}/src/winxp/advapi32.c
     ${CLAMWIN_DIR}/src/winxp/kernel32.c

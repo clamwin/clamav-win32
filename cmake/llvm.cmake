@@ -94,7 +94,9 @@ target_include_directories(llvm PRIVATE
 
 if(WINXP)
   target_compile_definitions(llvm PRIVATE PSAPI_VERSION=1)
-endif()
+  set_source_files_properties(${LLVM_DIR}/lib/Support/Path.cpp PROPERTIES COMPILE_FLAGS "-include llvm-winxp.h")
+  set_source_files_properties(${LLVM_DIR}/lib/Support/Signals.cpp PROPERTIES COMPILE_FLAGS "-include llvm-winxp.h")
+ endif()
 
 target_compile_options(llvm PRIVATE
     $<$<AND:$<CXX_COMPILER_ID:GNU>,$<COMPILE_LANGUAGE:CXX>>:-Wno-deprecated-declarations -Wno-missing-template-keyword -Wno-init-list-lifetime>

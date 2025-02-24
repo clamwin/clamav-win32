@@ -62,7 +62,11 @@
 #define WORDS_BIGENDIAN 0
 #define EAI_SYSTEM 0
 
+#ifdef WINXP
+extern DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
+#else
 WINBASEAPI DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
+#endif
 
 /* <strings.h> */
 #define strcasecmp _stricmp
