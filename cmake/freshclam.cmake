@@ -4,12 +4,13 @@ include(cmake/curl.cmake)
 file(GLOB libfreshclam_headers ${CLAMAV_DIR}/libfreshclam/*.h)
 
 set(libfreshclam_sources
+    ${CLAMAV_DIR}/libfreshclam/dns.c
     ${CLAMAV_DIR}/libfreshclam/libfreshclam.c
     ${CLAMAV_DIR}/libfreshclam/libfreshclam_internal.c
 )
 
 set(libfreshclam_win32_sources
-    ${CLAMWIN_DIR}/src/helpers/dnsquery.c
+    ${CLAMAV_DIR}/win32/compat/resolv.c
     ${CLAMWIN_DIR}/src/helpers/mprintf_disable.c
     ${CLAMWIN_DIR}/resources/libfreshclam.rc
 )
