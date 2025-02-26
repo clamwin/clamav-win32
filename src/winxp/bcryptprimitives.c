@@ -1,14 +1,13 @@
-#include <windows.h>
-#include <wincrypt.h>
+#include "winxp_compat.h"
 
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-#error "Please define _WIN32_WINNT < _WIN32_WINNT_VISTA (0x0600)"
-#endif
+#include <wincrypt.h>
 
 WINBASEAPI BOOL WINAPI ProcessPrng(void *buffer, size_t size)
 {
     HCRYPTPROV hProv = 0;
     BOOL result;
+
+    TRACE(L"ProcessPrng(0x%p, %d)\n", buffer, size);
 
     // Acquire a cryptographic context. The CRYPT_VERIFYCONTEXT flag indicates that
     // no persistent key container is needed (suitable for generating random data).
@@ -18,15 +17,10 @@ WINBASEAPI BOOL WINAPI ProcessPrng(void *buffer, size_t size)
     }
 
     // Generate random bytes and fill the buffer.
-    result = CryptGenRandom(hProv, (DWORD) size, (BYTE*) buffer);
+    result = CryptGenRandom(hProv, (DWORD)size, (BYTE *)buffer);
 
     // Release the cryptographic context.
     CryptReleaseContext(hProv, 0);
 
     return result;
-}
-
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
-{
-    return TRUE;
 }

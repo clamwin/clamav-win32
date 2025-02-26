@@ -1,9 +1,4 @@
-#include <windows.h>
-#include <string.h>
-
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-#error "Please define _WIN32_WINNT < _WIN32_WINNT_VISTA (0x0600)"
-#endif
+#include "winxp_compat.h"
 
 // Define flags if not already defined
 #ifndef RRF_ZEROONFAILURE
@@ -19,27 +14,34 @@
 //       nor does it expand environment strings (unless you add that logic).
 //       It does support RRF_ZEROONFAILURE to zero the output buffer on failure.
 WINADVAPI LONG WINAPI WINAPI RegGetValueW(
-    HKEY    hkey,
+    HKEY hkey,
     LPCWSTR lpSubKey,
     LPCWSTR lpValue,
-    DWORD   dwFlags,
+    DWORD dwFlags,
     LPDWORD pdwType,
-    PVOID   pvData,
+    PVOID pvData,
     LPDWORD pcbData)
 {
     HKEY hSubKey = NULL;
     LSTATUS status;
 
+    TRACE(L"RegGetValueW(0x%p, %ls, %ls, %d, 0x%p, 0x%p, 0x%p)\n",
+        hkey, lpSubKey, lpValue, dwFlags, pdwType, pvData, pcbData);
+
     // If lpSubKey is specified and not empty, open that subkey.
-    if (lpSubKey && *lpSubKey) {
-        if ((status = RegOpenKeyExW(hkey, lpSubKey, 0, KEY_READ, &hSubKey)) != ERROR_SUCCESS);
-            return status;
-    } else {
+    if (lpSubKey && *lpSubKey)
+    {
+        if ((status = RegOpenKeyExW(hkey, lpSubKey, 0, KEY_READ, &hSubKey)) != ERROR_SUCCESS)
+            ;
+        return status;
+    }
+    else
+    {
         hSubKey = hkey;
     }
 
     // Query the value (lpValue may be NULL to indicate the default value).
-    status = RegQueryValueExW(hSubKey, lpValue, NULL, pdwType, (LPBYTE) pvData, pcbData);
+    status = RegQueryValueExW(hSubKey, lpValue, NULL, pdwType, (LPBYTE)pvData, pcbData);
 
     // If we opened a subkey, close it.
     if (hSubKey != hkey)

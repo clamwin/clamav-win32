@@ -1,17 +1,28 @@
-#include <windows.h>
+#define CreateSymbolicLinkW NO_CreateSymbolicLinkW
+#define CreateWaitableTimerExW NO_CreateWaitableTimerExW
+#define InitializeProcThreadAttributeList NO_InitializeProcThreadAttributeList
+#define DeleteProcThreadAttributeList NO_DeleteProcThreadAttributeList
+#define UpdateProcThreadAttribute NO_UpdateProcThreadAttribute
+#include "winxp_compat.h"
+#undef CreateSymbolicLinkW
+#undef CreateWaitableTimerExW
+#undef InitializeProcThreadAttributeList
+#undef DeleteProcThreadAttributeList
+#undef UpdateProcThreadAttribute
 
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-#error "Please define _WIN32_WINNT < _WIN32_WINNT_VISTA (0x0600)"
-#endif
-
-BOOLEAN APIENTRY CreateSymbolicLinkW(LPCWSTR lpSymlinkFileName, LPCWSTR lpTargetFileName, DWORD dwFlags)
+BOOLEAN CreateSymbolicLinkW(LPCWSTR lpSymlinkFileName, LPCWSTR lpTargetFileName, DWORD dwFlags)
 {
+    TRACE(L"CreateSymbolicLinkW(%ls, %ls, %d)\n", lpSymlinkFileName, lpTargetFileName, dwFlags);
+
     SetLastError(ERROR_NOT_SUPPORTED);
     return FALSE;
 }
 
-HANDLE WINAPI CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LPCWSTR lpTimerName, DWORD dwFlags, DWORD dwDesiredAccess)
+HANDLE CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LPCWSTR lpTimerName, DWORD dwFlags, DWORD dwDesiredAccess)
 {
+    TRACE(L"CreateWaitableTimerExW(0x%p, %ls, %d, %d, %d)\n",
+          lpTimerAttributes, lpTimerName, dwFlags, dwDesiredAccess);
+
     SetLastError(ERROR_NOT_SUPPORTED);
     return NULL;
 }
@@ -21,7 +32,10 @@ HANDLE WINAPI CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LP
 // The value pointed to by StackSizeInBytes is left unchanged.
 WINBASEAPI WINBOOL WINAPI SetThreadStackGuarantee(PULONG StackSizeInBytes)
 {
-    if (StackSizeInBytes == NULL) {
+    TRACE(L"SetThreadStackGuarantee(%d)\n", StackSizeInBytes);
+
+    if (StackSizeInBytes == NULL)
+    {
         SetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
     }
@@ -31,7 +45,8 @@ WINBASEAPI WINBOOL WINAPI SetThreadStackGuarantee(PULONG StackSizeInBytes)
 
 // Define a minimal dummy attribute list structure.
 // This structure is only used as a placeholder because Windows XP does not support extended attributes.
-typedef struct _PROC_THREAD_ATTRIBUTE_LIST {
+typedef struct _PROC_THREAD_ATTRIBUTE_LIST
+{
     SIZE_T cbSize;
     // No attribute storage is provided in this fallback.
 } PROC_THREAD_ATTRIBUTE_LIST, *LPPROC_THREAD_ATTRIBUTE_LIST;
@@ -41,11 +56,15 @@ typedef struct _PROC_THREAD_ATTRIBUTE_LIST {
 // (as per the normal pattern). Otherwise, the dummy attribute list is initialized.
 WINBOOL WINAPI InitializeProcThreadAttributeList(
     LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList,
-    DWORD dwAttributeCount,   // Ignored in this fallback.
-    DWORD dwFlags,            // Must be zero.
+    DWORD dwAttributeCount, // Ignored in this fallback.
+    DWORD dwFlags,          // Must be zero.
     PSIZE_T lpSize)
 {
-    if (lpSize == NULL) {
+    TRACE(L"InitializeProcThreadAttributeList(0x%p, %d, %d, %d)\n",
+          lpAttributeList, dwAttributeCount, dwFlags, lpSize);
+
+    if (lpSize == NULL)
+    {
         SetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
     }
@@ -54,14 +73,16 @@ WINBOOL WINAPI InitializeProcThreadAttributeList(
     SIZE_T requiredSize = sizeof(PROC_THREAD_ATTRIBUTE_LIST);
 
     // If caller is requesting the required size, return it.
-    if (lpAttributeList == NULL) {
+    if (lpAttributeList == NULL)
+    {
         *lpSize = requiredSize;
         SetLastError(ERROR_INSUFFICIENT_BUFFER);
         return FALSE;
     }
 
     // Verify that the provided buffer is large enough.
-    if (*lpSize < requiredSize) {
+    if (*lpSize < requiredSize)
+    {
         SetLastError(ERROR_INSUFFICIENT_BUFFER);
         return FALSE;
     }
@@ -77,7 +98,10 @@ WINBOOL WINAPI InitializeProcThreadAttributeList(
 // In this dummy implementation, no resources are allocated, so this function simply clears the structure.
 VOID WINAPI DeleteProcThreadAttributeList(LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList)
 {
-    if (lpAttributeList) {
+    TRACE(L"DeleteProcThreadAttributeList(0x%p)\n", lpAttributeList);
+
+    if (lpAttributeList)
+    {
         // Clear the structure.
         lpAttributeList->cbSize = 0;
     }
@@ -95,13 +119,14 @@ WINBOOL WINAPI UpdateProcThreadAttribute(
     PVOID lpPreviousValue,
     PSIZE_T lpReturnSize)
 {
-    UNREFERENCED_PARAMETER(lpAttributeList);
-    UNREFERENCED_PARAMETER(dwFlags);
-    UNREFERENCED_PARAMETER(Attribute);
-    UNREFERENCED_PARAMETER(lpValue);
-    UNREFERENCED_PARAMETER(cbSize);
-    UNREFERENCED_PARAMETER(lpPreviousValue);
-    UNREFERENCED_PARAMETER(lpReturnSize);
+    TRACE(L"UpdateProcThreadAttribute(0x%p, %d, 0x%p, 0x%p, %d, 0x%p, 0x%p)\n",
+          lpAttributeList,
+          dwFlags,
+          Attribute,
+          lpValue,
+          cbSize,
+          lpPreviousValue,
+          lpReturnSize);
 
     SetLastError(ERROR_NOT_SUPPORTED);
     return FALSE;

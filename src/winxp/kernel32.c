@@ -1,25 +1,33 @@
-#define _SYNCHAPI_H_
-#include <windows.h>
+#define CompareStringOrdinal NO_CompareStringOrdinal
+#define GetFileInformationByHandleEx NO_GetFileInformationByHandleEx
+#define SetFileInformationByHandle NO_SetFileInformationByHandle
+#define GetFinalPathNameByHandleW NO_GetFinalPathNameByHandleW
+#include "winxp_compat.h"
+#undef CompareStringOrdinal
+#undef GetFileInformationByHandleEx
+#undef SetFileInformationByHandle
+#undef GetFinalPathNameByHandleW
+
+#include <fileapi.h>
 #include <ntdef.h>
+#include <winternl.h>
 #include <psapi.h>
 #include <strsafe.h>
+#include <ddk/mountmgr.h>
 
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-#error "Please define _WIN32_WINNT < _WIN32_WINNT_VISTA (0x0600)"
-#endif
-
-WINBASEAPI VOID WINAPI Sleep(DWORD dwMilliseconds);
+DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 
 int WINAPI CompareStringOrdinal(
     LPCWCH lpString1,
     int cchCount1,
     LPCWCH lpString2,
     int cchCount2,
-    WINBOOL bIgnoreCase
-)
+    WINBOOL bIgnoreCase)
 {
     int i, minCount;
     WCHAR ch1, ch2;
+
+    TRACE(L"CompareStringOrdinal(%ls, %d, %ls, %d, %d)\n", lpString1, cchCount1, lpString2, cchCount2, bIgnoreCase);
 
     // Validate input parameters.
     if (!lpString1 || !lpString2)
@@ -63,110 +71,101 @@ int WINAPI CompareStringOrdinal(
     return CSTR_EQUAL;
 }
 
-// Define FILE_BASIC_INFO structure for XP (not available by default)
-typedef struct _FILE_BASIC_INFO {
-    LARGE_INTEGER CreationTime;
-    LARGE_INTEGER LastAccessTime;
-    LARGE_INTEGER LastWriteTime;
-    LARGE_INTEGER ChangeTime;
-    DWORD FileAttributes;
-} FILE_BASIC_INFO, *PFILE_BASIC_INFO;
-
-// Define FILE_STANDARD_INFO structure for XP (not available by default)
-typedef struct _FILE_STANDARD_INFO {
-    LARGE_INTEGER AllocationSize;
-    LARGE_INTEGER EndOfFile;
-    DWORD NumberOfLinks;
-    BOOLEAN DeletePending;
-    BOOLEAN Directory;
-} FILE_STANDARD_INFO, *PFILE_STANDARD_INFO;
-
-// Define FILE_ATTRIBUTE_TAG_INFO structure (if not already defined)
-typedef struct _FILE_ATTRIBUTE_TAG_INFO {
-    DWORD FileAttributes;
-    DWORD ReparseTag;
-} FILE_ATTRIBUTE_TAG_INFO, *PFILE_ATTRIBUTE_TAG_INFO;
-
-// Define an enum for the file information classes (similar to Vista+)
-typedef enum _FILE_INFO_BY_HANDLE_CLASS {
-    FileBasicInfo = 0,
-    FileStandardInfo = 1,
-    FileAttributeTagInfo = 2,
-    // Other info classes are not supported in this fallback implementation
-} FILE_INFO_BY_HANDLE_CLASS;
-
 // Fallback implementation of GetFileInformationByHandleEx for Windows XP
 WINBOOL WINAPI GetFileInformationByHandleEx(HANDLE hFile,
-    FILE_INFO_BY_HANDLE_CLASS FileInformationClass,
-    LPVOID lpFileInformation,
-    DWORD dwBufferSize)
+                                            FILE_INFO_BY_HANDLE_CLASS FileInformationClass,
+                                            LPVOID lpFileInformation,
+                                            DWORD dwBufferSize)
 {
+    TRACE(L"GetFileInformationByHandleEx(0x%p, %d, 0x%p, %d)\n", hFile, FileInformationClass, lpFileInformation, dwBufferSize);
+
     // Validate input parameters
-    if (hFile == INVALID_HANDLE_VALUE || lpFileInformation == NULL) {
+    if (hFile == INVALID_HANDLE_VALUE || lpFileInformation == NULL)
+    {
+        TRACE(L"GetFileInformationByHandleEx -> ERROR_INVALID_PARAMETER\n");
         SetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
     }
 
-    if (FileInformationClass == FileBasicInfo) {
+    if (FileInformationClass == FileBasicInfo)
+    {
         // Check if the provided buffer is large enough for FILE_BASIC_INFO
-        if (dwBufferSize < sizeof(FILE_BASIC_INFO)) {
+        if (dwBufferSize < sizeof(FILE_BASIC_INFO))
+        {
+            TRACE(L"GetFileInformationByHandleEx -> ERROR_INSUFFICIENT_BUFFER\n");
             SetLastError(ERROR_INSUFFICIENT_BUFFER);
             return FALSE;
         }
-        FILE_BASIC_INFO *pInfo = (FILE_BASIC_INFO*)lpFileInformation;
+
+        FILE_BASIC_INFO *pInfo = (FILE_BASIC_INFO *)lpFileInformation;
         BY_HANDLE_FILE_INFORMATION fileInfo;
         if (!GetFileInformationByHandle(hFile, &fileInfo))
+        {
+            TRACE(L"GetFileInformationByHandleEx[FileBasicInfo] -> GetFileInformationByHandle Failed (%d)\n", GetLastError());
             return FALSE;
+        }
 
         // Copy the time and attribute data from the handle information
-        pInfo->CreationTime   = *(LARGE_INTEGER*)&fileInfo.ftCreationTime;
-        pInfo->LastAccessTime = *(LARGE_INTEGER*)&fileInfo.ftLastAccessTime;
-        pInfo->LastWriteTime  = *(LARGE_INTEGER*)&fileInfo.ftLastWriteTime;
+        pInfo->CreationTime = *(LARGE_INTEGER *)&fileInfo.ftCreationTime;
+        pInfo->LastAccessTime = *(LARGE_INTEGER *)&fileInfo.ftLastAccessTime;
+        pInfo->LastWriteTime = *(LARGE_INTEGER *)&fileInfo.ftLastWriteTime;
         // Windows XP does not provide a ChangeTime; using LastWriteTime as a fallback
-        pInfo->ChangeTime     = *(LARGE_INTEGER*)&fileInfo.ftLastWriteTime;
+        pInfo->ChangeTime = *(LARGE_INTEGER *)&fileInfo.ftLastWriteTime;
         pInfo->FileAttributes = fileInfo.dwFileAttributes;
         return TRUE;
     }
-    else if (FileInformationClass == FileStandardInfo) {
+    else if (FileInformationClass == FileStandardInfo)
+    {
         // Check if the provided buffer is large enough for FILE_STANDARD_INFO
-        if (dwBufferSize < sizeof(FILE_STANDARD_INFO)) {
+        if (dwBufferSize < sizeof(FILE_STANDARD_INFO))
+        {
+            TRACE(L"GetFileInformationByHandleEx[FileStandardInfo] -> ERROR_INSUFFICIENT_BUFFER\n");
             SetLastError(ERROR_INSUFFICIENT_BUFFER);
             return FALSE;
         }
-        FILE_STANDARD_INFO *pInfo = (FILE_STANDARD_INFO*)lpFileInformation;
+        FILE_STANDARD_INFO *pInfo = (FILE_STANDARD_INFO *)lpFileInformation;
         BY_HANDLE_FILE_INFORMATION fileInfo;
         if (!GetFileInformationByHandle(hFile, &fileInfo))
+        {
+            TRACE(L"GetFileInformationByHandleEx[FileStandardInfo] -> GetFileInformationByHandle Failed (%d)\n", GetLastError());
             return FALSE;
+        }
 
         // Compute the file size from its low and high parts
         LARGE_INTEGER fileSize;
-        fileSize.LowPart  = fileInfo.nFileSizeLow;
+        fileSize.LowPart = fileInfo.nFileSizeLow;
         fileSize.HighPart = fileInfo.nFileSizeHigh;
 
         pInfo->AllocationSize = fileSize;
-        pInfo->EndOfFile      = fileSize;
-        pInfo->NumberOfLinks  = fileInfo.nNumberOfLinks;
-        pInfo->DeletePending  = FALSE; // Not determinable via this API
-        pInfo->Directory      = (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? TRUE : FALSE;
+        pInfo->EndOfFile = fileSize;
+        pInfo->NumberOfLinks = fileInfo.nNumberOfLinks;
+        pInfo->DeletePending = FALSE; // Not determinable via this API
+        pInfo->Directory = (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? TRUE : FALSE;
         return TRUE;
     }
-    else if (FileInformationClass == FileAttributeTagInfo) {
+    else if (FileInformationClass == FileAttributeTagInfo)
+    {
         // Check if the provided buffer is large enough for FILE_ATTRIBUTE_TAG_INFO
-        if (dwBufferSize < sizeof(FILE_ATTRIBUTE_TAG_INFO)) {
+        if (dwBufferSize < sizeof(FILE_ATTRIBUTE_TAG_INFO))
+        {
             SetLastError(ERROR_INSUFFICIENT_BUFFER);
             return FALSE;
         }
-        FILE_ATTRIBUTE_TAG_INFO *pInfo = (FILE_ATTRIBUTE_TAG_INFO*)lpFileInformation;
+        FILE_ATTRIBUTE_TAG_INFO *pInfo = (FILE_ATTRIBUTE_TAG_INFO *)lpFileInformation;
         BY_HANDLE_FILE_INFORMATION fileInfo;
         if (!GetFileInformationByHandle(hFile, &fileInfo))
+        {
+            TRACE(L"GetFileInformationByHandleEx[FileAttributeTagInfo] -> GetFileInformationByHandle Failed (%d)\n", GetLastError());
             return FALSE;
+        }
 
         // Copy the file attributes from the handle information
         pInfo->FileAttributes = fileInfo.dwFileAttributes;
-        pInfo->ReparseTag = 0;  // Default value if not a reparse point
+        pInfo->ReparseTag = 0; // Default value if not a reparse point
 
         // If the file is a reparse point, try to retrieve the reparse tag
-        if (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) {
+        if (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)
+        {
             // Allocate a buffer for the reparse point data.
             // Although the maximum size is defined by MAXIMUM_REPARSE_DATA_BUFFER,
             // we use a static buffer of 16 KB for simplicity.
@@ -179,7 +178,8 @@ WINBOOL WINAPI GetFileInformationByHandleEx(HANDLE hFile,
                                 buffer,
                                 sizeof(buffer),
                                 &dwBytesReturned,
-                                NULL)) {
+                                NULL))
+            {
                 // Cast the buffer to a REPARSE_DATA_BUFFER pointer to retrieve the ReparseTag.
                 // Note: REPARSE_DATA_BUFFER has a variable layout; here we only extract the ReparseTag.
                 pInfo->ReparseTag = ((PREPARSE_DATA_BUFFER)buffer)->ReparseTag;
@@ -188,21 +188,23 @@ WINBOOL WINAPI GetFileInformationByHandleEx(HANDLE hFile,
         }
         return TRUE;
     }
-    else {
+    else
+    {
         // Unsupported FileInformationClass
+        TRACE(L"GetFileInformationByHandleEx: Unsupported FileInformationClass %d\n", FileInformationClass);
         SetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
     }
 }
 
-WINBOOL WINAPI SetFileInformationByHandle(
-    HANDLE hFile,
-    FILE_INFO_BY_HANDLE_CLASS FileInformationClass,
-    LPVOID lpFileInformation,
-    DWORD dwBufferSize)
+WINBOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLASS FileInformationClass, LPVOID lpFileInformation, DWORD dwBufferSize)
 {
+    TRACE(L"SetFileInformationByHandle(0x%p, %d, 0x%p, %d)\n", hFile, FileInformationClass, lpFileInformation, dwBufferSize);
+
     // Validate parameters.
-    if (hFile == INVALID_HANDLE_VALUE || lpFileInformation == NULL) {
+    if (hFile == INVALID_HANDLE_VALUE || lpFileInformation == NULL)
+    {
+        TRACE(L"SetFileInformationByHandle: hFile == INVALID_HANDLE_VALUE || lpFileInformation == NULL\n");
         SetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
     }
@@ -213,6 +215,7 @@ WINBOOL WINAPI SetFileInformationByHandle(
     {
         if (dwBufferSize < sizeof(FILE_BASIC_INFO))
         {
+            TRACE(L"SetFileInformationByHandle[FileBasicInfo]: ERROR_INSUFFICIENT_BUFFER\n");
             SetLastError(ERROR_INSUFFICIENT_BUFFER);
             return FALSE;
         }
@@ -226,109 +229,295 @@ WINBOOL WINAPI SetFileInformationByHandle(
                 (const FILETIME *)&pBasicInfo->LastWriteTime))
         {
             // If SetFileTime fails, it sets the proper error code.
+            TRACE(L"SetFileInformationByHandle[FileBasicInfo]->SetFileTime Failed (%d)\n", GetLastError());
             return FALSE;
         }
         // Note: pBasicInfo->ChangeTime and pBasicInfo->FileAttributes are not supported.
         return TRUE;
     }
+    case FileRenameInfo:
+    case FileRenameInfoEx:
+    {
+        if (dwBufferSize < sizeof(FILE_RENAME_INFO))
+        {
+            TRACE(L"SetFileInformationByHandle[FileRenameInfo]: ERROR_INSUFFICIENT_BUFFER\n");
+            SetLastError(ERROR_INSUFFICIENT_BUFFER);
+            return FALSE;
+        }
+
+        UNICODE_STRING NtPathName = {0, 0, 0};
+        FILE_RENAME_INFO *pInputRenameInfo = (FILE_RENAME_INFO *)lpFileInformation;
+        PFILE_RENAME_INFO pRename = (PFILE_RENAME_INFO)lpFileInformation;
+
+        // Only support RootDirectory == NULL.
+        if (pRename->RootDirectory != NULL)
+        {
+            TRACE(L"SetFileInformationByHandle[FileRenameInfo]: pRename->RootDirectory != NULL\n");
+            SetLastError(ERROR_NOT_SUPPORTED);
+            return FALSE;
+        }
+
+        NtPathName.MaximumLength = (USHORT)pInputRenameInfo->FileNameLength;
+        NtPathName.Length = (USHORT)pInputRenameInfo->FileNameLength;
+        NtPathName.Buffer = pInputRenameInfo->FileName;
+
+        ULONG size = (NtPathName.Length * sizeof(wchar_t)) + sizeof(FILE_RENAME_INFO);
+        FILE_RENAME_INFO *RenameBuffer = malloc(size);
+        if (!RenameBuffer)
+        {
+            TRACE(L"SetFileInformationByHandle[FileRenameInfo]: ERROR_OUTOFMEMORY\n");
+            SetLastError(ERROR_OUTOFMEMORY);
+            return FALSE;
+        }
+
+        memcpy(RenameBuffer->FileName, NtPathName.Buffer, NtPathName.Length * sizeof(wchar_t));
+        RenameBuffer->FileName[NtPathName.Length] = L'\0';
+
+        wchar_t sourcePath[MAX_PATH];
+        GetFinalPathNameByHandleW(hFile, sourcePath, MAX_PATH, 0);
+        TRACE(L"[%ls] -> [%ls]\n", sourcePath, RenameBuffer->FileName);
+
+#if 1
+        DWORD moveFlags = 0;
+        if (pRename->ReplaceIfExists)
+            moveFlags |= MOVEFILE_REPLACE_EXISTING;
+
+        BOOL result = MoveFileExW(sourcePath, RenameBuffer->FileName, moveFlags);
+        free(RenameBuffer);
+        return result;
+#else
+        RenameBuffer->ReplaceIfExists = pInputRenameInfo->ReplaceIfExists;
+        RenameBuffer->RootDirectory = pInputRenameInfo->RootDirectory;
+        RenameBuffer->FileNameLength = NtPathName.Length;
+        IO_STATUS_BLOCK IoStatusBlock;
+
+        // 0xc0000033 STATUS_OBJECT_NAME_INVALID
+        // 0xc00000cb on wine
+        // SHARING VIOLATION on ProcMon
+        TRACE(L"RenameBuffer->FileName -> %ls\n", RenameBuffer->FileName);
+        NTSTATUS ntRes = NtSetInformationFile(hFile,
+                                              &IoStatusBlock,
+                                              RenameBuffer,
+                                              size,
+                                              FileRenameInformation);
+
+        if (NtPathName.Buffer != pInputRenameInfo->FileName)
+            free(NtPathName.Buffer);
+
+        if (!NT_SUCCESS(ntRes))
+        {
+            TRACE(L"SetFileInformationByHandle[FileRenameInfo]: NtSetInformationFile failed (0x%08x)\n", ntRes);
+            SetLastError(RtlNtStatusToDosError(ntRes));
+            return FALSE;
+        }
+
+        return TRUE;
+#endif
+    }
     default:
+        TRACE(L"SetFileInformationByHandle: Unsupported FileInformationClass %d\n", FileInformationClass);
         SetLastError(ERROR_NOT_SUPPORTED);
         return FALSE;
     }
 }
 
-DWORD WINAPI GetFinalPathNameByHandleW(
-    HANDLE hFile,
-    LPWSTR lpszFilePath,
-    DWORD cchFilePath,
-    DWORD dwFlags   // This implementation supports only basic DOS paths
-) {
+// https://github.com/zeroclear/xpext/blob/master/xpext_ver4/k32_file.cpp#L445
+// https://stackoverflow.com/questions/65170/how-to-get-name-associated-with-open-handle/5286888#5286888
+union ANY_BUFFER
+{
+    MOUNTMGR_TARGET_NAME TargetName;
+    MOUNTMGR_VOLUME_PATHS TargetPaths;
+    FILE_NAME_INFORMATION NameInfo;
+    UNICODE_STRING UnicodeString;
+    WCHAR Buffer[USHRT_MAX];
+};
+
+// This implementation supports only basic DOS paths
+DWORD WINAPI
+GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags)
+{
+    TRACE(L"GetFinalPathNameByHandleW(0x%p, 0x%p, %d, %d)\n", hFile, lpszFilePath, cchFilePath, dwFlags);
+
     // Validate input parameters.
-    if (hFile == INVALID_HANDLE_VALUE || lpszFilePath == NULL) {
+    if (hFile == INVALID_HANDLE_VALUE)
+    {
+        TRACE(L"GetFinalPathNameByHandleW: -> ERROR_INVALID_PARAMETER\n");
         SetLastError(ERROR_INVALID_PARAMETER);
         return 0;
     }
 
-    // Create a file mapping object for the file handle.
-    // We only need a mapping of 1 byte.
-    HANDLE hMapping = CreateFileMappingW(hFile, NULL, PAGE_READONLY, 0, 1, NULL);
-    if (hMapping == NULL) {
+    if (dwFlags != VOLUME_NAME_DOS)
+    {
+        TRACE(L"GetFinalPathNameByHandleW: Unsupported dwFlags 0x%08x\n", dwFlags);
+        SetLastError(ERROR_INVALID_PARAMETER);
         return 0;
     }
 
-    // Map a view of the file into memory.
-    LPVOID pMappingView = MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 1);
-    if (pMappingView == NULL) {
-        CloseHandle(hMapping);
+    // FIXME: too big?
+    union ANY_BUFFER nameFull, nameRel, nameMnt;
+
+    NTSTATUS status = NtQueryObject(hFile, ObjectNameInformation, nameFull.Buffer, sizeof(nameFull.Buffer), NULL);
+    if (!NT_SUCCESS(status))
+    {
+        TRACE(L"GetFinalPathNameByHandleW->NtQueryObject failed (0x%08x)\n", status);
+        SetLastError(RtlNtStatusToDosError(status));
         return 0;
     }
 
-    // Retrieve the device path of the mapped file.
-    // The device path will be something like:
-    // "\\Device\\HarddiskVolume2\\Windows\\system32\\kernel32.dll"
-    WCHAR devicePath[MAX_PATH];
-    DWORD devicePathLen = GetMappedFileNameW(GetCurrentProcess(), pMappingView, devicePath, MAX_PATH);
+    IO_STATUS_BLOCK iosb;
+    status = NtQueryInformationFile(hFile, &iosb, nameRel.Buffer, sizeof(nameRel.Buffer), FileNameInformation);
 
-    // Clean up the mapping.
-    UnmapViewOfFile(pMappingView);
-    CloseHandle(hMapping);
-
-    if (devicePathLen == 0) {
-        // Failed to get the mapped file name.
+    if (!NT_SUCCESS(status))
+    {
+        TRACE(L"GetFinalPathNameByHandleW->NtQueryInformationFile failed (0x%08x)\n", status);
+        SetLastError(RtlNtStatusToDosError(status));
         return 0;
     }
 
-    // Convert the device path to a DOS path.
-    // Iterate over possible drive letters (A: to Z:) and compare the device name.
-    WCHAR drive[3] = L"A:";  // Buffer for the drive letter (e.g., "C:")
-    WCHAR deviceName[MAX_PATH];
-    BOOL found = FALSE;
-    WCHAR finalPath[MAX_PATH] = {0};
-    size_t deviceNameLen = 0;
-    DWORD i;
+    if (nameFull.UnicodeString.Length < nameRel.NameInfo.FileNameLength)
+    {
+        TRACE(L"nameFull.UnicodeString.Length < nameRel.NameInfo.FileNameLength\n");
+        // FIXME: WTF
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return 0;
+    }
 
-    for (i = L'A'; i <= L'Z'; i++) {
-        drive[0] = (WCHAR)i;
-        drive[1] = L':';
-        drive[2] = L'\0';
-        // QueryDosDeviceW retrieves the device name for the drive letter.
-        if (QueryDosDeviceW(drive, deviceName, MAX_PATH)) {
-            deviceNameLen = wcslen(deviceName);
-            // Check if the beginning of devicePath matches the device name.
-            if (wcsncmp(devicePath, deviceName, deviceNameLen) == 0) {
-                // Build the final DOS path.
-                // For example, if devicePath is "\\Device\\HarddiskVolume2\\Windows\\system32\\file.dll"
-                // and deviceName is "\\Device\\HarddiskVolume2", then finalPath becomes "C:\\Windows\\system32\\file.dll".
-                HRESULT hr = StringCchPrintfW(finalPath, MAX_PATH, L"%s%s", drive, devicePath + deviceNameLen);
-                if (FAILED(hr)) {
-                    SetLastError(ERROR_INVALID_PARAMETER);
-                    return 0;
+    nameMnt.TargetName.DeviceNameLength = nameFull.UnicodeString.Length - nameRel.NameInfo.FileNameLength;
+    wcsncpy(nameMnt.TargetName.DeviceName,
+            nameFull.UnicodeString.Buffer,
+            nameMnt.TargetName.DeviceNameLength / sizeof(wchar_t));
+
+    HANDLE hDevice = CreateFileW(
+        MOUNTMGR_DOS_DEVICE_NAME,
+        0,
+        FILE_SHARE_READ | FILE_SHARE_WRITE,
+        NULL, OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL);
+
+    if (hDevice == INVALID_HANDLE_VALUE)
+    {
+        TRACE(L"GetFinalPathNameByHandleW->CreateFileW(MOUNTMGR_DOS_DEVICE_NAME): failed (%d)\n", GetLastError());
+        return 0;
+    }
+
+    TRACE(L"DevicePath: [%ls]\n", nameMnt.TargetName.DeviceName);
+    TRACE(L"FileName: [%ls]\n", nameRel.NameInfo.FileName);
+
+    DWORD rl;
+    BOOL success = DeviceIoControl(hDevice,
+                                   IOCTL_MOUNTMGR_QUERY_DOS_VOLUME_PATH,
+                                   &nameMnt,
+                                   sizeof(nameMnt),
+                                   &nameMnt,
+                                   sizeof(nameMnt),
+                                   &rl,
+                                   NULL);
+
+    if (success)
+        CloseHandle(hDevice);
+
+    int cchReq = 0;
+    int nameLength = nameRel.NameInfo.FileNameLength / sizeof(wchar_t);
+
+    if (success)
+    {
+        if (nameMnt.TargetPaths.MultiSzLength == 0)
+        {
+            TRACE(L"GetFinalPathNameByHandleW->DeviceIoControl nameMnt.TargetPaths.MultiSzLength == 0\n");
+            SetLastError(ERROR_INVALID_PARAMETER);
+            return 0;
+        }
+        TRACE(L"Matched MountMgr: %ls\n", nameRel.NameInfo.FileName);
+        wcsncat(nameMnt.TargetPaths.MultiSz, nameRel.NameInfo.FileName, nameLength);
+        cchReq = wcslen(nameMnt.TargetPaths.MultiSz);
+    }
+    else
+    {
+        DWORD le = GetLastError();
+        if ((le != ERROR_INVALID_FUNCTION) && (le != ERROR_NOT_SUPPORTED))
+        {
+            TRACE(L"GetFinalPathNameByHandleW->DeviceIoControl failed (%d)\n", le);
+            return 0;
+        }
+
+        DWORD dwSize = MAX_PATH;
+        wchar_t szLogicalDrives[MAX_PATH] = {0};
+        DWORD dwResult = GetLogicalDriveStringsW(dwSize, szLogicalDrives);
+
+        if (!dwResult || dwResult > MAX_PATH)
+        {
+            TRACE(L"GetFinalPathNameByHandleW->GetLogicalDriveStringsW failed or oversize (%d)\n", GetLastError());
+            return 0;
+        }
+
+        wchar_t TargetDevice[MAX_PATH + 1];
+        wchar_t *drive = szLogicalDrives;
+        while (*drive)
+        {
+            wchar_t driveLetter[3] = {drive[0], drive[1], L'\0'};
+            if (QueryDosDeviceW(driveLetter, TargetDevice, sizeof(TargetDevice)))
+            {
+                TRACE(L"%ls is {%ls}\n", driveLetter, TargetDevice);
+                if (wcsncmp(TargetDevice, nameMnt.TargetName.DeviceName, nameMnt.TargetName.DeviceNameLength / sizeof(wchar_t)) == 0)
+                {
+                    wcsncpy(nameMnt.TargetPaths.MultiSz, driveLetter, sizeof(driveLetter));
+                    int off;
+
+                    if (TargetDevice == wcsstr(TargetDevice, L"\\Device\\LanmanRedirector\\;"))
+                    {
+                        /* \Device\LanmanRedirector\;C:0000000000000000\Complete Path\To File.ext */
+                        if ((TargetDevice[26] == drive[0]) && (TargetDevice[27] == ':'))
+                        {
+                            wchar_t *path = wcschr(&TargetDevice[28], L'\\');
+                            if (path == NULL)
+                            {
+                                SetLastError(ERROR_BAD_PATHNAME);
+                                return 0;
+                            }
+                            TRACE(L"Matched LanmanRedirector: %ls\n", path);
+                            off = wcslen(path);
+                        }
+                        else
+                        {
+                            TRACE(L"LanmanRedirector: Invalid pattern\n");
+                            SetLastError(ERROR_BAD_PATHNAME);
+                            return 0;
+                        }
+                    }
+                    else // \Device\VBoxMiniRdr\;Z:\VBoxSvr\shared
+                    {
+                        TRACE(L"Matched Network Provider: %ls\n", driveLetter, nameMnt.TargetName.DeviceName);
+                        wchar_t *semicolon = wcschr(TargetDevice, L';');
+                        off = semicolon ? wcslen(semicolon + 3) : 0; // Z:\ (3)
+                    }
+
+                    wcsncat(nameMnt.TargetPaths.MultiSz, nameRel.NameInfo.FileName + off, nameLength - off);
+                    cchReq = wcslen(nameMnt.TargetPaths.MultiSz);
+                    break;
                 }
-                found = TRUE;
-                break;
             }
+            drive += wcslen(drive) + 1;
+        }
+
+        if (!cchReq)
+        {
+            TRACE(L"DosPath Not Found\n");
+            SetLastError(ERROR_INVALID_PARAMETER);
+            return 0;
         }
     }
 
-    // If no matching drive letter was found, use the original device path.
-    LPWSTR outputPath = found ? finalPath : devicePath;
-    size_t outputPathLen = wcslen(outputPath);
-
-    // Check if the provided output buffer is large enough.
-    if (outputPathLen + 1 > cchFilePath) {
-        SetLastError(ERROR_INSUFFICIENT_BUFFER);
-        return (DWORD)(outputPathLen + 1);
+    if (lpszFilePath && (cchFilePath >= cchReq))
+    {
+        wcsncpy(lpszFilePath, nameMnt.TargetPaths.MultiSz, cchReq);
+        lpszFilePath[cchReq] = L'\0';
     }
 
-    // Copy the resulting path to the caller's buffer using safe string copy.
-    HRESULT hrCopy = StringCchCopyW(lpszFilePath, cchFilePath, outputPath);
-    if (FAILED(hrCopy)) {
-        SetLastError(ERROR_INVALID_PARAMETER);
-        return 0;
-    }
-
+    TRACE(L"GetFinalPathNameByHandleW->%ls (%d)\n", nameMnt.TargetPaths.MultiSz, cchReq);
     // Return the length of the final path (excluding the terminating null).
-    return (DWORD)outputPathLen;
+
+    return cchReq;
 }
 
 WINBASEAPI HANDLE WINAPI ReOpenFile(
@@ -337,36 +526,44 @@ WINBASEAPI HANDLE WINAPI ReOpenFile(
     DWORD dwShareMode,
     DWORD dwFlags)
 {
+    TRACE(L"ReOpenFile(0x%p, 0x%08x, 0x%08x, 0x%08x)\n", hOriginalFile, dwDesiredAccess, dwShareMode, dwFlags);
+
     // Validate the original handle.
-    if (hOriginalFile == INVALID_HANDLE_VALUE) {
+    if (hOriginalFile == INVALID_HANDLE_VALUE)
+    {
         SetLastError(ERROR_INVALID_HANDLE);
         return INVALID_HANDLE_VALUE;
     }
 
     // Retrieve the file's final path.
     WCHAR filePath[MAX_PATH] = {0};
-    DWORD ret = GetFinalPathNameByHandleW(hOriginalFile, filePath, MAX_PATH, 0);
-    if (ret == 0 || ret > MAX_PATH) {
+    DWORD ret = GetFinalPathNameByHandleW(hOriginalFile, filePath, MAX_PATH, VOLUME_NAME_DOS);
+    if (ret == 0 || ret > MAX_PATH)
+    {
         // Could not retrieve the path.
         return INVALID_HANDLE_VALUE;
     }
 
     // Remove any "\\?\" prefix if present. CreateFileW cannot use paths with this prefix.
     WCHAR *pPath = filePath;
-    if (wcsncmp(filePath, L"\\\\?\\", 4) == 0) {
+    if (wcsncmp(filePath, L"\\\\?\\", 4) == 0)
+    {
         pPath += 4;
         // Special handling for UNC paths: a UNC path may start as "\\?\UNC\server\share..."
-        if (wcsncmp(pPath, L"UNC\\", 4) == 0) {
+        if (wcsncmp(pPath, L"UNC\\", 4) == 0)
+        {
             pPath += 3; // Skip "UNC"
             // Prepend "\\" to form a standard UNC path.
             WCHAR uncPath[MAX_PATH];
             HRESULT hr = StringCchPrintfW(uncPath, MAX_PATH, L"\\\\%s", pPath);
-            if (FAILED(hr)) {
+            if (FAILED(hr))
+            {
                 SetLastError(ERROR_INVALID_PARAMETER);
                 return INVALID_HANDLE_VALUE;
             }
             hr = StringCchCopyW(filePath, MAX_PATH, uncPath);
-            if (FAILED(hr)) {
+            if (FAILED(hr))
+            {
                 SetLastError(ERROR_INVALID_PARAMETER);
                 return INVALID_HANDLE_VALUE;
             }
@@ -379,10 +576,10 @@ WINBASEAPI HANDLE WINAPI ReOpenFile(
         pPath,
         dwDesiredAccess,
         dwShareMode,
-        NULL,            // default security attributes
-        OPEN_EXISTING,   // file must exist
-        dwFlags,         // flags and attributes for the new handle
-        NULL             // no template file
+        NULL,          // default security attributes
+        OPEN_EXISTING, // file must exist
+        dwFlags,       // flags and attributes for the new handle
+        NULL           // no template file
     );
 
     return hNew;
@@ -396,6 +593,8 @@ WINBASEAPI VOID WINAPI GetSystemTimePreciseAsFileTime(LPFILETIME lpSystemTimeAsF
     static LARGE_INTEGER qpcBase = {0};      // Baseline performance counter value.
     static FILETIME ftBase = {0};            // Baseline system time corresponding to qpcBase.
     static LARGE_INTEGER qpcFrequency = {0}; // Performance counter frequency.
+
+    TRACE(L"GetSystemTimePreciseAsFileTime(0x%p)\n", lpSystemTimeAsFileTime);
 
     // If not yet initialized, set the baseline.
     if (initialized == 0)
@@ -430,77 +629,10 @@ WINBASEAPI VOID WINAPI GetSystemTimePreciseAsFileTime(LPFILETIME lpSystemTimeAsF
     lpSystemTimeAsFileTime->dwHighDateTime = (DWORD)(preciseTime >> 32);
 }
 
-// Define our fallback INIT_ONCE structure for one-time initialization.
-// It must be zero-initialized (e.g. as a static/global variable).
-typedef struct _INIT_ONCE {
-    volatile LONG state; // 0 = not initialized, 1 = initializing, 2 = initialized
-} INIT_ONCE, *PINIT_ONCE;
-
-// Fallback implementation of InitOnceBeginInitialize for Windows XP.
-// Parameters:
-//   pInitOnce - pointer to our INIT_ONCE_FALLBACK structure (must be zero-initialized)
-//   dwFlags   - reserved, must be 0
-//   lpPending - output flag that indicates whether the calling thread should perform initialization (TRUE)
-//   lpContext - reserved, must be NULL
-// Returns TRUE on success, FALSE on error (with an appropriate error code set)
-WINBOOL WINAPI InitOnceBeginInitialize(PINIT_ONCE pInitOnce, DWORD dwFlags, PBOOL lpPending, LPVOID *lpContext)
-{
-    // Validate parameters.
-    // lpContext must be NULL and dwFlags must be 0.
-    if (pInitOnce == NULL || lpPending == NULL || lpContext != NULL || dwFlags != 0) {
-        SetLastError(ERROR_INVALID_PARAMETER);
-        return FALSE;
-    }
-
-    // If initialization is already complete, indicate no pending initialization.
-    if (pInitOnce->state == 2) {
-        *lpPending = FALSE;
-        return TRUE;
-    }
-
-    // Attempt to mark the INIT_ONCE structure as "initializing".
-    // If the current state is 0 (not initialized), atomically set it to 1.
-    if (InterlockedCompareExchange(&pInitOnce->state, 1, 0) == 0) {
-        // The current thread is responsible for performing the initialization.
-        *lpPending = TRUE;
-        return TRUE;
-    }
-    else {
-        // Another thread is performing initialization.
-        // Spin-wait until the state becomes 2 (initialized).
-        while (pInitOnce->state != 2) {
-            Sleep(0); // Yield execution to other threads.
-        }
-        *lpPending = FALSE;
-        return TRUE;
-    }
-}
-
-// Fallback implementation of InitOnceComplete for Windows XP.
-// This function should be called by the thread that performed the initialization to mark it as complete.
-// Parameters:
-//   pInitOnce - pointer to our INIT_ONCE_FALLBACK structure (must be zero-initialized)
-//   dwFlags   - reserved, must be 0
-//   lpContext - reserved, must be NULL
-// Returns TRUE on success, or FALSE if an invalid parameter is provided.
-WINBOOL WINAPI  InitOnceComplete(PINIT_ONCE pInitOnce, DWORD dwFlags, LPVOID lpContext)
-{
-    // Validate parameters: pInitOnce must not be NULL, lpContext must be NULL, and dwFlags must be 0.
-    if (pInitOnce == NULL || lpContext != NULL || dwFlags != 0) {
-        SetLastError(ERROR_INVALID_PARAMETER);
-        return FALSE;
-    }
-
-    // Mark the initialization as complete by setting the state to 2.
-    InterlockedExchange(&pInitOnce->state, 2);
-
-    return TRUE;
-}
-
 // Helper: Returns the number of days in a given month for a specified year.
 static int DaysInMonth(int year, int month)
 {
-    static const int days[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    static const int days[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     int d = days[month - 1];
     if (month == 2 && ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)))
         d = 29;
@@ -511,10 +643,10 @@ static int DaysInMonth(int year, int month)
 // 0 = Sunday, 1 = Monday, ... 6 = Saturday.
 static int day_of_week(int year, int month, int day)
 {
-    static int t[] = { 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4 };
+    static int t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
     if (month < 3)
         year -= 1;
-    return (year + year/4 - year/100 + year/400 + t[month - 1] + day) % 7;
+    return (year + year / 4 - year / 100 + year / 400 + t[month - 1] + day) % 7;
 }
 
 // Helper: Given a recurring transition rule (expressed as a SYSTEMTIME with zero year)
@@ -535,13 +667,15 @@ static void ComputeTransitionDate(USHORT wYear, const SYSTEMTIME *pRule, SYSTEMT
     pResult->wMilliseconds = pRule->wMilliseconds;
 
     // If no transition is defined, set day values to zero.
-    if (pRule->wMonth == 0) {
+    if (pRule->wMonth == 0)
+    {
         pResult->wDay = 0;
         pResult->wDayOfWeek = 0;
         return;
     }
 
-    if (pRule->wDay < 5) {
+    if (pRule->wDay < 5)
+    {
         // pRule->wDay indicates the nth occurrence of pRule->wDayOfWeek in the month.
         int nth = pRule->wDay;
         int firstDow = day_of_week(wYear, pRule->wMonth, 1);
@@ -554,7 +688,9 @@ static void ComputeTransitionDate(USHORT wYear, const SYSTEMTIME *pRule, SYSTEMT
             day -= 7;
         pResult->wDay = (WORD)day;
         pResult->wDayOfWeek = (WORD)desiredDow;
-    } else {
+    }
+    else
+    {
         // pRule->wDay == 5 means the last occurrence of the specified day-of-week.
         int dim = DaysInMonth(wYear, pRule->wMonth);
         int lastDow = day_of_week(wYear, pRule->wMonth, dim);
@@ -579,7 +715,10 @@ WINBOOL WINAPI GetTimeZoneInformationForYear(
     PDYNAMIC_TIME_ZONE_INFORMATION pdtzi,
     LPTIME_ZONE_INFORMATION ptzi)
 {
-    if (ptzi == NULL) {
+    TRACE(L"GetTimeZoneInformationForYear(%d, 0x%p, 0x%p)\n", wYear, pdtzi, ptzi);
+
+    if (ptzi == NULL)
+    {
         SetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
     }
@@ -588,9 +727,10 @@ WINBOOL WINAPI GetTimeZoneInformationForYear(
     PDYNAMIC_TIME_ZONE_INFORMATION pDTZI;
 
     // If no dynamic TZ info is provided, use the current time zone.
-    if (pdtzi == NULL) {
+    if (pdtzi == NULL)
+    {
         TIME_ZONE_INFORMATION tzi;
-        DWORD res = GetTimeZoneInformation(&tzi);
+        GetTimeZoneInformation(&tzi);
         // Map the TIME_ZONE_INFORMATION fields into our dynamic structure.
         memset(&dtziLocal, 0, sizeof(dtziLocal));
         dtziLocal.Bias = tzi.Bias;
@@ -604,9 +744,9 @@ WINBOOL WINAPI GetTimeZoneInformationForYear(
         dtziLocal.TimeZoneKeyName[0] = L'\0';
         dtziLocal.DynamicDaylightTimeDisabled = FALSE;
         pDTZI = &dtziLocal;
-    } else {
-        pDTZI = pdtzi;
     }
+    else
+        pDTZI = pdtzi;
 
     // Copy basic bias and name information to the output structure.
     ptzi->Bias = pDTZI->Bias;
