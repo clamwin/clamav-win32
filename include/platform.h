@@ -49,9 +49,8 @@
 #include "socket_inline.h"
 
 /* resolv.h */
-
 int res_init(void);
-int res_query(const char *dname, int class, int type, unsigned char *answer, int anslen);
+int res_query(const char *dname, int klass, int type, unsigned char *answer, int anslen);
 int dn_expand(unsigned char *msg, unsigned char *eomorig, unsigned char *comp_dn, char *exp_dn, int length);
 
 /* re-route main to cw_main to handle some startup code */
@@ -72,16 +71,12 @@ DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD 
 /* <strings.h> */
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
+
 /* ctrl + c handler */
 extern BOOL WINAPI cw_stop_ctrl_handler(DWORD CtrlType);
 
 #define ftruncate _chsize
-
-#ifndef __cplusplus
-//extern char *strtok_r(char *s, const char *delim, char **save_ptr);
-extern char *strptime (const char *buf, const char *format, struct tm *tm);
-#endif
-
+extern char *strptime(const char *buf, const char *format, struct tm *tm);
 extern wchar_t* uncpath(const char* path);
 
 #define lstat stat
