@@ -447,6 +447,7 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
 
     TRACE(L"deviceName: [%ls]\n", deviceName);
     TRACE(L"fileName: [%ls]\n", fileName);
+
     // Try to resolve using MountMgr first
     hMountMgr = CreateFileW(
         MOUNTMGR_DOS_DEVICE_NAME,
