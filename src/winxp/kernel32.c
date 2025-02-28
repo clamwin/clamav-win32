@@ -408,7 +408,7 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
     // pointer refs for readability
     wchar_t *deviceName = nameMnt.TargetName.DeviceName;
     wchar_t *fileName = nameRel.NameInfo.FileName;
-    wchar_t targetPath[MAX_PATH + 1] = {0};
+    wchar_t targetPath[MAX_PATH + 1] = L"\\\\?\\";
 
     // Get object name information (full NT path)
     status = NtQueryObject(hFile, ObjectNameInformation, nameFull.Buffer, sizeof(nameFull.Buffer), NULL);
@@ -447,7 +447,6 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
 
     TRACE(L"deviceName: [%ls]\n", deviceName);
     TRACE(L"fileName: [%ls]\n", fileName);
-
     // Try to resolve using MountMgr first
     hMountMgr = CreateFileW(
         MOUNTMGR_DOS_DEVICE_NAME,
@@ -474,7 +473,6 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
         if (success && nameMnt.TargetPaths.MultiSzLength > 0)
         {
             TRACE(L"Resolved via MountMgr: %ls\n", targetPath);
-            wcsncpy(targetPath, L"\\\\?\\", 4);
             wcsncat(targetPath, nameMnt.TargetPaths.MultiSz, nameMnt.TargetPaths.MultiSzLength);
             wcsncat(targetPath, fileName, nameLength);
             requiredLength = wcslen(targetPath);
@@ -513,13 +511,11 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
             if (QueryDosDeviceW(driveLetter, targetDevice, MAX_PATH))
             {
                 TRACE(L"%ls is {%ls}\n", driveLetter, targetDevice);
+                TRACE(L"targePath: %ls\n", targetPath);
 
+                // Found matching drive
                 if (wcsncmp(deviceName, targetDevice, deviceNameLen) == 0)
                 {
-                    // Found matching drive
-                    wcsncpy(targetPath, driveLetter, 3);
-                    int offset = 0;
-
                     // Handle network path
                     if (wcsstr(targetDevice, L"\\Device\\LanmanRedirector\\;"))
                     {
@@ -529,12 +525,11 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
                             wchar_t *path = wcschr(&targetDevice[28], L'\\');
                             if (path)
                             {
-                                offset = wcslen(path);
                                 // same network host, different share
-                                if (wcsncmp(path, fileName, offset) == 0)
+                                if (wcsncmp(path, fileName, wcslen(path)) == 0)
                                 {
+                                    TRACE(L"Matched LanmanRedirector path: %ls\n", path);
                                     found = TRUE;
-                                    TRACE(L"Matched LanmanRedirector path: %ls (offset %d)\n", path, offset);
                                 }
                             }
                         }
@@ -544,15 +539,13 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
                         // Other network providers (e.g. VBoxMiniRdr)
                         // \Device\VBoxMiniRdr\;Z:\VBoxSvr\shared
                         TRACE(L"Matched Network Provider: %ls -> %ls\n", driveLetter, targetDevice);
-                        wchar_t *semicolon = wcschr(targetDevice, L';');
-                        offset = semicolon ? wcslen(semicolon + 3) : 0; // Skip "Z:\"
                         found = TRUE;
                     }
 
                     if (found)
                     {
-                        // Append the filename part, accounting for offset
-                        wcsncat(targetPath, fileName + offset, nameLength - offset);
+                        wcsncat(targetPath, L"UNC", 3);
+                        wcsncat(targetPath, fileName, nameLength);
                         requiredLength = wcslen(targetPath);
                         break;
                     }
