@@ -1,5 +1,7 @@
+enable_language(C ASM)
+
 list(APPEND COMPAT_DEFINES
-    _WIN32_WINNT=0x0501
+    _WIN32_WINNT=_WIN32_WINNT_WINXP
     TRACE_COMPAT
 )
 
@@ -9,6 +11,7 @@ file(GLOB clamav_compat_sources
     ${CLAMWIN_DIR}/src/winxp/kernel32.c
     ${CLAMWIN_DIR}/src/winxp/runonce.c
     ${CLAMWIN_DIR}/src/winxp/shell32.c
+    ${CLAMWIN_DIR}/src/winxp/forward.S
 )
 
 add_library(clamav_compat STATIC
@@ -22,6 +25,12 @@ target_link_libraries(gfpn PRIVATE clamav_compat psapi ntdll mpr)
 target_link_options(gfpn PRIVATE -municode)
 target_compile_definitions(gfpn PRIVATE ${COMPAT_DEFINES})
 target_compile_options(gfpn PRIVATE -Wall)
+
+add_executable(sfibh ${CLAMWIN_DIR}/src/winxp/sfibh.c)
+target_link_libraries(sfibh PRIVATE clamav_compat psapi ntdll mpr)
+target_link_options(sfibh PRIVATE -municode)
+target_compile_definitions(sfibh PRIVATE ${COMPAT_DEFINES})
+target_compile_options(sfibh PRIVATE -Wall)
 
 file(GLOB synchapi_sources
     ${CLAMWIN_DIR}/src/winxp/synchapi.c

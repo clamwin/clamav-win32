@@ -9,7 +9,7 @@ int wmain(int argc, wchar_t *argv[])
 {
     if (argc != 2)
     {
-        printf("Invalid arguments\n");
+        wprintf(L"Invalid arguments\n");
         return 1;
     }
 
@@ -24,7 +24,7 @@ int wmain(int argc, wchar_t *argv[])
 
     if (hFile == INVALID_HANDLE_VALUE)
     {
-        fprintf(stderr, "CreateFileW (%ld)\n", GetLastError());
+        fwprintf(stderr, L"CreateFileW (%ld)\n", GetLastError());
         return 1;
     }
 

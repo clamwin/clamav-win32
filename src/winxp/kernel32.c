@@ -201,6 +201,10 @@ WINBOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLAS
 {
     TRACE(L"SetFileInformationByHandle(0x%p, %d, 0x%p, %d)\n", hFile, FileInformationClass, lpFileInformation, dwBufferSize);
 
+    IO_STATUS_BLOCK ioStatusBlock;
+    NTSTATUS status;
+    BOOL success = FALSE;
+
     // Validate parameters.
     if (hFile == INVALID_HANDLE_VALUE || lpFileInformation == NULL)
     {
@@ -208,6 +212,12 @@ WINBOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLAS
         SetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
     }
+
+    // Map Win32 file information class to NT file information class
+    // and prepare the appropriate structure
+    PVOID ntBuffer = NULL;
+    ULONG ntBufferSize = 0;
+    FILE_INFORMATION_CLASS ntInfoClass;
 
     switch (FileInformationClass)
     {
@@ -219,21 +229,26 @@ WINBOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLAS
             SetLastError(ERROR_INSUFFICIENT_BUFFER);
             return FALSE;
         }
-        PFILE_BASIC_INFO pBasicInfo = (PFILE_BASIC_INFO)lpFileInformation;
-        // Update file times using SetFileTime.
-        // Note: SetFileTime only allows updating Creation, LastAccess, and LastWrite times.
-        if (!SetFileTime(
-                hFile,
-                (const FILETIME *)&pBasicInfo->CreationTime,
-                (const FILETIME *)&pBasicInfo->LastAccessTime,
-                (const FILETIME *)&pBasicInfo->LastWriteTime))
+
+        PFILE_BASIC_INFO win32BasicInfo = (PFILE_BASIC_INFO)lpFileInformation;
+        PFILE_BASIC_INFORMATION ntBasicInfo;
+
+        ntBufferSize = sizeof(FILE_BASIC_INFORMATION);
+        if (!(ntBuffer = malloc(ntBufferSize)))
         {
-            // If SetFileTime fails, it sets the proper error code.
-            TRACE(L"SetFileInformationByHandle[FileBasicInfo]->SetFileTime Failed (%d)\n", GetLastError());
+            SetLastError(ERROR_OUTOFMEMORY);
             return FALSE;
         }
-        // Note: pBasicInfo->ChangeTime and pBasicInfo->FileAttributes are not supported.
-        return TRUE;
+
+        ntBasicInfo = (PFILE_BASIC_INFORMATION)ntBuffer;
+        ntBasicInfo->CreationTime = win32BasicInfo->CreationTime;
+        ntBasicInfo->LastAccessTime = win32BasicInfo->LastAccessTime;
+        ntBasicInfo->LastWriteTime = win32BasicInfo->LastWriteTime;
+        ntBasicInfo->ChangeTime = win32BasicInfo->ChangeTime;
+        ntBasicInfo->FileAttributes = win32BasicInfo->FileAttributes;
+
+        ntInfoClass = FileBasicInformation;
+        break;
     }
     case FileRenameInfo:
     case FileRenameInfoEx:
@@ -245,80 +260,98 @@ WINBOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLAS
             return FALSE;
         }
 
-        UNICODE_STRING NtPathName = {0, 0, 0};
-        FILE_RENAME_INFO *pInputRenameInfo = (FILE_RENAME_INFO *)lpFileInformation;
-        PFILE_RENAME_INFO pRename = (PFILE_RENAME_INFO)lpFileInformation;
+        UNICODE_STRING ntPath;
+        PFILE_RENAME_INFO win32RenameInfo = (PFILE_RENAME_INFO)lpFileInformation;
 
-        // Only support RootDirectory == NULL.
-        if (pRename->RootDirectory != NULL)
+        // Convert the DOS path to an NT native path.
+        if (!RtlDosPathNameToNtPathName_U(win32RenameInfo->FileName, &ntPath, NULL, NULL))
         {
-            TRACE(L"SetFileInformationByHandle[FileRenameInfo]: pRename->RootDirectory != NULL\n");
-            SetLastError(ERROR_NOT_SUPPORTED);
+            TRACE(L"RtlDosPathNameToNtPathName_U failed\n");
+            SetLastError(ERROR_INVALID_PARAMETER);
             return FALSE;
         }
+        // Print the converted NT path.
+        TRACE(L"NT Path: [%ls]\n", ntPath.Buffer);
 
-        NtPathName.MaximumLength = (USHORT)pInputRenameInfo->FileNameLength;
-        NtPathName.Length = (USHORT)pInputRenameInfo->FileNameLength;
-        NtPathName.Buffer = pInputRenameInfo->FileName;
+        // Map FileRenameInfo to FileRenameInformation
+        PFILE_RENAME_INFORMATION ntRenameInfo;
 
-        ULONG size = (NtPathName.Length * sizeof(wchar_t)) + sizeof(FILE_RENAME_INFO);
-        FILE_RENAME_INFO *RenameBuffer = malloc(size);
-        if (!RenameBuffer)
+        // Calculate the NT buffer size
+        ntBufferSize = sizeof(FILE_RENAME_INFORMATION) - sizeof(wchar_t) + ntPath.Length;
+        if (!(ntBuffer = malloc(ntBufferSize)))
         {
-            TRACE(L"SetFileInformationByHandle[FileRenameInfo]: ERROR_OUTOFMEMORY\n");
             SetLastError(ERROR_OUTOFMEMORY);
             return FALSE;
         }
 
-        memcpy(RenameBuffer->FileName, NtPathName.Buffer, NtPathName.Length * sizeof(wchar_t));
-        RenameBuffer->FileName[NtPathName.Length] = L'\0';
+        ntRenameInfo = (PFILE_RENAME_INFORMATION)ntBuffer;
+        ntRenameInfo->ReplaceIfExists = win32RenameInfo->ReplaceIfExists;
+        ntRenameInfo->RootDirectory = win32RenameInfo->RootDirectory;
+        ntRenameInfo->FileNameLength = ntPath.Length;
+        memcpy(ntRenameInfo->FileName, ntPath.Buffer, ntPath.Length);
 
-        wchar_t sourcePath[MAX_PATH];
-        GetFinalPathNameByHandleW(hFile, sourcePath, MAX_PATH, 0);
-        TRACE(L"[%ls] -> [%ls]\n", sourcePath, RenameBuffer->FileName);
-
-#if 1
-        DWORD moveFlags = 0;
-        if (pRename->ReplaceIfExists)
-            moveFlags |= MOVEFILE_REPLACE_EXISTING;
-
-        BOOL result = MoveFileExW(sourcePath, RenameBuffer->FileName, moveFlags);
-        free(RenameBuffer);
-        return result;
-#else
-        RenameBuffer->ReplaceIfExists = pInputRenameInfo->ReplaceIfExists;
-        RenameBuffer->RootDirectory = pInputRenameInfo->RootDirectory;
-        RenameBuffer->FileNameLength = NtPathName.Length;
-        IO_STATUS_BLOCK IoStatusBlock;
-
-        // 0xc0000033 STATUS_OBJECT_NAME_INVALID
-        // 0xc00000cb on wine
-        // SHARING VIOLATION on ProcMon
-        TRACE(L"RenameBuffer->FileName -> %ls\n", RenameBuffer->FileName);
-        NTSTATUS ntRes = NtSetInformationFile(hFile,
-                                              &IoStatusBlock,
-                                              RenameBuffer,
-                                              size,
-                                              FileRenameInformation);
-
-        if (NtPathName.Buffer != pInputRenameInfo->FileName)
-            free(NtPathName.Buffer);
-
-        if (!NT_SUCCESS(ntRes))
+        ntInfoClass = FileRenameInformation;
+        break;
+    }
+    case FileDispositionInfo:
+    {
+        if (dwBufferSize < sizeof(FILE_DISPOSITION_INFORMATION))
         {
-            TRACE(L"SetFileInformationByHandle[FileRenameInfo]: NtSetInformationFile failed (0x%08x)\n", ntRes);
-            SetLastError(RtlNtStatusToDosError(ntRes));
+            TRACE(L"SetFileInformationByHandle[FileRenameInfo]: ERROR_INSUFFICIENT_BUFFER\n");
+            SetLastError(ERROR_INSUFFICIENT_BUFFER);
             return FALSE;
         }
 
-        return TRUE;
-#endif
+        // Map FileDispositionInfo to FileDispositionInformation
+        PFILE_DISPOSITION_INFO win32DispInfo = (PFILE_DISPOSITION_INFO)lpFileInformation;
+        PFILE_DISPOSITION_INFORMATION ntDispInfo;
+
+        ntBufferSize = sizeof(FILE_DISPOSITION_INFORMATION);
+        if (!(ntBuffer = malloc(ntBufferSize)))
+        {
+            SetLastError(ERROR_OUTOFMEMORY);
+            return FALSE;
+        }
+
+        ntDispInfo = (PFILE_DISPOSITION_INFORMATION)ntBuffer;
+        ntDispInfo->DoDeleteFile = win32DispInfo->DeleteFile;
+
+        ntInfoClass = FileDispositionInformation;
+        break;
     }
     default:
         TRACE(L"SetFileInformationByHandle: Unsupported FileInformationClass %d\n", FileInformationClass);
         SetLastError(ERROR_NOT_SUPPORTED);
         return FALSE;
     }
+
+    // Call NtSetInformationFile with the prepared NT structures
+    status = NtSetInformationFile(
+        hFile,
+        &ioStatusBlock,
+        ntBuffer,
+        ntBufferSize,
+        ntInfoClass);
+
+    // Convert NT status to Win32 error and set return value
+    if (NT_SUCCESS(status))
+    {
+        TRACE(L"SetFileInformationByHandle -> NtSetInformationFile OK\n");
+        success = TRUE;
+    }
+    else
+    {
+        // Convert NTSTATUS to Win32 error code
+        TRACE(L"SetFileInformationByHandle -> NtSetInformationFile failed: 0x%08lx (%ld)\n", status, RtlNtStatusToDosError(status));
+        SetLastError(RtlNtStatusToDosError(status));
+        success = FALSE;
+    }
+
+    // Clean up
+    if (ntBuffer)
+        free(ntBuffer);
+
+    return success;
 }
 
 // https://github.com/zeroclear/xpext/blob/master/xpext_ver4/k32_file.cpp#L445
