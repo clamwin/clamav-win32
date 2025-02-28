@@ -408,7 +408,7 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
     // pointer refs for readability
     wchar_t *deviceName = nameMnt.TargetName.DeviceName;
     wchar_t *fileName = nameRel.NameInfo.FileName;
-    wchar_t targetPath[MAX_PATH + 1];
+    wchar_t targetPath[MAX_PATH + 1] = {0};
 
     // Get object name information (full NT path)
     status = NtQueryObject(hFile, ObjectNameInformation, nameFull.Buffer, sizeof(nameFull.Buffer), NULL);
@@ -474,7 +474,8 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
         if (success && nameMnt.TargetPaths.MultiSzLength > 0)
         {
             TRACE(L"Resolved via MountMgr: %ls\n", targetPath);
-            wcsncpy(targetPath, nameMnt.TargetPaths.MultiSz, nameMnt.TargetPaths.MultiSzLength);
+            wcsncpy(targetPath, L"\\\\?\\", 4);
+            wcsncat(targetPath, nameMnt.TargetPaths.MultiSz, nameMnt.TargetPaths.MultiSzLength);
             wcsncat(targetPath, fileName, nameLength);
             requiredLength = wcslen(targetPath);
         }
