@@ -229,8 +229,16 @@ static inline int inl_listen(SOCKET sockfd, int backlog)
 }
 #define listen inl_listen
 
-/* #define ntohl() */
-/* #define ntohs() */
+#if !defined(SSIZE_T_DEFINED) && !defined(_SSIZE_T_DEFINED)
+#if defined(_MSC_VER)
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+#else
+typedef int ssize_t;
+#endif
+#define SSIZE_T_DEFINED
+#define _SSIZE_T_DEFINED
+#endif
 
 static inline ssize_t inl_recv(SOCKET s, void *buf, size_t len, int flags)
 {

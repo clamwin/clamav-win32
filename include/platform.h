@@ -118,10 +118,6 @@ extern int __cdecl fseeko64(FILE* stream, off64_t offset, int whence);
 #define MAX(a,b) (((a) > (b)) ? (a) : (b))
 #endif
 
-#ifdef OUT
-#undef OUT
-#endif
-
 typedef unsigned short in_port_t;
 typedef unsigned int in_addr_t;
 
