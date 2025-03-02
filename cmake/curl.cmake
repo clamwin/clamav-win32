@@ -10,6 +10,7 @@ target_include_directories(curl PRIVATE
 )
 
 target_compile_definitions(curl PRIVATE
+    CURL_DISABLE_DEPRECATION
     BUILDING_LIBCURL
     CURL_STATICLIB
 
