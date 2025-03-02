@@ -22,6 +22,7 @@ typedef struct _THREAD_BASIC_INFORMATION
 } THREAD_BASIC_INFORMATION, *PTHREAD_BASIC_INFORMATION;
 
 #define GetLargePageMinimum() 0
+#define EnumProcessModulesEx(p, m, cb, n, f) EnumProcessModules(p, m, cb, n)
 
 static inline DWORD GetFinalPathNameByHandleW_winxp(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags)
 {

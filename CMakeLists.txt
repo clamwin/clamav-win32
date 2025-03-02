@@ -1,6 +1,14 @@
 cmake_minimum_required (VERSION 3.14)
 project(clamav-win32 VERSION "1.4.2")
 
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set (CLAMAV_ARCH x64)
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    set (CLAMAV_ARCH x86)
+else()
+    message(FATAL_ERROR "WTF")
+endif()
+
 set(CLAMWIN_DIR ${CMAKE_SOURCE_DIR})
 set(CLAMAV_DIR ${CLAMWIN_DIR}/clamav)
 set(3RDPARTY_DIR ${CLAMWIN_DIR}/3rdparty)
@@ -73,7 +81,8 @@ set(CLAMWIN_DEFINES
 
 configure_file(libclamav.def ${CMAKE_BINARY_DIR}/libclamav.def @ONLY)
 
-if(MSVC)
+if((MSVC) OR (CLAMAV_ARCH STREQUAL x64))
+    set(WITH_WINPTHREADS TRUE)
     set(WINPTHREADS_DIR ${3RDPARTY_DIR}/mingw-w64/mingw-w64-libraries/winpthreads)
     list(APPEND CLAMWIN_INCLUDES ${WINPTHREADS_DIR}/include)
     file(READ winpthreads.def WINPTHREADS_CONTENT)
@@ -86,7 +95,6 @@ else()
     list(APPEND CLAMWIN_DEFINES _WIN32_WINNT=_WIN32_WINNT_VISTA)
 endif()
 
-configure_file(${CLAMAV_DIR}/target.h.cmake.in ${CMAKE_BINARY_DIR}/target.h)
 configure_file(${CLAMAV_DIR}/clamav-version.h.in ${CMAKE_BINARY_DIR}/clamav-version.h)
 
 if(MINGW)
@@ -101,14 +109,6 @@ elseif(MSVC)
     add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
     add_compile_options($<$<COMPILE_LANGUAGE:C>:/MP$<SEMICOLON>/wd4996$<SEMICOLON>/wd4005>)
     add_compile_options($<$<COMPILE_LANGUAGE:CXX>:/MP$<SEMICOLON>/wd4996$<SEMICOLON>/wd4005>)
-endif()
-
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set (CLAMAV_ARCH x64)
-elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-    set (CLAMAV_ARCH x86)
-else()
-    message(FATAL_ERROR "WTF")
 endif()
 
 if(ENABLE_LLVM)

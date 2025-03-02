@@ -194,6 +194,7 @@ target_include_directories(llvm PRIVATE
 if(WINXP)
     target_compile_definitions(llvm PRIVATE PSAPI_VERSION=1)
     set_source_files_properties(
+        ${LLVM_DIR}/lib/Support/DynamicLibrary.cpp
         ${LLVM_DIR}/lib/Support/Memory.cpp
         ${LLVM_DIR}/lib/Support/Path.cpp
         ${LLVM_DIR}/lib/Support/Signals.cpp
