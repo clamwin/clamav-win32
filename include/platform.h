@@ -59,7 +59,8 @@ int dn_expand(unsigned char *msg, unsigned char *eomorig, unsigned char *comp_dn
 #endif
 
 #ifndef PATH_MAX
-#define PATH_MAX 260 // 32767
+// TODO: 32767
+#define PATH_MAX 260
 #endif
 #define WORDS_BIGENDIAN 0
 #define EAI_SYSTEM 0
@@ -67,6 +68,8 @@ int dn_expand(unsigned char *msg, unsigned char *eomorig, unsigned char *comp_dn
 #if _WIN32_WINNT < _WIN32_WINNT_VISTA
 DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 #endif
+
+#define difftime(time_end, time_beg) ((double)(time_end - time_beg))
 
 /* <strings.h> */
 #define strcasecmp _stricmp
