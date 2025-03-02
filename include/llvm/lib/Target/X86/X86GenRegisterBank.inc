@@ -10,9 +10,10 @@
 #undef GET_REGBANK_DECLARATIONS
 namespace llvm {
 namespace X86 {
-enum {
-  GPRRegBankID,
-  VECRRegBankID,
+enum : unsigned {
+  InvalidRegBankID = ~0u,
+  GPRRegBankID = 0,
+  VECRRegBankID = 1,
   NumRegisterBanks,
 };
 } // end namespace X86
@@ -40,20 +41,17 @@ const uint32_t GPRRegBankCoverageData[] = {
     (1u << (X86::LOW32_ADDR_ACCESS_RBPRegClassID - 0)) |
     (1u << (X86::LOW32_ADDR_ACCESSRegClassID - 0)) |
     (1u << (X86::LOW32_ADDR_ACCESS_RBP_with_sub_8bitRegClassID - 0)) |
-    (1u << (X86::GR32RegClassID - 0)) |
-    (1u << (X86::GR32_NOSPRegClassID - 0)) |
     (1u << (X86::GR8_NOREXRegClassID - 0)) |
     (1u << (X86::GR8_ABCD_HRegClassID - 0)) |
     (1u << (X86::GR8_ABCD_LRegClassID - 0)) |
     (1u << (X86::GR16_NOREXRegClassID - 0)) |
     (1u << (X86::GR16_ABCDRegClassID - 0)) |
-    (1u << (X86::LOW32_ADDR_ACCESS_RBP_with_sub_16bit_in_GR16_NOREXRegClassID - 0)) |
-    (1u << (X86::GR32_NOREXRegClassID - 0)) |
     0,
     // 32-63
-    (1u << (X86::GR64RegClassID - 32)) |
-    (1u << (X86::GR64_with_sub_8bitRegClassID - 32)) |
-    (1u << (X86::GR64_NOSPRegClassID - 32)) |
+    (1u << (X86::GR32RegClassID - 32)) |
+    (1u << (X86::GR32_NOSPRegClassID - 32)) |
+    (1u << (X86::LOW32_ADDR_ACCESS_RBP_with_sub_16bit_in_GR16_NOREXRegClassID - 32)) |
+    (1u << (X86::GR32_NOREXRegClassID - 32)) |
     (1u << (X86::GR32_NOREX_NOSPRegClassID - 32)) |
     (1u << (X86::GR32_ABCDRegClassID - 32)) |
     (1u << (X86::GR32_TCRegClassID - 32)) |
@@ -74,19 +72,17 @@ const uint32_t GPRRegBankCoverageData[] = {
     (1u << (X86::GR32_BPSP_and_GR32_TCRegClassID - 32)) |
     0,
     // 64-95
+    (1u << (X86::GR64RegClassID - 64)) |
+    (1u << (X86::GR64_with_sub_8bitRegClassID - 64)) |
+    (1u << (X86::GR64_NOSPRegClassID - 64)) |
     (1u << (X86::GR64_NOSP_and_GR64_TCRegClassID - 64)) |
     (1u << (X86::GR64_TC_and_GR64_NOSP_and_GR64_TCW64RegClassID - 64)) |
     (1u << (X86::GR64_with_sub_32bit_in_GR32_ABCD_and_GR32_TCRegClassID - 64)) |
     (1u << (X86::GR64_ADRegClassID - 64)) |
-    (1u << (X86::GR64_with_sub_32bit_in_GR32_DCRegClassID - 64)) |
     (1u << (X86::GR64_NOREX_NOSP_and_GR64_TCRegClassID - 64)) |
-    (1u << (X86::GR64_with_sub_32bit_in_GR32_SIDIRegClassID - 64)) |
     (1u << (X86::GR64_NOREX_NOSPRegClassID - 64)) |
     (1u << (X86::GR64_ABCDRegClassID - 64)) |
-    (1u << (X86::GR64_with_sub_32bit_in_GR32_CBRegClassID - 64)) |
-    (1u << (X86::GR64_with_sub_32bit_in_GR32_ABCD_and_GR32_BSIRegClassID - 64)) |
     (1u << (X86::GR64_with_sub_32bit_in_GR32_BSIRegClassID - 64)) |
-    (1u << (X86::GR64_with_sub_32bit_in_GR32_DIBPRegClassID - 64)) |
     (1u << (X86::GR64_NOSP_and_GR64_TCW64RegClassID - 64)) |
     (1u << (X86::GR64_TC_with_sub_8bitRegClassID - 64)) |
     (1u << (X86::GR64_TCW64_and_GR64_TC_with_sub_8bitRegClassID - 64)) |
@@ -98,7 +94,6 @@ const uint32_t GPRRegBankCoverageData[] = {
     (1u << (X86::GR64_TCRegClassID - 64)) |
     (1u << (X86::GR64_TC_and_GR64_TCW64RegClassID - 64)) |
     (1u << (X86::GR64_NOREX_and_GR64_TCW64RegClassID - 64)) |
-    (1u << (X86::GR64_and_LOW32_ADDR_ACCESSRegClassID - 64)) |
     (1u << (X86::GR64_NOREX_and_GR64_TCRegClassID - 64)) |
     (1u << (X86::GR64_NOREXRegClassID - 64)) |
     (1u << (X86::GR64_and_LOW32_ADDR_ACCESS_RBPRegClassID - 64)) |
@@ -106,42 +101,42 @@ const uint32_t GPRRegBankCoverageData[] = {
     0,
     // 96-127
     (1u << (X86::GR64_with_sub_32bit_in_GR32_AD_and_GR32_DCRegClassID - 96)) |
+    (1u << (X86::GR64_with_sub_32bit_in_GR32_DCRegClassID - 96)) |
     (1u << (X86::GR64_with_sub_32bit_in_GR32_CB_and_GR32_DCRegClassID - 96)) |
+    (1u << (X86::GR64_with_sub_32bit_in_GR32_SIDIRegClassID - 96)) |
     (1u << (X86::GR64_with_sub_32bit_in_GR32_BSI_and_GR32_SIDIRegClassID - 96)) |
     (1u << (X86::GR64_with_sub_32bit_in_GR32_DIBP_and_GR32_SIDIRegClassID - 96)) |
+    (1u << (X86::GR64_with_sub_32bit_in_GR32_CBRegClassID - 96)) |
+    (1u << (X86::GR64_with_sub_32bit_in_GR32_ABCD_and_GR32_BSIRegClassID - 96)) |
+    (1u << (X86::GR64_with_sub_32bit_in_GR32_DIBPRegClassID - 96)) |
     (1u << (X86::GR64_with_sub_32bit_in_GR32_BPSP_and_GR32_DIBPRegClassID - 96)) |
     (1u << (X86::GR64_with_sub_32bit_in_GR32_BPSP_and_GR32_TCRegClassID - 96)) |
+    (1u << (X86::GR64_and_LOW32_ADDR_ACCESSRegClassID - 96)) |
     0,
 };
 const uint32_t VECRRegBankCoverageData[] = {
     // 0-31
     (1u << (X86::FR32XRegClassID - 0)) |
-    (1u << (X86::FR32RegClassID - 0)) |
     0,
     // 32-63
-    (1u << (X86::FR64XRegClassID - 32)) |
-    (1u << (X86::FR64RegClassID - 32)) |
+    (1u << (X86::FR32RegClassID - 32)) |
     0,
     // 64-95
+    (1u << (X86::FR64XRegClassID - 64)) |
+    (1u << (X86::FR64RegClassID - 64)) |
     0,
     // 96-127
     (1u << (X86::VR512RegClassID - 96)) |
     (1u << (X86::VR128XRegClassID - 96)) |
     (1u << (X86::VR256XRegClassID - 96)) |
-    (1u << (X86::VR512_with_sub_xmm_in_FR32RegClassID - 96)) |
+    (1u << (X86::VR512_0_15RegClassID - 96)) |
     (1u << (X86::VR128RegClassID - 96)) |
     (1u << (X86::VR256RegClassID - 96)) |
-    (1u << (X86::VR512_with_sub_xmm_in_VR128HRegClassID - 96)) |
-    (1u << (X86::VR128HRegClassID - 96)) |
-    (1u << (X86::VR256HRegClassID - 96)) |
-    (1u << (X86::VR512_with_sub_xmm_in_VR128LRegClassID - 96)) |
-    (1u << (X86::VR128LRegClassID - 96)) |
-    (1u << (X86::VR256LRegClassID - 96)) |
     0,
 };
 
-RegisterBank GPRRegBank(/* ID */ X86::GPRRegBankID, /* Name */ "GPR", /* Size */ 64, /* CoveredRegClasses */ GPRRegBankCoverageData, /* NumRegClasses */ 118);
-RegisterBank VECRRegBank(/* ID */ X86::VECRRegBankID, /* Name */ "VECR", /* Size */ 512, /* CoveredRegClasses */ VECRRegBankCoverageData, /* NumRegClasses */ 118);
+RegisterBank GPRRegBank(/* ID */ X86::GPRRegBankID, /* Name */ "GPR", /* Size */ 64, /* CoveredRegClasses */ GPRRegBankCoverageData, /* NumRegClasses */ 119);
+RegisterBank VECRRegBank(/* ID */ X86::VECRRegBankID, /* Name */ "VECR", /* Size */ 512, /* CoveredRegClasses */ VECRRegBankCoverageData, /* NumRegClasses */ 119);
 } // end namespace X86
 
 RegisterBank *X86GenRegisterBankInfo::RegBanks[] = {

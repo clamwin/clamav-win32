@@ -100,7 +100,7 @@ if (NOT WINXP)
 endif()
 
 if(ENABLE_LLVM)
-    target_compile_definitions(libclamav PRIVATE LLVM_VERSION=80)
+    target_compile_definitions(libclamav PRIVATE LLVM_VERSION=${LLVM_VERSION})
     target_include_directories(libclamav PRIVATE ${LLVM_DIR}/include)
     target_link_libraries(libclamav PRIVATE llvm)
     target_compile_options(libclamav PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/wd4141 /wd4146 /wd4244 /wd4291 /wd4624>)

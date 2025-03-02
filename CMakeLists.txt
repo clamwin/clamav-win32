@@ -107,6 +107,8 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set (CLAMAV_ARCH x64)
 elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
     set (CLAMAV_ARCH x86)
+else()
+    message(FATAL_ERROR "WTF")
 endif()
 
 if(ENABLE_LLVM)
