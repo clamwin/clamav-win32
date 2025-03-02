@@ -193,8 +193,12 @@ target_include_directories(llvm PRIVATE
 
 if(WINXP)
     target_compile_definitions(llvm PRIVATE PSAPI_VERSION=1)
-    set_source_files_properties(${LLVM_DIR}/lib/Support/Path.cpp PROPERTIES COMPILE_FLAGS "-include llvm-winxp.h")
-    set_source_files_properties(${LLVM_DIR}/lib/Support/Signals.cpp PROPERTIES COMPILE_FLAGS "-include llvm-winxp.h")
+    set_source_files_properties(
+        ${LLVM_DIR}/lib/Support/Memory.cpp
+        ${LLVM_DIR}/lib/Support/Path.cpp
+        ${LLVM_DIR}/lib/Support/Signals.cpp
+        ${LLVM_DIR}/lib/Support/Threading.cpp
+        PROPERTIES COMPILE_FLAGS "-include llvm-winxp.h")
 endif()
 
 target_compile_options(llvm PRIVATE
