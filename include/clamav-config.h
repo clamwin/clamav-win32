@@ -560,6 +560,7 @@
 /* #define inline inline */
 #endif
 
+#ifndef __cplusplus
 /* Define to `int' if <sys/types.h> does not define. */
 #if !defined(SSIZE_T_DEFINED) && !defined(_SSIZE_T_DEFINED)
    #if defined(_MSC_VER)
@@ -570,6 +571,7 @@
    #endif
    # define SSIZE_T_DEFINED
    # define _SSIZE_T_DEFINED
+#endif
 #endif
 
 /* Define to `long int' if <sys/types.h> does not define. */
