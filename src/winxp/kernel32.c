@@ -106,11 +106,11 @@ WINBOOL WINAPI GetFileInformationByHandleEx(HANDLE hFile,
         }
 
         // Copy the time and attribute data from the handle information
-        pInfo->CreationTime = *(LARGE_INTEGER *)&fileInfo.ftCreationTime;
-        pInfo->LastAccessTime = *(LARGE_INTEGER *)&fileInfo.ftLastAccessTime;
-        pInfo->LastWriteTime = *(LARGE_INTEGER *)&fileInfo.ftLastWriteTime;
+        memcpy(&pInfo->CreationTime, &fileInfo.ftCreationTime, sizeof(pInfo->CreationTime));
+        memcpy(&pInfo->LastAccessTime, &fileInfo.ftLastAccessTime, sizeof(pInfo->LastAccessTime));
+        memcpy(&pInfo->LastWriteTime, &fileInfo.ftLastWriteTime, sizeof(pInfo->LastWriteTime));
         // Windows XP does not provide a ChangeTime; using LastWriteTime as a fallback
-        pInfo->ChangeTime = *(LARGE_INTEGER *)&fileInfo.ftLastWriteTime;
+        memcpy(&pInfo->ChangeTime, &fileInfo.ftLastWriteTime, sizeof(pInfo->ChangeTime));
         pInfo->FileAttributes = fileInfo.dwFileAttributes;
         return TRUE;
     }
