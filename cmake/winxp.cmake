@@ -43,29 +43,21 @@ target_compile_options(reopenfile PRIVATE -Wall)
 file(GLOB synchapi_sources
     ${CLAMWIN_DIR}/src/winxp/synchapi.c
     ${CLAMWIN_DIR}/resources/synchapi.rc
-)
-
-add_library(synchapi SHARED
     ${CLAMWIN_DIR}/src/winxp/synchapi.def
-    ${synchapi_sources}
 )
+add_library(synchapi SHARED ${synchapi_sources})
 target_compile_definitions(synchapi PRIVATE ${COMPAT_DEFINES})
-
 set_target_properties(synchapi PROPERTIES PREFIX "" OUTPUT_NAME api-ms-win-core-synch-l1-2-0)
 list(APPEND CLAMAV_INSTALL_TARGETS synchapi)
 
 file(GLOB bcryptprimitives_sources
     ${CLAMWIN_DIR}/src/winxp/bcryptprimitives.c
-)
-
-add_library(bcryptprimitives SHARED
+    ${CLAMWIN_DIR}/resources/bcryptprimitives.rc
     ${CLAMWIN_DIR}/src/winxp/bcryptprimitives.def
-    ${bcryptprimitives_sources}
 )
+add_library(bcryptprimitives SHARED ${bcryptprimitives_sources})
 target_compile_definitions(bcryptprimitives PRIVATE ${COMPAT_DEFINES})
-
 target_link_libraries(bcryptprimitives PRIVATE advapi32)
-
 set_target_properties(bcryptprimitives PROPERTIES PREFIX "" OUTPUT_NAME bcryptprimitives)
 list(APPEND CLAMAV_INSTALL_TARGETS bcryptprimitives)
 
