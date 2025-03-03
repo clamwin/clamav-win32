@@ -22,7 +22,7 @@ static inline int gettimeofday(struct timeval *tv, struct timezone *tz)
     tv->tv_usec = 1000 * timebuffer.millitm;
     return 0;
 }
-    
+
 static inline wchar_t *mb2wc(const char *mb)
 {
     wchar_t *wc;
