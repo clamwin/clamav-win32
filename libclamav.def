@@ -460,3 +460,11 @@ tcgetattr                                  @1262 NONAME
 tcsetattr                                  @1263 NONAME
 uncpath                                    @1264 NONAME
 w32_stat                                   @1265 NONAME
+cdiff_apply                                @1266 NONAME
+clrs_log_init                              @1267 NONAME
+evidence_free                              @1268 NONAME
+evidence_new                               @1269 NONAME
+ffierror_fmt                               @1270 NONAME
+ffierror_free                              @1271 NONAME
+fuzzy_hash_calculate_image                 @1272 NONAME
+script2cdiff                               @1273 NONAME

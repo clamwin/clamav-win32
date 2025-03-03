@@ -14,3 +14,13 @@ tcgetattr
 tcsetattr
 uncpath
 w32_stat
+
+; rust
+cdiff_apply
+clrs_log_init
+evidence_free
+evidence_new
+ffierror_fmt
+ffierror_free
+fuzzy_hash_calculate_image
+script2cdiff

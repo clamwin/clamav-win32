@@ -33,7 +33,6 @@ set_target_properties(libfreshclam PROPERTIES PREFIX "" OUTPUT_NAME libfreshclam
 target_include_directories(libfreshclam PRIVATE ${CLAMWIN_INCLUDES} ${3RDPARTY_DIR}/curl/include)
 target_compile_definitions(libfreshclam PRIVATE ${CLAMWIN_DEFINES} CURL_STATICLIB)
 target_link_libraries(libfreshclam PRIVATE
-    ClamAV::libclamav_rust
     libcurl_static
     zlib
     libclamav_common
