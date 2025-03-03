@@ -119,7 +119,6 @@ cli_bytevalue_describe
 __cli_strndup
 
 ; public
-;cl_engine_set_clcb_progress
 cl_always_gen_section_hash                  @1
 cl_countsigs
 cl_cvdfree
@@ -142,6 +141,7 @@ cl_engine_set_clcb_meta
 cl_engine_set_clcb_post_scan
 cl_engine_set_clcb_pre_cache
 cl_engine_set_clcb_pre_scan
+cl_engine_set_clcb_scan_progress
 cl_engine_set_clcb_sigload
 cl_engine_set_clcb_sigload_progress
 cl_engine_set_clcb_stats_add_sample
