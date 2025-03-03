@@ -784,16 +784,11 @@ WINBOOL WINAPI GetTimeZoneInformationForYear(
     if (pdtzi == NULL)
     {
         TIME_ZONE_INFORMATION tzi;
-        GetTimeZoneInformation(&tzi);
+        if (GetTimeZoneInformation(&tzi) == TIME_ZONE_ID_INVALID)
+            return FALSE;
+
         // Map the TIME_ZONE_INFORMATION fields into our dynamic structure.
-        memset(&dtziLocal, 0, sizeof(dtziLocal));
-        dtziLocal.Bias = tzi.Bias;
-        dtziLocal.StandardBias = tzi.StandardBias;
-        dtziLocal.DaylightBias = tzi.DaylightBias;
-        memcpy(dtziLocal.StandardName, tzi.StandardName, sizeof(dtziLocal.StandardName));
-        memcpy(dtziLocal.DaylightName, tzi.DaylightName, sizeof(dtziLocal.DaylightName));
-        dtziLocal.StandardDate = tzi.StandardDate;
-        dtziLocal.DaylightDate = tzi.DaylightDate;
+        memcpy(&dtziLocal, &tzi, sizeof(tzi));
         // For the dynamic fields not present in TIME_ZONE_INFORMATION, set defaults.
         dtziLocal.TimeZoneKeyName[0] = L'\0';
         dtziLocal.DynamicDaylightTimeDisabled = FALSE;
