@@ -21,7 +21,7 @@
 #include <windows.h>
 
 #if _WIN32_WINNT >= 0x0600
-#include "common/actions.c"
+#include "actions.c"
 #else
 
 #if HAVE_CONFIG_H
