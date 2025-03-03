@@ -574,69 +574,104 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
     return requiredLength;
 }
 
+#define VALID_FLAGS 0x5AFFB7
+
 WINBASEAPI HANDLE WINAPI ReOpenFile(
     HANDLE hOriginalFile,
     DWORD dwDesiredAccess,
     DWORD dwShareMode,
-    DWORD dwFlags)
+    DWORD dwFlagsAndAttributes)
 {
-    TRACE(L"ReOpenFile(0x%p, 0x%08x, 0x%08x, 0x%08x)\n", hOriginalFile, dwDesiredAccess, dwShareMode, dwFlags);
+    TRACE(L"ReOpenFile(0x%p, 0x%08x, 0x%08x, 0x%08x)\n", hOriginalFile, dwDesiredAccess, dwShareMode, dwFlagsAndAttributes);
 
-    // Validate the original handle.
-    if (hOriginalFile == INVALID_HANDLE_VALUE)
+    SECURITY_QUALITY_OF_SERVICE qos;
+    OBJECT_ATTRIBUTES ObjectAttributes;
+    UNICODE_STRING DestinationString = {0};
+    IO_STATUS_BLOCK IoStatusBlock;
+
+    if ((dwFlagsAndAttributes & VALID_FLAGS) != 0)
     {
-        SetLastError(ERROR_INVALID_HANDLE);
+        SetLastError(STATUS_INVALID_PARAMETER);
         return INVALID_HANDLE_VALUE;
     }
 
-    // Retrieve the file's final path.
-    WCHAR filePath[MAX_PATH] = {0};
-    DWORD ret = GetFinalPathNameByHandleW(hOriginalFile, filePath, MAX_PATH, VOLUME_NAME_DOS);
-    if (ret == 0 || ret > MAX_PATH)
+    ULONG CreateOptions = FILE_NON_DIRECTORY_FILE;
+
+    if ((dwFlagsAndAttributes & FILE_FLAG_WRITE_THROUGH) != 0)
+        CreateOptions |= FILE_WRITE_THROUGH;
+
+    if ((dwFlagsAndAttributes & FILE_FLAG_SEQUENTIAL_SCAN) != 0)
+        CreateOptions |= FILE_SEQUENTIAL_ONLY;
+
+    if ((dwFlagsAndAttributes & FILE_FLAG_RANDOM_ACCESS) != 0)
+        CreateOptions |= FILE_RANDOM_ACCESS;
+
+    if ((dwFlagsAndAttributes & FILE_FLAG_BACKUP_SEMANTICS) != 0)
+        CreateOptions |= FILE_OPEN_FOR_BACKUP_INTENT;
+
+    if ((dwFlagsAndAttributes & FILE_FLAG_OPEN_NO_RECALL) != 0)
+        CreateOptions |= FILE_OPEN_NO_RECALL;
+
+    if ((dwFlagsAndAttributes & FILE_FLAG_OPEN_REPARSE_POINT) != 0)
+        CreateOptions |= FILE_FLAG_OPEN_REPARSE_POINT;
+
+    if ((dwFlagsAndAttributes & FILE_FLAG_NO_BUFFERING) != 0)
+        CreateOptions |= FILE_NO_INTERMEDIATE_BUFFERING;
+
+    if ((dwFlagsAndAttributes & FILE_FLAG_OVERLAPPED) != 0)
+        CreateOptions |= FILE_SYNCHRONOUS_IO_NONALERT;
+
+    if ((dwFlagsAndAttributes & FILE_FLAG_DELETE_ON_CLOSE) != 0)
     {
-        // Could not retrieve the path.
-        return INVALID_HANDLE_VALUE;
+        CreateOptions |= FILE_DELETE_ON_CLOSE;
+        dwDesiredAccess |= DELETE;
     }
 
-    // Remove any "\\?\" prefix if present. CreateFileW cannot use paths with this prefix.
-    WCHAR *pPath = filePath;
-    if (wcsncmp(filePath, L"\\\\?\\", 4) == 0)
+    ULONG Attributes = 0;
+    if ((dwFlagsAndAttributes & FILE_FLAG_POSIX_SEMANTICS) == 0)
+        Attributes = OBJ_CASE_INSENSITIVE;
+
+    InitializeObjectAttributes(
+        &ObjectAttributes,
+        &DestinationString,
+        Attributes,
+        hOriginalFile,
+        0);
+
+    if (dwFlagsAndAttributes & SECURITY_SQOS_PRESENT)
     {
-        pPath += 4;
-        // Special handling for UNC paths: a UNC path may start as "\\?\UNC\server\share..."
-        if (wcsncmp(pPath, L"UNC\\", 4) == 0)
-        {
-            pPath += 3; // Skip "UNC"
-            // Prepend "\\" to form a standard UNC path.
-            WCHAR uncPath[MAX_PATH];
-            HRESULT hr = StringCchPrintfW(uncPath, MAX_PATH, L"\\\\%s", pPath);
-            if (FAILED(hr))
-            {
-                SetLastError(ERROR_INVALID_PARAMETER);
-                return INVALID_HANDLE_VALUE;
-            }
-            hr = StringCchCopyW(filePath, MAX_PATH, uncPath);
-            if (FAILED(hr))
-            {
-                SetLastError(ERROR_INVALID_PARAMETER);
-                return INVALID_HANDLE_VALUE;
-            }
-            pPath = filePath;
-        }
+        qos.Length = sizeof(qos);
+        qos.ImpersonationLevel = (dwFlagsAndAttributes >> 16) & 0x3;
+        qos.ContextTrackingMode = dwFlagsAndAttributes & SECURITY_CONTEXT_TRACKING ? SECURITY_DYNAMIC_TRACKING : SECURITY_STATIC_TRACKING;
+        qos.EffectiveOnly = (dwFlagsAndAttributes & SECURITY_EFFECTIVE_ONLY) != 0;
+        ObjectAttributes.SecurityQualityOfService = &qos;
     }
 
-    // Reopen the file using CreateFileW with the new parameters.
-    HANDLE hNew = CreateFileW(
-        pPath,
-        dwDesiredAccess,
-        dwShareMode,
-        NULL,          // default security attributes
-        OPEN_EXISTING, // file must exist
-        dwFlags,       // flags and attributes for the new handle
-        NULL           // no template file
+    HANDLE FileHandle;
+
+    NTSTATUS status = NtCreateFile(
+        &FileHandle,                                          // FileHandle
+        dwDesiredAccess | SYNCHRONIZE | FILE_READ_ATTRIBUTES, // DesiredAccess
+        &ObjectAttributes,                                    // ObjectAttributes
+        &IoStatusBlock,                                       // IoStatusBlock
+        0,                                                    // AllocationSize
+        0,                                                    // FileAttributes
+        dwShareMode,                                          // ShareAccess
+        FILE_OPEN,                                            // CreateDisposition
+        CreateOptions,                                        // CreateOptions
+        0,                                                    // EaBuffer
+        0                                                     // EaLength
     );
 
-    return hNew;
+    if (!NT_SUCCESS(status))
+    {
+        TRACE(L"ReOpenFile->NtCreateFile failed (0x%08x)\n", status);
+        SetLastError(RtlNtStatusToDosError(status));
+        return INVALID_HANDLE_VALUE;
+    }
+
+    SetLastError(0);
+    return FileHandle;
 }
 
 WINBASEAPI VOID WINAPI GetSystemTimePreciseAsFileTime(LPFILETIME lpSystemTimeAsFileTime)

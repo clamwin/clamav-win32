@@ -32,6 +32,12 @@ target_link_options(sfibh PRIVATE -municode)
 target_compile_definitions(sfibh PRIVATE ${COMPAT_DEFINES})
 target_compile_options(sfibh PRIVATE -Wall)
 
+add_executable(reopenfile ${CLAMWIN_DIR}/src/winxp/reopenfile.c)
+target_link_libraries(reopenfile PRIVATE clamav_compat ntdll)
+target_link_options(reopenfile PRIVATE -municode)
+target_compile_definitions(reopenfile PRIVATE ${COMPAT_DEFINES})
+target_compile_options(reopenfile PRIVATE -Wall)
+
 file(GLOB synchapi_sources
     ${CLAMWIN_DIR}/src/winxp/synchapi.c
     ${CLAMWIN_DIR}/resources/synchapi.rc
