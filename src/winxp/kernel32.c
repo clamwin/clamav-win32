@@ -365,6 +365,25 @@ union ANY_BUFFER
     WCHAR Buffer[USHRT_MAX];
 };
 
+static HANDLE hMountMgr = INVALID_HANDLE_VALUE;
+
+__attribute__((constructor)) static void open_mount_manager()
+{
+    hMountMgr = CreateFileW(
+        MOUNTMGR_DOS_DEVICE_NAME,
+        0,
+        FILE_SHARE_READ | FILE_SHARE_WRITE,
+        NULL, OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL);
+}
+
+__attribute__((destructor)) static void close_mount_manager()
+{
+    if (hMountMgr != INVALID_HANDLE_VALUE)
+        CloseHandle(hMountMgr);
+}
+
 /*
  * GetFinalPathNameByHandleW - Retrieves the final path for the specified file
  *
@@ -382,7 +401,6 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
     IO_STATUS_BLOCK iosb;
     DWORD requiredLength = 0;
     BOOL success = FALSE;
-    HANDLE hMountMgr = INVALID_HANDLE_VALUE;
 
     TRACE(L"GetFinalPathNameByHandleW(0x%p, 0x%p, %d, %d)\n", hFile, lpszFilePath, cchFilePath, dwFlags);
 
@@ -449,14 +467,6 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
     TRACE(L"fileName: [%ls]\n", fileName);
 
     // Try to resolve using MountMgr first
-    hMountMgr = CreateFileW(
-        MOUNTMGR_DOS_DEVICE_NAME,
-        0,
-        FILE_SHARE_READ | FILE_SHARE_WRITE,
-        NULL, OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL);
-
     if (hMountMgr != INVALID_HANDLE_VALUE)
     {
         DWORD bytesReturned = 0;

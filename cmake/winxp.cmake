@@ -1,13 +1,15 @@
 enable_language(C ASM)
 
-list(APPEND COMPAT_DEFINES
-    _WIN32_WINNT=_WIN32_WINNT_WINXP
-    #TRACE_COMPAT
-)
+list(APPEND COMPAT_DEFINES _WIN32_WINNT=_WIN32_WINNT_WINXP)
+option(WINXP_TRACE "Enable support for WINXP" OFF)
+
+if(WINXP_TRACE)
+    list(APPEND COMPAT_DEFINES TRACE_COMPAT)
+endif()
 
 file(GLOB clamav_compat_sources
     ${CLAMWIN_DIR}/src/winxp/stubs.c
-    ${CLAMWIN_DIR}/src/winxp/advapi32.c
+    ${CLAMWIN_DIR}/src/winxp/bcrypt.c
     ${CLAMWIN_DIR}/src/winxp/kernel32.c
     ${CLAMWIN_DIR}/src/winxp/runonce.c
     ${CLAMWIN_DIR}/src/winxp/shell32.c
