@@ -19,6 +19,7 @@ option(ENABLE_LLVM "Enable JIT using LLVM Engine" OFF)
 option(WINXP "Enable support for WINXP" OFF)
 
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Do not build shared libraries" FORCE)
+set(BUILD_STATIC_LIBS ON CACHE BOOL "Build static libraries" FORCE)
 
 include(${CLAMAV_DIR}/cmake/Version.cmake)
 

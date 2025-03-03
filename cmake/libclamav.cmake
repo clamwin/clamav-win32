@@ -40,7 +40,7 @@ list(APPEND libclamav_win32_sources ${CMAKE_BINARY_DIR}/libclamav.def)
 source_group("Win32 Files" FILES ${libclamav_win32_sources})
 
 if (WITH_WINPTHREADS)
-    message(STATUS "Bundling Winpthreads")
+    message(STATUS "Building Winpthreads")
     file(GLOB winpthreads_sources ${WINPTHREADS_DIR}/src/*.c)
     source_group("Winpthreads Files" FILES ${winpthreads_sources})
     list(APPEND libclamav_win32_sources ${winpthreads_sources})

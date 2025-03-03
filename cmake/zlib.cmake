@@ -5,6 +5,10 @@ set(ZLIB_ENABLE_TESTS OFF)
 set(ZLIBNG_ENABLE_TESTS OFF)
 set(WITH_GTEST OFF)
 
+if (MSVC)
+    set(HAVE_UNISTD_H 0)
+endif()
+
 add_subdirectory(${ZLIB_DIR})
 
 list(APPEND CLAMWIN_INCLUDES ${zlib_BINARY_DIR})
