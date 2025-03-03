@@ -6,3 +6,6 @@ list(TRANSFORM bzip2_sources PREPEND ${3RDPARTY_DIR}/bzip2/)
 add_library(bzip2 STATIC ${bzip2_headers} ${bzip2_sources})
 set_target_properties(bzip2 PROPERTIES OUTPUT_NAME bz2)
 target_compile_options(bzip2 PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4244 /wd4267>)
+
+list(APPEND CLAMWIN_INCLUDES ${3RDPARTY_DIR}/bzip2)
+list(APPEND CLAMWIN_LIBRARIES bzip2)

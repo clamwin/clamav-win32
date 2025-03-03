@@ -2,7 +2,7 @@ enable_language(C ASM)
 
 list(APPEND COMPAT_DEFINES
     _WIN32_WINNT=_WIN32_WINNT_WINXP
-    TRACE_COMPAT
+    #TRACE_COMPAT
 )
 
 file(GLOB clamav_compat_sources

@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 3.14)
 project(clamav-win32 VERSION "1.4.2")
 
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set (CLAMAV_ARCH x64)
 elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
@@ -15,6 +17,8 @@ set(3RDPARTY_DIR ${CLAMWIN_DIR}/3rdparty)
 
 option(ENABLE_LLVM "Enable JIT using LLVM Engine" ON)
 option(WINXP "Enable support for WINXP" OFF)
+
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Do not build shared libraries" FORCE)
 
 include(${CLAMAV_DIR}/cmake/Version.cmake)
 
@@ -49,26 +53,17 @@ add_custom_command(
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/genversion.py ${GIT_HEAD} ${BUILD_GRADLE}
 )
 
+set(CLAMWIN_LIBRARIES)
+
 set(CLAMWIN_INCLUDES
     ${CMAKE_BINARY_DIR}
     ${CLAMWIN_DIR}/include
-    ${CLAMWIN_DIR}/include/json-c
-    ${CLAMWIN_DIR}/include/libxml2
-    ${CLAMWIN_DIR}/include/pcre2
-    ${CLAMAV_DIR}
     ${CLAMAV_DIR}/common
     ${CLAMAV_DIR}/win32/compat
     ${CLAMAV_DIR}/libclamav
     ${CLAMAV_DIR}/libclamav_rust
     ${CLAMAV_DIR}/libclamunrar_iface
     ${CLAMAV_DIR}/libclammspack/mspack
-    ${3RDPARTY_DIR}
-    ${3RDPARTY_DIR}/zlib
-    ${3RDPARTY_DIR}/bzip2
-    ${3RDPARTY_DIR}/json-c
-    ${3RDPARTY_DIR}/libxml2/include
-    ${3RDPARTY_DIR}/openssl/include
-    ${3RDPARTY_DIR}/pcre2/src
 )
 
 set(CLAMWIN_DEFINES
@@ -121,6 +116,7 @@ else()
     message(STATUS "LLVM is DISABLED")
 endif()
 
+include(cmake/openssl.cmake)
 include(cmake/zlib.cmake)
 include(cmake/bzip2.cmake)
 include(cmake/pcre2.cmake)

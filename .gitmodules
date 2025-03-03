@@ -16,9 +16,6 @@
 [submodule "3rdparty/pcre2"]
 	path = 3rdparty/pcre2
 	url = https://github.com/PhilipHazel/pcre2.git
-[submodule "3rdparty/zlib"]
-	path = 3rdparty/zlib
-	url = https://github.com/madler/zlib.git
 [submodule "3rdparty/llvm-project"]
 	path = 3rdparty/llvm-project
 	url = https://github.com/llvm/llvm-project.git
@@ -29,3 +26,6 @@
 	path = clamav
 	url = ../clamav.git
 	branch = 1.4.2
+[submodule "3rdparty/zlib-ng"]
+	path = 3rdparty/zlib-ng
+	url = https://github.com/zlib-ng/zlib-ng.git

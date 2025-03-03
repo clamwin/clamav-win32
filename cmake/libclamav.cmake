@@ -1,23 +1,5 @@
 enable_language(C CXX ASM)
 
-if(MINGW)
-    set(OPENSSL_LIBRARY_PATH ${3RDPARTY_DIR}/openssl/lib/mingw/${CLAMAV_ARCH})
-elseif(MSVC)
-    set(OPENSSL_LIBRARY_PATH ${3RDPARTY_DIR}/openssl/lib/msvc/${CLAMAV_ARCH})
-else()
-    message(FATAL_ERROR "Unsupported compiler")
-endif()
-
-find_library(OPENSSL_SSL_LIBRARY
-    NAMES ssl libssl
-    HINTS ${OPENSSL_LIBRARY_PATH}
-)
-
-find_library(OPENSSL_CRYPTO_LIBRARY
-    NAMES crypto libcrypto
-    HINTS ${OPENSSL_LIBRARY_PATH}
-)
-
 file(GLOB libclamav_sources
     ${CLAMAV_DIR}/libclamav/*.c
     ${CLAMAV_DIR}/libclamav/7z/*.c
@@ -83,12 +65,7 @@ target_compile_options(libclamav PRIVATE
 )
 
 target_link_libraries(libclamav PRIVATE
-    zlib
-    bzip2
-    pcre2
-    json-c
-    libxml2
-    clammspack
+    ${CLAMWIN_LIBRARIES}
     ${OPENSSL_SSL_LIBRARY}
     ${OPENSSL_CRYPTO_LIBRARY}
     ws2_32

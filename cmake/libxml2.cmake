@@ -1,21 +1,14 @@
-file(GLOB_RECURSE libxml2_headers ${CLAMWIN_DIR}/include/libxml2/*.h)
+set(LIBXML2_DIR ${3RDPARTY_DIR}/libxml2)
 
-set(libxml2_sources
-    SAX.c entities.c encoding.c error.c parserInternals.c
-    parser.c tree.c hash.c list.c xmlIO.c xmlmemory.c uri.c
-    valid.c xlink.c HTMLparser.c HTMLtree.c debugXML.c xpath.c
-    xpointer.c xinclude.c nanohttp.c nanoftp.c
-    catalog.c globals.c threads.c c14n.c xmlstring.c buf.c
-    xmlregexp.c xmlschemas.c xmlschemastypes.c xmlunicode.c
-    xmlreader.c relaxng.c dict.c SAX2.c
-    xmlwriter.c legacy.c chvalid.c pattern.c xmlsave.c
-    xmlmodule.c schematron.c xzlib.c)
-list(TRANSFORM libxml2_sources PREPEND ${3RDPARTY_DIR}/libxml2/)
+set(LIBXML2_WITH_ICONV OFF)
+set(LIBXML2_WITH_PYTHON OFF)
+set(LIBXML2_WITH_MODULES OFF)
+set(LIBXML2_WITH_PROGRAMS OFF)
+set(LIBXML2_WITH_TESTS OFF)
 
-add_library(libxml2 STATIC ${libxml2_headers} ${libxml2_sources})
-set_target_properties(libxml2 PROPERTIES PREFIX "")
-target_include_directories(libxml2 PRIVATE ${CLAMWIN_DIR}/include/libxml2 ${3RDPARTY_DIR}/libxml2/include)
-target_compile_definitions(libxml2 PRIVATE LIBXML_STATIC LIBXML_STATIC_FOR_DLL)
-target_compile_options(libxml2 PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4244 /wd4267>)
+add_subdirectory(${LIBXML2_DIR})
 
-install(FILES ${3RDPARTY_DIR}/libxml2/Copyright DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME COPYING.libxml2)
+list(APPEND CLAMWIN_INCLUDES ${LIBXML2_DIR}/include)
+list(APPEND CLAMWIN_LIBRARIES LibXml2)
+
+install(FILES ${LIBXML2_DIR}/Copyright DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME COPYING.libxml2)

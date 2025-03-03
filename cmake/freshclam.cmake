@@ -1,4 +1,3 @@
-# libfreshclam
 include(cmake/curl.cmake)
 
 file(GLOB libfreshclam_headers ${CLAMAV_DIR}/libfreshclam/*.h)
@@ -35,7 +34,8 @@ target_include_directories(libfreshclam PRIVATE ${CLAMWIN_INCLUDES} ${3RDPARTY_D
 target_compile_definitions(libfreshclam PRIVATE ${CLAMWIN_DEFINES} CURL_STATICLIB)
 target_link_libraries(libfreshclam PRIVATE
     ClamAV::libclamav_rust
-    curl
+    libcurl_static
+    zlib
     libclamav_common
     libclamav
     crypt32

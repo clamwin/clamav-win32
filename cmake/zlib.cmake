@@ -1,13 +1,13 @@
-set(zlib_headers zconf.h zlib.h)
-list(TRANSFORM zlib_headers PREPEND ${3RDPARTY_DIR}/zlib/)
+set(ZLIB_DIR ${3RDPARTY_DIR}/zlib-ng)
 
-set(zlib_sources
-    adler32.c compress.c crc32.c
-    deflate.c gzlib.c gzread.c gzwrite.c
-    gzclose.c infback.c inffast.c inflate.c
-    inftrees.c trees.c uncompr.c zutil.c)
-list(TRANSFORM zlib_sources PREPEND ${3RDPARTY_DIR}/zlib/)
+set(ZLIB_COMPAT ON)
+set(ZLIB_ENABLE_TESTS OFF)
+set(ZLIBNG_ENABLE_TESTS OFF)
+set(WITH_GTEST OFF)
 
-add_library(zlib STATIC ${zlib_headers}     ${zlib_sources})
-set_target_properties(zlib PROPERTIES OUTPUT_NAME z)
-target_compile_options(zlib PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4267>)
+add_subdirectory(${ZLIB_DIR})
+
+list(APPEND CLAMWIN_INCLUDES ${zlib_BINARY_DIR})
+list(APPEND CLAMWIN_LIBRARIES zlib)
+
+install(FILES ${ZLIB_DIR}/LICENSE.md DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME LICENSE.zlib-ng.md)

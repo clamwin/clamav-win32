@@ -24,9 +24,4 @@ add_library(PDCurses STATIC ${pdcurses_headers} ${pdcurses_sources})
 target_include_directories(PDCurses PRIVATE ${PDCURSES})
 target_link_libraries(PDCurses winmm)
 
-if((MINGW) AND (CLAMAV_ARCH STREQUAL "x86"))
-    # 0x0400 is _WIN32_WINNT_NT4
-    target_compile_definitions(PDCurses PRIVATE WINVER=0x0400)
-endif()
-
 install(FILES ${PDCURSES}/README.md DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME PDCurses-README.md)
