@@ -479,8 +479,6 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
                                   &bytesReturned,
                                   NULL);
 
-        CloseHandle(hMountMgr);
-
         if (success && nameMnt.TargetPaths.MultiSzLength > 0)
         {
             TRACE(L"Resolved via MountMgr: %ls\n", targetPath);
