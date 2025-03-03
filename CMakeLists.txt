@@ -15,7 +15,7 @@ set(CLAMWIN_DIR ${CMAKE_SOURCE_DIR})
 set(CLAMAV_DIR ${CLAMWIN_DIR}/clamav)
 set(3RDPARTY_DIR ${CLAMWIN_DIR}/3rdparty)
 
-option(ENABLE_LLVM "Enable JIT using LLVM Engine" ON)
+option(ENABLE_LLVM "Enable JIT using LLVM Engine" OFF)
 option(WINXP "Enable support for WINXP" OFF)
 
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Do not build shared libraries" FORCE)
