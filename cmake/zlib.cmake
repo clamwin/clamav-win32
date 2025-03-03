@@ -9,7 +9,7 @@ if (MSVC)
     set(HAVE_UNISTD_H 0)
 endif()
 
-add_subdirectory(${ZLIB_DIR})
+add_subdirectory(${ZLIB_DIR} EXCLUDE_FROM_ALL)
 
 list(APPEND CLAMWIN_INCLUDES ${zlib_BINARY_DIR})
 list(APPEND CLAMWIN_LIBRARIES zlib)

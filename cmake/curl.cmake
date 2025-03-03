@@ -1,13 +1,18 @@
 set(CURL_DIR ${3RDPARTY_DIR}/curl)
 
-set(CURL_USE_LIBPSL OFF)
-set(ENABLE_UNICODE ON)
 set(HTTP_ONLY ON)
+
+set(ENABLE_UNICODE ON)
 set(CURL_DISABLE_KERBEROS_AUTH ON)
 set(CURL_DISABLE_AWS ON)
 set(CURL_DISABLE_WEBSOCKETS ON)
+
+set(USE_WIN32_IDN ON)
 set(USE_NGHTTP2 OFF)
 set(USE_NGTCP2 OFF)
+set(CURL_USE_OPENSSL OFF)
+set(CURL_USE_LIBPSL OFF)
+set(CURL_USE_LIBSSH2 OFF)
 
 set(ENABLE_CURL_MANUAL OFF)
 set(CURL_DISABLE_INSTALL ON)
@@ -20,12 +25,22 @@ set(BUILD_MISC_DOCS OFF)
 set(BUILD_EXAMPLES OFF)
 set(BUILD_TESTING OFF)
 
-if (MSVC)
+set(CURL_ZLIB ON)
+set(CURL_BROTLI OFF)
+set(CURL_ZSTD OFF)
+
+set(_ssl_enabled ON)
+set(USE_OPENSSL ON)
+set(HAVE_SSL_SET0_WBIO 1)
+set(HAVE_OPENSSL_SRP 1)
+
+if(MSVC)
     set(HAVE_SIZEOF_SSIZE_T FALSE)
 endif()
 
-add_subdirectory(${CURL_DIR})
+if(WINXP)
+    set(CURL_TARGET_WINDOWS_VERSION "0x0501" CACHE STRING "Minimum target Windows version as hex string")
+endif()
 
-# add zlib
-target_compile_definitions(libcurl_object PRIVATE HAVE_LIBZ=1)
-target_include_directories(libcurl_object PRIVATE ${zlib_BINARY_DIR})
+add_subdirectory(${CURL_DIR} EXCLUDE_FROM_ALL)
+target_include_directories(libcurl_object PRIVATE ${OPENSSL_INCLUDE_DIR})

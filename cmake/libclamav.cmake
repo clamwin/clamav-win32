@@ -73,10 +73,6 @@ target_link_libraries(libclamav PRIVATE
     clamav_rust
 )
 
-if (NOT WINXP)
-    target_link_libraries(libclamav PRIVATE bcrypt)
-endif()
-
 if(ENABLE_LLVM)
     target_compile_definitions(libclamav PRIVATE LLVM_VERSION=${LLVM_VERSION})
     target_include_directories(libclamav PRIVATE ${LLVM_DIR}/include)

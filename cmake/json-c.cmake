@@ -2,7 +2,7 @@ set(JSONC_DIR ${3RDPARTY_DIR}/json-c)
 
 set(BUILD_APPS OFF)
 set(BUILD_TESTING OFF)
-add_subdirectory(${JSONC_DIR})
+add_subdirectory(${JSONC_DIR} EXCLUDE_FROM_ALL)
 target_compile_options(json-c PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4244 /wd4267>)
 
 list(APPEND CLAMWIN_INCLUDES ${JSONC_DIR} ${json-c_BINARY_DIR})

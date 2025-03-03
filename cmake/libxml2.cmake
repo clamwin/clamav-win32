@@ -7,7 +7,7 @@ set(LIBXML2_WITH_PROGRAMS OFF)
 set(LIBXML2_WITH_TESTS OFF)
 set(LIBXML2_WITH_DEBUG OFF)
 
-add_subdirectory(${LIBXML2_DIR})
+add_subdirectory(${LIBXML2_DIR} EXCLUDE_FROM_ALL)
 target_compile_options(LibXml2 PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4244 /wd4267>)
 
 list(APPEND CLAMWIN_INCLUDES ${LIBXML2_DIR}/include)
