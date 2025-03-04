@@ -102,13 +102,11 @@ static void processattach(void)
        needed ones (I hope :D) */
     if (bIsWow64)
     {
-        /* winsock */
-        LoadLibrary("mswsock.dll");
-        LoadLibrary("winrnr.dll");
-        LoadLibrary("wshtcpip.dll");
-
-        /* wintrust for sigcheck */
-        LoadLibrary("rsaenh.dll");
+        LoadLibraryW(L"mswsock.dll");
+        LoadLibraryW(L"winrnr.dll");
+        LoadLibraryW(L"wshtcpip.dll");
+        LoadLibraryW(L"iphlpapi.dll");
+        LoadLibraryW(L"rsaenh.dll");
     }
 #endif
 }
