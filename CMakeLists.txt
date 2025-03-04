@@ -77,7 +77,7 @@ set(CLAMWIN_DEFINES
 
 configure_file(libclamav.def ${CMAKE_BINARY_DIR}/libclamav.def @ONLY)
 
-if((MSVC) OR (CLAMAV_ARCH STREQUAL x64))
+if(TRUE)
     set(WITH_WINPTHREADS TRUE)
     set(WINPTHREADS_DIR ${3RDPARTY_DIR}/mingw-w64/mingw-w64-libraries/winpthreads)
     list(APPEND CLAMWIN_INCLUDES ${WINPTHREADS_DIR}/include)
