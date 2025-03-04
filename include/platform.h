@@ -74,9 +74,6 @@ DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD 
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
 
-/* ctrl + c handler */
-extern BOOL WINAPI cw_stop_ctrl_handler(DWORD CtrlType);
-
 #define ftruncate _chsize
 extern char *strptime(const char *buf, const char *format, struct tm *tm);
 extern wchar_t* uncpath(const char* path);

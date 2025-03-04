@@ -3,7 +3,6 @@ file(GLOB clambc_sources ${CLAMAV_DIR}/clambc/*.c)
 set(clambc_win32_sources
     ${CLAMWIN_DIR}/src/helpers/cw_main.c
     ${CLAMWIN_DIR}/src/helpers/crashdump.c
-    ${CLAMWIN_DIR}/src/helpers/cw_sch.c
 )
 
 source_group("Win32 Files" FILES ${clambc_win32_sources})

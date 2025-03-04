@@ -42,9 +42,6 @@ int main(int argc, char* argv[])
         abort();
     }
 
-    //if (!SetConsoleCtrlHandler(cw_stop_ctrl_handler, TRUE))
-    //    fprintf(stderr, "[cw_main] Cannot install Console Ctrl Handler (%d)\n", GetLastError());
-
 #ifndef _WIN64
     disablefsredir();
 #endif

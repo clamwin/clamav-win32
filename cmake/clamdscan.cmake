@@ -5,7 +5,6 @@ file(GLOB clamdscan_sources ${CLAMAV_DIR}/clamdscan/*.c)
 set(clamdscan_win32_sources
     ${CLAMWIN_DIR}/src/helpers/cw_main.c
     ${CLAMWIN_DIR}/src/helpers/crashdump.c
-    ${CLAMWIN_DIR}/src/helpers/cw_sch.c
 )
 
 source_group("Win32 Files" FILES ${clamdscan_win32_sources})

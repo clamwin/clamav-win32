@@ -4,7 +4,6 @@ file(GLOB sigtool_sources ${CLAMAV_DIR}/sigtool/*.c)
 set(sigtool_win32_sources
     ${CLAMWIN_DIR}/src/helpers/cw_main.c
     ${CLAMWIN_DIR}/src/helpers/crashdump.c
-    ${CLAMWIN_DIR}/src/helpers/cw_sch.c
 )
 
 source_group("Win32 Files" FILES ${sigtool_win32_sources})

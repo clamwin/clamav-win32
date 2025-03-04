@@ -10,7 +10,6 @@ set(libfreshclam_sources
 
 set(libfreshclam_win32_sources
     ${CLAMAV_DIR}/win32/compat/resolv.c
-    ${CLAMWIN_DIR}/src/helpers/mprintf_disable.c
     ${CLAMWIN_DIR}/resources/libfreshclam.rc
 )
 
