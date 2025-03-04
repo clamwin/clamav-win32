@@ -44,7 +44,6 @@
 #include <io.h>
 
 #include "posix-errno.h"
-#include "safe_ctype.h"
 #include "cw_inline.h"
 #include "socket_inline.h"
 
