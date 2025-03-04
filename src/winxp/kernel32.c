@@ -376,12 +376,16 @@ __attribute__((constructor)) static void open_mount_manager()
         NULL, OPEN_EXISTING,
         FILE_ATTRIBUTE_NORMAL,
         NULL);
+    TRACE(L"MountMgr HANDLE: %p\n", hMountMgr);
 }
 
 __attribute__((destructor)) static void close_mount_manager()
 {
     if (hMountMgr != INVALID_HANDLE_VALUE)
+    {
         CloseHandle(hMountMgr);
+        TRACE(L"Closed MountMgr HANDLE\n");
+    }
 }
 
 /*
