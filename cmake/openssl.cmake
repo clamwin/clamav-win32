@@ -9,11 +9,13 @@ endif()
 find_library(OPENSSL_SSL_LIBRARY
     NAMES ssl libssl
     HINTS ${OPENSSL_ROOT_DIR}
+    REQUIRED
 )
 
 find_library(OPENSSL_CRYPTO_LIBRARY
     NAMES crypto libcrypto
     HINTS ${OPENSSL_ROOT_DIR}
+    REQUIRED
 )
 
 set(OPENSSL_INCLUDE_DIR ${3RDPARTY_DIR}/openssl/include)
