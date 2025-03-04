@@ -70,7 +70,7 @@ static void processattach(void)
     WSADATA wsaData;
 
 #ifndef _WIN64
-    HMODULE kernel32 = GetModuleHandleA("kernel32");
+    HMODULE kernel32 = GetModuleHandleW(L"kernel32");
     if (IMPORT_KERNEL32_FUNC(IsWow64Process))
     {
         if (!pIsWow64Process(GetCurrentProcess(), &bIsWow64))
