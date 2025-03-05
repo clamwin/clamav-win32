@@ -47,3 +47,5 @@ target_compile_definitions(libclamunrar_iface PRIVATE ${UNRAR_DEFINES})
 target_link_libraries(libclamunrar_iface PRIVATE libclamunrar)
 
 list(APPEND CLAMAV_INSTALL_TARGETS libclamunrar libclamunrar_iface)
+
+install(FILES ${CLAMAV_DIR}/libclamunrar/license.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME UnRAR.txt)

@@ -44,3 +44,5 @@ endif()
 
 add_subdirectory(${CURL_DIR} EXCLUDE_FROM_ALL)
 target_include_directories(libcurl_object PRIVATE ${OPENSSL_INCLUDE_DIR})
+
+install(FILES ${CURL_DIR}/COPYING DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME curl.txt)

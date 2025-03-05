@@ -206,3 +206,5 @@ target_compile_options(llvm PRIVATE
     $<$<AND:$<CXX_COMPILER_ID:GNU>,$<COMPILE_LANGUAGE:CXX>>:-Wno-deprecated-declarations -Wno-missing-template-keyword -Wno-init-list-lifetime>
     $<$<CXX_COMPILER_ID:MSVC>:/wd4141 /wd4146 /wd4244 /wd4267 /wd4291 /wd4319 /wd4624 /wd4805>
 )
+
+install(FILES ${LLVM_DIR}/LICENSE.TXT DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME llvm.txt)

@@ -44,7 +44,7 @@ if (WITH_WINPTHREADS)
     file(GLOB winpthreads_sources ${WINPTHREADS_DIR}/src/*.c)
     source_group("Winpthreads Files" FILES ${winpthreads_sources})
     list(APPEND libclamav_win32_sources ${winpthreads_sources})
-    install(FILES ${WINPTHREADS_DIR}/COPYING DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME COPYING.winpthreads)
+    install(FILES ${WINPTHREADS_DIR}/COPYING DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME winpthreads.txt)
 endif()
 
 add_library(libclamav SHARED
@@ -88,3 +88,5 @@ if(MSVC)
 endif()
 
 list(APPEND CLAMAV_INSTALL_TARGETS libclamav)
+
+install(FILES ${CLAMAV_DIR}/COPYING.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME clamav.txt)

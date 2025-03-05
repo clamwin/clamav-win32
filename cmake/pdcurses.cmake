@@ -24,4 +24,4 @@ add_library(PDCurses STATIC ${pdcurses_headers} ${pdcurses_sources})
 target_include_directories(PDCurses PRIVATE ${PDCURSES})
 target_link_libraries(PDCurses winmm)
 
-install(FILES ${PDCURSES}/README.md DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME PDCurses-README.md)
+install(FILES ${PDCURSES}/README.md DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME PDCurses.md)
