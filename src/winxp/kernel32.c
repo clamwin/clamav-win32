@@ -260,9 +260,9 @@ WINBOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLAS
             return FALSE;
         }
 
-        UNICODE_STRING ntPath;
         PFILE_RENAME_INFO win32RenameInfo = (PFILE_RENAME_INFO)lpFileInformation;
-
+#if 0
+        UNICODE_STRING ntPath;
         // Convert the DOS path to an NT native path.
         if (!RtlDosPathNameToNtPathName_U(win32RenameInfo->FileName, &ntPath, NULL, NULL))
         {
@@ -310,7 +310,9 @@ WINBOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLAS
         {
             TRACE(L"SetFileInformationByHandle -> NtSetInformationFile Rename failed: 0x%08lx (%ld)\n",
                   status, RtlNtStatusToDosError(status));
-
+#else
+        {
+#endif
             // try with RenameFileEx
             wchar_t sourcePath[MAX_PATH + 1];
 
