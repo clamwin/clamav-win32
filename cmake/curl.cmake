@@ -32,7 +32,7 @@ set(CURL_ZSTD OFF)
 set(_ssl_enabled ON)
 set(USE_OPENSSL ON)
 set(HAVE_SSL_SET0_WBIO 1)
-set(HAVE_OPENSSL_SRP 1)
+set(HAVE_OPENSSL_SRP 0)
 
 if(MSVC)
     set(HAVE_SIZEOF_SSIZE_T FALSE)
