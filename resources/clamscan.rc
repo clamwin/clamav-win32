@@ -1,4 +1,6 @@
 #define __MODULE__	"clamscan.exe"
 #define __ICON__	"clamav.ico"
 #include "clamav.rc"
+#ifndef _MSC_VER
 1 RT_MANIFEST "compatibility.manifest"
+#endif
