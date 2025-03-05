@@ -28,158 +28,136 @@
 #define MINDUMP_FLAGS (MINIDUMP_TYPE) \
     (MiniDumpWithDataSegs  | MiniDumpWithIndirectlyReferencedMemory | MiniDumpFilterModulePaths)
 typedef BOOL(WINAPI* pMiniDumpWriteDumpFunc)(HANDLE, DWORD, HANDLE, MINIDUMP_TYPE,
-    CONST PMINIDUMP_EXCEPTION_INFORMATION,
-    CONST PMINIDUMP_USER_STREAM_INFORMATION,
-    CONST PMINIDUMP_CALLBACK_INFORMATION);
-
-extern LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs);
-
-typedef struct _crashdata_t
-{
-    char filename[MAX_PATH];
-    EXCEPTION_POINTERS *pExPtrs;
-} crashdata_t;
+	CONST PMINIDUMP_EXCEPTION_INFORMATION,
+	CONST PMINIDUMP_USER_STREAM_INFORMATION,
+	CONST PMINIDUMP_CALLBACK_INFORMATION);
 
 DWORD WINAPI CrashMiniDumpWriteDumpProc(LPVOID lpParam)
 {
-    crashdata_t *cdata = (crashdata_t *) lpParam;
-    LONG retval = 1;
-    MINIDUMP_EXCEPTION_INFORMATION ExInfo;
-    pMiniDumpWriteDumpFunc pMiniDumpWriteDump = NULL;
-    HANDLE hFile = INVALID_HANDLE_VALUE;
-    HANDLE hMapFile = NULL;
-    LPBYTE lpMapAddress = NULL;
-    BY_HANDLE_FILE_INFORMATION FileInformation;
-    HMODULE hDll = NULL;
-    char dumpfile[MAX_PATH];
-    char executable[MAX_PATH] = "Unknown module";
-    char *lSlash;
-    unsigned int i;
+	PEXCEPTION_POINTERS pExPtrs = (PEXCEPTION_POINTERS)lpParam;
+	LONG retval = 1;
+	MINIDUMP_EXCEPTION_INFORMATION ExInfo;
+	pMiniDumpWriteDumpFunc pMiniDumpWriteDump = NULL;
+	HANDLE hFile = INVALID_HANDLE_VALUE;
+	HANDLE hMapFile = NULL;
+	LPBYTE lpMapAddress = NULL;
+	BY_HANDLE_FILE_INFORMATION FileInformation;
+	HMODULE hDll = NULL;
+	wchar_t dumpfile[MAX_PATH + 1] = { 0 };
+	wchar_t executable[MAX_PATH + 1] = L"Unknown module";
+	wchar_t* lSlash;
 
-    GetModuleFileNameA(NULL, executable, MAX_PATH - 1);
-    GetTempPathA(MAX_PATH - 1, dumpfile);
+	GetModuleFileNameW(NULL, executable, MAX_PATH);
+	GetTempPathW(MAX_PATH, dumpfile);
+	dumpfile[MAX_PATH] = L'\0';
 
-    lSlash = strrchr(executable, '\\');
-    snprintf(&dumpfile[strlen(dumpfile)], MAX_PATH - strlen(dumpfile) - 1, "%s.%08lx.dmp", lSlash ? lSlash + 1 : "Unknown", GetCurrentProcessId());
+	lSlash = wcsrchr(executable, L'\\');
+	size_t size = wcslen(dumpfile);
+	_snwprintf(&dumpfile[size], MAX_PATH - size, L"%s.%08lx.dmp", lSlash ? lSlash + 1 : L"Unknown", GetCurrentProcessId());
+	dumpfile[MAX_PATH - size - 1] = L'\0';
 
-    fprintf(stderr, "*** ClamWinDumper ***\n"
-                    "*** %s Crashed\n"
-                    "    ExpCode   : 0x%8.8x\n"
-                    "    ExpAddress: 0x%p\n",
-                    executable,
-                    cdata->pExPtrs->ExceptionRecord->ExceptionCode,
-                    cdata->pExPtrs->ExceptionRecord->ExceptionAddress);
+	fwprintf(stderr, L"*** ClamWinDumper ***\n"
+		L"*** %ls Crashed\n"
+		L"    ExpCode   : 0x%8.8x\n"
+		L"    ExpAddress: 0x%p\n",
+		executable,
+		pExPtrs->ExceptionRecord->ExceptionCode,
+		pExPtrs->ExceptionRecord->ExceptionAddress);
 
-    if (cdata->filename[0])
-        fprintf(stderr, "scanning: [%s]\n", cdata->filename);
+	/* Load the version provided by the environment */
+	if (!hDll)
+		hDll = LoadLibraryW(L"dbghelp.dll");
 
-    /* Try to get dll from executable directory, win2k dbghelp misses symbols */
-    if (lSlash)
-    {
-        strncpy(lSlash + 1, "dbghelp.dll", MAX_PATH - strlen(executable) - 1); // plus some chars but who cares
-        hDll = LoadLibraryA(executable);
-    }
+	if (!hDll)
+	{
+		fwprintf(stderr, L"[crashdump] Cannot find dbghelp.dll, I cannot produce a crash dump without\n");
+		return retval;
+	}
 
-    /* Load the version provided by the environment */
-    if (!hDll)
-        hDll = LoadLibraryA("dbghelp.dll");
+	pMiniDumpWriteDump = (pMiniDumpWriteDumpFunc)GetProcAddress(hDll, "MiniDumpWriteDump");
+	if (!pMiniDumpWriteDump)
+	{
+		fwprintf(stderr, L"[crashdump] Your dbghelp.dll does not export MiniDumpWriteDump\n");
+		goto cleanup;
+	}
 
-    if (!hDll)
-    {
-        fprintf(stderr, "[ClamWin] Cannot find dbghelp.dll, you cannot produce a crash dump without\n");
-        return retval;
-    }
+	hFile = CreateFileW(dumpfile, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
-    pMiniDumpWriteDump = (pMiniDumpWriteDumpFunc) GetProcAddress(hDll, "MiniDumpWriteDump");
-    if (!pMiniDumpWriteDump)
-    {
-        fprintf(stderr, "[ClamWin] Your dbghelp.dll is too old, put an updated version\n"
-                        "in the same directory of the executable\n");
-        goto cleanup;
-    }
+	if (hFile == INVALID_HANDLE_VALUE)
+	{
+		fwprintf(stderr, L"[crashdump] Cannot open file for writing (LE: %d)\n", GetLastError());
+		goto cleanup;
+	}
 
-    hFile = CreateFileA(dumpfile, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	ExInfo.ThreadId = GetCurrentThreadId();
+	ExInfo.ExceptionPointers = pExPtrs;
+	ExInfo.ClientPointers = FALSE;
 
-    if (hFile == INVALID_HANDLE_VALUE)
-    {
-        fprintf(stderr, "[ClamWin] Cannot open file for writing (LE: %d)\n", GetLastError());
-        goto cleanup;
-    }
+	if (!pMiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MINDUMP_FLAGS, &ExInfo, NULL, NULL))
+	{
+		fwprintf(stderr, L"[crashdump] MiniDumpWriteDump() failed (LE: %d)\n", GetLastError());
+		goto cleanup;
+	}
 
-    ExInfo.ThreadId = GetCurrentThreadId();
-    ExInfo.ExceptionPointers = cdata->pExPtrs;
-    ExInfo.ClientPointers = FALSE;
+#ifdef SCRAMBLE_CRASH_DUMP
+	/* Now scramble it by xor-ing with 42, to avoid false positives on the dump file */
+	hMapFile = CreateFileMappingW(hFile, NULL, PAGE_READWRITE, 0, 0, L"libClamAVDumper");
 
-    if (!pMiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MINDUMP_FLAGS, &ExInfo, NULL, NULL))
-    {
-        fprintf(stderr, "[ClamWin] MiniDumpWriteDump() failed (LE: %d)\n", GetLastError());
-        goto cleanup;
-    }
+	if (!hMapFile)
+	{
+		fwprintf(stderr, L"[crashdump] CreateFileMappingW() failed (LE: %d)\n", GetLastError());
+		goto cleanup;
+	}
 
-#if 0
-    /* Now scramble it by xor-ing with 42, to avoid false positives on the dump file */
-    hMapFile = CreateFileMappingA(hFile, NULL, PAGE_READWRITE, 0, 0, "libClamAVDumper");
+	lpMapAddress = (LPBYTE)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+	if (!lpMapAddress)
+	{
+		fwprintf(stderr, L"[crashdump] MapViewOfFile() failed (LE: %d)\n", GetLastError());
+		goto cleanup;
+	}
 
-    if (!hMapFile)
-    {
-        fprintf(stderr, "[ClamWin] CreateFileMappingA() on file failed (LE: %d)\n", GetLastError());
-        goto cleanup;
-    }
+	if (!GetFileInformationByHandle(hFile, &FileInformation))
+	{
+		fwprintf(stderr, L"[crashdump] GetFileInformationByHandle() failed (LE: %d)\n", GetLastError());
+		goto cleanup;
+	}
 
-    lpMapAddress = (LPBYTE) MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-    if (!lpMapAddress)
-    {
-        fprintf(stderr, "[ClamWin] MapViewOfFile() on file failed (LE: %d)\n", GetLastError());
-        goto cleanup;
-    }
+	for (int i = 0; i < FileInformation.nFileSizeLow; i++)
+		lpMapAddress[i] ^= 42;
 
-    if (!GetFileInformationByHandle(hFile, &FileInformation))
-    {
-        fprintf(stderr, "[ClamWin] GetFileInformationByHandle() on file failed (LE: %d)\n", GetLastError());
-        goto cleanup;
-    }
-
-    for (i = 0; i < FileInformation.nFileSizeLow; i++)
-        lpMapAddress[i] ^= 42;
-
-    FlushViewOfFile(lpMapAddress, 0);
+	FlushViewOfFile(lpMapAddress, 0);
 #endif
-    fprintf(stderr, "[ClamWin] Crash Dump saved as %s, please report\n", dumpfile);
-    retval = 0;
+	fwprintf(stderr, L"[crashdump] Crash Dump saved as %ls, please report\n", dumpfile);
+	retval = 0;
 
 cleanup:
-    if (lpMapAddress) UnmapViewOfFile(lpMapAddress);
-    if (hMapFile) CloseHandle(hMapFile);
-    if (hFile != INVALID_HANDLE_VALUE) CloseHandle(hFile);
-    FreeLibrary(hDll);
-    return retval;
+	if (lpMapAddress) UnmapViewOfFile(lpMapAddress);
+	if (hMapFile) CloseHandle(hMapFile);
+	if (hFile != INVALID_HANDLE_VALUE) CloseHandle(hFile);
+	FreeLibrary(hDll);
+	return retval;
 }
 
-LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS *pExPtrs)
+LONG __stdcall CrashHandlerExceptionFilter(PEXCEPTION_POINTERS pExPtrs)
 {
-    /* Spawn a new thread this should improve the dump */
-    HANDLE cProc;
-    DWORD tid = 0, res = -1;
+	/* Spawn a new thread this should improve the dump */
+	HANDLE cProc;
+	DWORD tid = 0, res = -1;
 
-    crashdata_t cdata;
-    cdata.pExPtrs = pExPtrs;
-    memset(cdata.filename, 0, sizeof(cdata.filename));
+	cProc = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CrashMiniDumpWriteDumpProc, (LPVOID)pExPtrs, 0, &tid);
 
+	if (!cProc)
+	{
+		fwprintf(stderr, L"[crashdump] W00ps!! Cannot spawn crash dumper thread (LE: %d)\n", GetLastError());
+		abort();
+	}
 
-    cProc = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) CrashMiniDumpWriteDumpProc, (LPVOID) &cdata, 0, &tid);
+	if (WaitForSingleObject(cProc, INFINITE) == WAIT_OBJECT_0)
+		GetExitCodeThread(cProc, &res);
 
-    if (!cProc)
-    {
-        fprintf(stderr, "[ClamWin] W00ps!! Cannot spawn crash dumper thread (LE: %d)\n", GetLastError());
-        abort();
-    }
-
-    if (WaitForSingleObject(cProc, INFINITE) == WAIT_OBJECT_0)
-        GetExitCodeThread(cProc, &res);
-
-    CloseHandle(cProc);
-    fprintf(stderr, "[ClamWin] Crash Dumper Thread Done (Result: %d)\n", res);
-    return EXCEPTION_EXECUTE_HANDLER;
+	CloseHandle(cProc);
+	fwprintf(stderr, L"[crashdump] Thread Done (Result: %d)\n", res);
+	return EXCEPTION_EXECUTE_HANDLER;
 }
 
 #endif /* _MSC_VER */
