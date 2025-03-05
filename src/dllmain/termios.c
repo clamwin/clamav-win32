@@ -1,7 +1,7 @@
 /*
  * Clamav Native Windows Port: minimal termios emulation
  *
- * Copyright (c) 2008 Gianluigi Tiesi <sherpya@netfarm.it>
+ * Copyright (c) 2008-2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -18,10 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <platform.h>
-#include <termios.h>
+#include "platform.h"
+#include "termios.h"
+#include "posix-errno.h"
+
 #include <assert.h>
-#include <posix-errno.h>
 
 static BOOL isvalidtty(HANDLE h)
 {

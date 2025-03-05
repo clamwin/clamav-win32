@@ -1,7 +1,7 @@
 /*
  * Clamav Native Windows Port: actions replacement for win32
  *
- * Copyright (c) 2009-2011 Gianluigi Tiesi <sherpya@netfarm.it>
+ * Copyright (c) 2009-2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -163,17 +163,7 @@ int actsetup(const struct optstruct *opts)
 {
     int move = optget(opts, "move")->enabled;
     if (move || optget(opts, "copy")->enabled) {
-#ifndef _WIN32
-        cl_error_t ret;
-#endif
         actarget = optget(opts, move ? "move" : "copy")->strarg;
-#ifndef _WIN32
-        ret = cli_realpath((const char *)actarget, &actarget);
-        if (CL_SUCCESS != ret || NULL == actarget) {
-            logg(LOGG_INFO, "action_setup: Failed to get realpath of %s\n", actarget);
-            return 0;
-        }
-#endif
         if (!isdir()) return 1;
         action  = move ? action_move : action_copy;
         targlen = strlen(actarget);
@@ -181,4 +171,5 @@ int actsetup(const struct optstruct *opts)
         action = action_remove;
     return 0;
 }
+
 #endif /* _WIN32_WINNT >= 0x0600 */
