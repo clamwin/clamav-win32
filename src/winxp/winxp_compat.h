@@ -12,7 +12,7 @@
 #include <wchar.h>
 #include <strsafe.h>
 
-#if 1// def TRACE_COMPAT
+#ifdef TRACE_COMPAT
 #include <stdio.h>
 #define TRACE(format, ...) fwprintf(stderr, L"[winxp] " format, ##__VA_ARGS__)
 #else
