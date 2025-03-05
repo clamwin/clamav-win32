@@ -2,18 +2,18 @@ file(GLOB clamd_headers ${CLAMAV_DIR}/clamd/*.h)
 file(GLOB clamd_sources ${CLAMAV_DIR}/clamd/*.c)
 
 set(clamd_win32_sources
+    ${CLAMAV_DIR}/win32/compat/net.c
     ${CLAMWIN_DIR}/src/helpers/cw_main.c
     ${CLAMWIN_DIR}/src/helpers/crashdump.c
-    ${CLAMAV_DIR}/win32/compat/net.c
+    ${CLAMWIN_DIR}/resources/clamd.rc
 )
 
-source_group("Win32 Files" FILES ${clamd_win32_sources})
+source_group("Win32 Sources" FILES ${clamd_win32_sources})
 
 add_executable(clamd
     ${clamd_headers}
     ${clamd_sources}
     ${clamd_win32_sources}
-    ${CLAMWIN_DIR}/resources/clamd.rc
 )
 
 # clamav/win32/compat/net.c needs poll api

@@ -11,6 +11,7 @@ set(libfreshclam_sources
 set(libfreshclam_win32_sources
     ${CLAMAV_DIR}/win32/compat/resolv.c
     ${CLAMWIN_DIR}/resources/libfreshclam.rc
+    ${CLAMWIN_DIR}/libfreshclam.def
 )
 
 file(GLOB libfreshclam_common_sources
@@ -25,7 +26,6 @@ add_library(libfreshclam SHARED
     ${libfreshclam_sources}
     ${libfreshclam_win32_sources}
     ${libfreshclam_common_sources}
-    ${CLAMWIN_DIR}/libfreshclam.def
 )
 
 set_target_properties(libfreshclam PROPERTIES PREFIX "" OUTPUT_NAME libfreshclam)
@@ -48,6 +48,7 @@ file(GLOB freshclam_sources ${CLAMAV_DIR}/freshclam/*.c)
 set(freshclam_win32_sources
     ${CLAMWIN_DIR}/src/helpers/cw_main.c
     ${CLAMWIN_DIR}/src/helpers/crashdump.c
+    ${CLAMWIN_DIR}/resources/freshclam.rc
 )
 
 source_group("Win32 Files" FILES ${freshclam_win32_sources})
@@ -56,7 +57,6 @@ add_executable(freshclam
     ${freshclam_headers}
     ${freshclam_sources}
     ${freshclam_win32_sources}
-    ${CLAMWIN_DIR}/resources/freshclam.rc
 )
 
 target_include_directories(freshclam PRIVATE ${CLAMWIN_INCLUDES} ${CLAMAV_DIR}/libfreshclam)

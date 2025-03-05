@@ -4,15 +4,15 @@ file(GLOB clamdscan_sources ${CLAMAV_DIR}/clamdscan/*.c)
 set(clamdscan_win32_sources
     ${CLAMWIN_DIR}/src/helpers/cw_main.c
     ${CLAMWIN_DIR}/src/helpers/crashdump.c
+    ${CLAMWIN_DIR}/resources/clamdscan.rc
 )
 
-source_group("Win32 Files" FILES ${clamdscan_win32_sources})
+source_group("Win32 Sources" FILES ${clamdscan_win32_sources})
 
 add_executable(clamdscan
     ${clamdscan_headers}
     ${clamdscan_sources}
     ${clamdscan_win32_sources}
-    ${CLAMWIN_DIR}/resources/clamdscan.rc
 )
 
 target_include_directories(clamdscan PRIVATE ${CLAMWIN_INCLUDES})

@@ -13,14 +13,14 @@ list(REMOVE_ITEM libclamav_sources
     ${CLAMAV_DIR}/libclamav/regex/engine.c
     ${CLAMAV_DIR}/libclamav/tomsfastmath/misc/fp_ident.c)
 
-if (ENABLE_LLVM)
+if(ENABLE_LLVM)
     list(REMOVE_ITEM libclamav_sources ${CLAMAV_DIR}/libclamav/bytecode_nojit.c)
     list(APPEND libclamav_sources
         ${CLAMAV_DIR}/libclamav/c++/detect.cpp
         ${CLAMAV_DIR}/libclamav/c++/bytecode2llvm.cpp)
 endif()
 
-file(GLOB_RECURSE libclamav_win32_headers ${CLAMWIN_DIR}/include/*.h)
+source_group(TREE ${CLAMAV_DIR}/libclamav PREFIX "Source Files" FILES ${libclamav_sources})
 
 file(GLOB libclamav_win32_sources ${CLAMWIN_DIR}/src/dllmain/*.c)
 list(APPEND libclamav_win32_sources
@@ -32,26 +32,29 @@ list(APPEND libclamav_win32_sources
     ${CLAMAV_DIR}/win32/compat/w32_stat.c
 )
 
-if (MINGW AND WINXP)
+if(MINGW AND WINXP)
     list(APPEND libclamav_win32_sources ${CLAMWIN_DIR}/src/dllmain/dll_dependency.S)
 endif()
 
-list(APPEND libclamav_win32_sources ${CMAKE_BINARY_DIR}/libclamav.def)
-source_group("Win32 Files" FILES ${libclamav_win32_sources})
+file(GLOB_RECURSE libclamav_win32_headers ${CLAMWIN_DIR}/include/*.h)
+source_group(TREE ${CLAMWIN_DIR}/include PREFIX "Win32 Headers" FILES ${libclamav_win32_headers})
 
-if (WITH_WINPTHREADS)
+list(APPEND libclamav_win32_sources ${CMAKE_BINARY_DIR}/libclamav.def ${CLAMWIN_DIR}/resources/libclamav.rc)
+source_group("Win32 Sources" FILES ${libclamav_win32_sources})
+
+if(WITH_WINPTHREADS)
     message(STATUS "Building Winpthreads")
+    file(GLOB winpthreads_headers ${WINPTHREADS_DIR}/src/*.h)
     file(GLOB winpthreads_sources ${WINPTHREADS_DIR}/src/*.c)
-    source_group("Winpthreads Files" FILES ${winpthreads_sources})
+    source_group("Winpthreads Files" FILES ${winpthreads_headers} ${winpthreads_sources})
     list(APPEND libclamav_win32_sources ${winpthreads_sources})
     install(FILES ${WINPTHREADS_DIR}/COPYING DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME winpthreads.txt)
 endif()
 
 add_library(libclamav SHARED
-    ${libclamav_win32_headers}
     ${libclamav_sources}
+    ${libclamav_win32_headers}
     ${libclamav_win32_sources}
-    ${CLAMWIN_DIR}/resources/libclamav.rc
 )
 
 add_library(ClamAV::libclamav ALIAS libclamav)

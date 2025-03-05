@@ -70,6 +70,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
 
 file(GLOB_RECURSE llvm_headers ${LLVM_DIR}/include/llvm/*.h)
+source_group(TREE ${LLVM_DIR}/include/llvm PREFIX "Headers Files" FILES ${llvm_headers})
 
 file(GLOB llvm_sources
     ${LLVM_DIR}/lib/Analysis/*.cpp
@@ -120,6 +121,7 @@ file(GLOB llvm_sources
     ${LLVM_DIR}/lib/Support/*.cpp
     ${LLVM_DIR}/lib/Support/*.c
 )
+source_group(TREE ${LLVM_DIR}/lib PREFIX "Source Files" FILES ${llvm_sources})
 
 add_library(llvm STATIC
     ${llvm_headers}
