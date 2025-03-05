@@ -16,6 +16,11 @@ add_executable(clamdscan
     ${CLAMWIN_DIR}/resources/clamdscan.rc
 )
 
+if(MSVC)
+    set_target_properties(clamdscan PROPERTIES
+        VS_MANIFEST_ADDITIONAL_FILES "${CLAMWIN_DIR}/resources/compatibility.manifest")
+endif()
+
 target_include_directories(clamdscan PRIVATE ${CLAMWIN_INCLUDES})
 target_compile_definitions(clamdscan PRIVATE ${CLAMWIN_DEFINES})
 target_link_libraries(clamdscan PRIVATE libclamav_common libclamav psapi ws2_32)
