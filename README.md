@@ -18,27 +18,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ## Features
 
 - [**clamav**] small footprint
-- [**clamav**] native msvc win64 port, legacy mingw 32bit build for old systems
+- [**clamav**] native msvc win64 port, legacy mingw 32bit/64bit build for WinXP+
 - [**clamav**] support for unc paths, exotic/long file names
 - [**clamav**] nice icons ;)
 - [**clamscan**] memory scanner (in memory loaded modules are scanned n-disk)
-- [**llvm**] jit dll is optional, and since not supported on old os will be loaded dinamically
-- [**freshclam**] native dns txt query on NT4 / DnsAPI query on Win2k+
+- [**llvm**] MSVC Build
 - [**clamdtop**] curses ui to connect to a running clamd service
 - [**clamd/freshclam**] as Windows Service
 
 ## 3rdparty libraries and versions
 
-- OpenSSL: 1.1.1w
+- OpenSSL: 3.4.1
 - bzip2: 1.0.8
-- curl: 8.10.1
-- gnulib: old version but still fine for my needs
+- curl: 8.12.1
 - json-c: 0.18-20240915
-- libxml2: 2.13.4
-- pcre2: 10.44
+- libxml2: 2.13.6
+- pcre2: 10.45
 - PDCurses: git-6ba6df38
-- Winpthreads: git-9c006fc7
-- zlib: 1.3.1
+- Winpthreads: git-6ba6df3
+- zlib-ng: 2.2.4
 
 ## Getting sources
 
