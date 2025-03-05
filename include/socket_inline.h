@@ -1,7 +1,7 @@
 /*
  * Clamav Native Windows Port: <sys/socket.h> mappings
  *
- * Copyright (c) 2005-2008 Gianluigi Tiesi <sherpya@netfarm.it>
+ * Copyright (c) 2005-2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public

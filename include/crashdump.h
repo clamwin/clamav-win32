@@ -21,9 +21,6 @@
 #ifndef _CRASHDUMP_H_
 #define _CRASHDUMP_H_
 
-//#include <tlhelp32.h>
-//#include <psapi.h>
-
 /* dbghelp32 */
 #ifdef _MSC_VER
 #pragma warning (push)
@@ -39,7 +36,5 @@ typedef BOOL (WINAPI *pMiniDumpWriteDumpFunc)(HANDLE, DWORD, HANDLE, MINIDUMP_TY
 
 extern LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS *pExPtrs);
 #endif
-
-//typedef int (*proc_callback)(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void *data);
 
 #endif /* _CRASHDUMP_H_ */

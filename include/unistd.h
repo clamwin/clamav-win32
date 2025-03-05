@@ -1,7 +1,7 @@
 /*
  * Clamav Native Windows Port: unistd.h for msvc
  *
- * Copyright (c) 2008 Gianluigi Tiesi <sherpya@netfarm.it>
+ * Copyright (c) 2008-2025 Gianluigi Tiesi <sherpya@gmai.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,7 +22,6 @@
 #define _UNISTD_H
 
 #include <io.h>
-
 
 #ifndef __GNUC__
 #define R_OK    4   /* Test for read permission */
