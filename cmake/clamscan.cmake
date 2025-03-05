@@ -20,6 +20,8 @@ add_executable(clamscan
 if(MSVC)
     set_target_properties(clamscan PROPERTIES
         VS_MANIFEST_ADDITIONAL_FILES "${CLAMWIN_DIR}/resources/compatibility.manifest")
+elseif(MINGW)
+    target_compile_definitions(clamscan PRIVATE RC_NEEDS_MANIFEST)
 endif()
 
 target_include_directories(clamscan PRIVATE ${CLAMWIN_INCLUDES})

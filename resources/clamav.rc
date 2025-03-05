@@ -37,3 +37,7 @@ END
 #ifdef __ICON__
 100	ICON	__ICON__
 #endif
+
+#ifdef RC_NEEDS_MANIFEST
+1 RT_MANIFEST "compatibility.manifest"
+#endif
