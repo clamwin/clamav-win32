@@ -41,7 +41,7 @@ add_library(libclamunrar_iface SHARED
     ${CLAMWIN_DIR}/libclamunrar_iface.def
 )
 
-set_target_properties(libclamunrar_iface PROPERTIES DEFINE_SYMBOL "" PREFIX "" OUTPUT_NAME libclamunrar_iface)
+set_target_properties(libclamunrar_iface PROPERTIES DEFINE_SYMBOL "" PREFIX "" DEBUG_POSTFIX "" OUTPUT_NAME libclamunrar_iface)
 target_include_directories(libclamunrar_iface PRIVATE ${UNRAR_INCLUDES} ${CLAMWIN_DIR}/include)
 target_compile_definitions(libclamunrar_iface PRIVATE ${UNRAR_DEFINES})
 target_link_libraries(libclamunrar_iface PRIVATE libclamunrar)
