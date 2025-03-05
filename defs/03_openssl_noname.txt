@@ -191,7 +191,6 @@ SSL_pending
 SSL_read
 SSL_SESSION_free
 SSL_SESSION_get_timeout
-SSL_SESSION_get_timeout
 SSL_set0_rbio
 SSL_set0_wbio
 SSL_set_bio
