@@ -290,8 +290,39 @@ WINBOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLAS
         ntRenameInfo->FileNameLength = ntPath.Length;
         memcpy(ntRenameInfo->FileName, ntPath.Buffer, ntPath.Length);
 
-        ntInfoClass = FileRenameInformation;
-        break;
+        status = NtSetInformationFile(
+            hFile,
+            &ioStatusBlock,
+            ntBuffer,
+            ntBufferSize,
+            FileRenameInformation);
+
+        // Clean up
+        free(ntBuffer);
+
+        // Convert NT status to Win32 error and set return value
+        if (NT_SUCCESS(status))
+        {
+            TRACE(L"SetFileInformationByHandle -> NtSetInformationFile Rename OK\n");
+            return TRUE;
+        }
+        else
+        {
+            TRACE(L"SetFileInformationByHandle -> NtSetInformationFile Rename failed: 0x%08lx (%ld)\n",
+                  status, RtlNtStatusToDosError(status));
+
+            // try with RenameFileEx
+            wchar_t sourcePath[MAX_PATH + 1];
+
+            if (!GetFinalPathNameByHandleW(hFile, sourcePath, MAX_PATH, VOLUME_NAME_DOS))
+                return FALSE;
+
+            DWORD moveFlags = 0;
+            if (win32RenameInfo->ReplaceIfExists)
+                moveFlags |= MOVEFILE_REPLACE_EXISTING;
+
+            return MoveFileExW(sourcePath, win32RenameInfo->FileName, moveFlags);
+        }
     }
     case FileDispositionInfo:
     {
