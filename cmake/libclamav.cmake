@@ -88,5 +88,3 @@ if(MSVC)
 endif()
 
 list(APPEND CLAMAV_INSTALL_TARGETS libclamav)
-
-install(FILES ${3RDPARTY_DIR}/openssl/LICENSE DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME COPYING.openssl)
