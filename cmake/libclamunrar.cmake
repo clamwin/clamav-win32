@@ -1,5 +1,9 @@
 # libclamunrar
+set(UNRAR_DEFINES RARDLL RAR_NOCRYPT _FILE_OFFSET_BITS=64)
+set(UNRAR_INCLUDES ${CLAMAV_DIR}/libclamunrar ${CLAMWIN_DIR}/resources)
+
 file(GLOB libclamunrar_headers ${CLAMAV_DIR}/libclamunrar/*.hpp)
+file(GLOB libclamunrar_win32_sources ${CLAMWIN_DIR}/src/unrar/*.cpp)
 
 set(libclamunrar_sources
     archive.cpp arcread.cpp blake2s.cpp
@@ -16,13 +20,7 @@ set(libclamunrar_sources
     unpack.cpp volume.cpp)
 list(TRANSFORM libclamunrar_sources PREPEND ${CLAMAV_DIR}/libclamunrar/)
 
-set(libclamunrar_win32_sources
-    ${CLAMWIN_DIR}/src/unrar/extinfo.cpp
-    ${CLAMWIN_DIR}/src/unrar/isnt.cpp
-    ${CLAMWIN_DIR}/src/unrar/system.cpp
-    ${CLAMWIN_DIR}/resources/libclamunrar.rc
-)
-
+list(APPEND libclamunrar_win32_sources ${CLAMWIN_DIR}/resources/libclamunrar.rc)
 source_group("Win32 Files" FILES ${libclamunrar_win32_sources})
 
 add_library(libclamunrar SHARED
@@ -33,8 +31,8 @@ add_library(libclamunrar SHARED
 )
 
 set_target_properties(libclamunrar PROPERTIES DEFINE_SYMBOL "" PREFIX "" OUTPUT_NAME libclamunrar)
-target_include_directories(libclamunrar PRIVATE ${CLAMAV_DIR}/ ${CLAMWIN_DIR}/resources)
-target_compile_definitions(libclamunrar PRIVATE HAVE_CONFIG_H RARDLL WARN_DLOPEN_FAIL _FILE_OFFSET_BITS=64)
+target_include_directories(libclamunrar PRIVATE ${UNRAR_INCLUDES})
+target_compile_definitions(libclamunrar PRIVATE ${UNRAR_DEFINES})
 
 # libclamunrar_iface
 add_library(libclamunrar_iface SHARED
@@ -44,8 +42,8 @@ add_library(libclamunrar_iface SHARED
 )
 
 set_target_properties(libclamunrar_iface PROPERTIES DEFINE_SYMBOL "" PREFIX "" OUTPUT_NAME libclamunrar_iface)
-target_compile_definitions(libclamunrar_iface PRIVATE HAVE_CONFIG_H RARDLL WARN_DLOPEN_FAIL _FILE_OFFSET_BITS=64)
-target_include_directories(libclamunrar_iface PRIVATE ${CLAMWIN_DIR}/include ${CLAMAV_DIR} ${CLAMAV_DIR}/libclamunrar ${CLAMWIN_DIR}/resources)
+target_include_directories(libclamunrar_iface PRIVATE ${UNRAR_INCLUDES} ${CLAMWIN_DIR}/include)
+target_compile_definitions(libclamunrar_iface PRIVATE ${UNRAR_DEFINES})
 target_link_libraries(libclamunrar_iface PRIVATE libclamunrar)
 
 list(APPEND CLAMAV_INSTALL_TARGETS libclamunrar libclamunrar_iface)

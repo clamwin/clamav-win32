@@ -1,28 +1,40 @@
-#include <libclamunrar/rar.hpp>
+#include "rar.hpp"
 
 DWORD WinNT()
 {
-  static int dwPlatformId=-1;
-  static DWORD dwMajorVersion,dwMinorVersion;
-  if (dwPlatformId==-1)
-  {
-    OSVERSIONINFO WinVer;
-    WinVer.dwOSVersionInfoSize=sizeof(WinVer);
-    GetVersionEx(&WinVer);
-    dwPlatformId=WinVer.dwPlatformId;
-    dwMajorVersion=WinVer.dwMajorVersion;
-    dwMinorVersion=WinVer.dwMinorVersion;
+    static int dwPlatformId = -1;
+    static DWORD dwMajorVersion, dwMinorVersion;
 
-  }
-  DWORD Result=0;
-  if (dwPlatformId==VER_PLATFORM_WIN32_NT)
-    Result=dwMajorVersion*0x100+dwMinorVersion;
+    if (dwPlatformId == -1)
+    {
+        OSVERSIONINFO WinVer;
+        WinVer.dwOSVersionInfoSize = sizeof(WinVer);
+        GetVersionEx(&WinVer);
+        dwPlatformId = WinVer.dwPlatformId;
+        dwMajorVersion = WinVer.dwMajorVersion;
+        dwMinorVersion = WinVer.dwMinorVersion;
+    }
 
-  return Result;
+    DWORD Result = 0;
+    if (dwPlatformId == VER_PLATFORM_WIN32_NT)
+        Result = dwMajorVersion * 0x100 + dwMinorVersion;
+
+    return Result;
 }
 
-// Replace it with actual check when available.
 bool IsWindows11OrGreater()
 {
-  return false;
+    OSVERSIONINFOEXW vi = {0};
+    vi.dwOSVersionInfoSize = sizeof(vi);
+    vi.dwMajorVersion = 10;
+    vi.dwMinorVersion = 0;
+    // Use build 21996 as a threshold (any build >= 22000 indicates Windows 11)
+    vi.dwBuildNumber = 22000;
+
+    ULONGLONG cond = 0;
+    cond = VerSetConditionMask(cond, VER_MAJORVERSION, VER_GREATER_EQUAL);
+    cond = VerSetConditionMask(cond, VER_MINORVERSION, VER_GREATER_EQUAL);
+    cond = VerSetConditionMask(cond, VER_BUILDNUMBER, VER_GREATER_EQUAL);
+
+    return VerifyVersionInfoW(&vi, VER_MAJORVERSION | VER_MINORVERSION | VER_BUILDNUMBER, cond);
 }
