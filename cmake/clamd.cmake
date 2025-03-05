@@ -21,6 +21,12 @@ set(CLAMD_DEFINES ${CLAMWIN_DEFINES})
 list(FILTER CLAMD_DEFINES EXCLUDE REGEX "^_WIN32_WINNT=.*$")
 list(APPEND CLAMD_DEFINES _WIN32_WINNT=0x0600)
 
+if(MSVC)
+    target_sources(clamd PRIVATE ${CLAMWIN_DIR}/resources/compatibility.manifest)
+elseif(MINGW)
+    target_compile_definitions(clamd PRIVATE RC_NEEDS_MANIFEST)
+endif()
+
 target_include_directories(clamd PRIVATE ${CLAMWIN_INCLUDES})
 target_compile_definitions(clamd PRIVATE ${CLAMD_DEFINES})
 target_link_libraries(clamd PRIVATE libclamav_common libclamav ws2_32)
