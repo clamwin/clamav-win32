@@ -18,77 +18,91 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "platform.h"
+
 #include <windows.h>
 #include <psapi.h>
 
-#include "platform.h"
-
 struct mallinfo mallinfo(void)
 {
+    HANDLE hProcess = GetCurrentProcess();
     PROCESS_MEMORY_COUNTERS_EX pmc;
-    MEMORYSTATUSEX ms;
-    _HEAPINFO hinfo;
     struct mallinfo info;
-    int numBlocks = 0;
-    int freeBlocks = 0;
-    size_t freeSize = 0;
-    size_t totalHeapSize = 0;
+    SIZE_T initialFree = 0, initialTotal = 0;
+    SIZE_T currentFree = 0, currentTotal = 0;
+    void *addr = 0;
+    int freeRegions = 0;
 
     memset(&info, 0, sizeof(struct mallinfo));
-    ms.dwLength = sizeof(MEMORYSTATUSEX);
 
-    if (GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc)))
+    /* Get process memory information for basic metrics */
+    memset(&pmc, 0, sizeof(pmc));
+    if (GetProcessMemoryInfo(hProcess, (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc)))
     {
-        /* WorkingSetSize is a good approximation for heap memory */
+        /* Private working set (reasonable approximation for heap) */
         info.arena = pmc.WorkingSetSize;
 
-        /* Space used from memory mapped files */
+        /* Total private usage */
         info.hblkhd = pmc.PrivateUsage;
     }
 
-    /* Get global memory status */
-    if (GlobalMemoryStatusEx(&ms))
-    {
-        /*
-         * Critical: We set usmblks to 0 since it gets added to uordblks in the
-         * calculation. In the Unix mallinfo, usmblks is not actually the maximum
-         * available memory but rather the "maximum total allocated space".
-         */
-        info.usmblks = 0;
+    /* Get heap metrics more directly */
+    DWORD dwHeapCount = GetProcessHeaps(0, NULL);
+    HANDLE *pHeaps = (HANDLE *)malloc(dwHeapCount * sizeof(HANDLE));
 
-        /* Available virtual memory that could be allocated */
-        info.fordblks = ms.ullAvailVirtual;
-    }
-
-    /* Scan the heap to count blocks */
-    hinfo._pentry = NULL;
-    while (_heapwalk(&hinfo) == _HEAPOK)
+    if (pHeaps)
     {
-        numBlocks++;
-        if (hinfo._useflag == _FREEENTRY)
+        size_t freeHeapSize = 0;
+        GetProcessHeaps(dwHeapCount, pHeaps);
+
+        /* Directly query each heap for size information */
+        for (DWORD i = 0; i < dwHeapCount; i++)
         {
-            freeBlocks++;
-            freeSize += hinfo._size;
+            PROCESS_HEAP_ENTRY entry;
+            memset(&entry, 0, sizeof(entry));
+
+            if (HeapLock(pHeaps[i]))
+            {
+                while (HeapWalk(pHeaps[i], &entry))
+                {
+                    if (entry.wFlags & PROCESS_HEAP_UNCOMMITTED_RANGE)
+                    {
+                        /* Uncommitted range */
+                        continue;
+                    }
+
+                    if (entry.wFlags & PROCESS_HEAP_ENTRY_BUSY)
+                    {
+                        /* Used block */
+                    }
+                    else
+                    {
+                        /* Free block */
+                        freeHeapSize += entry.cbData;
+                        freeRegions++;
+                    }
+                }
+                HeapUnlock(pHeaps[i]);
+            }
         }
-        totalHeapSize += hinfo._size;
+
+        /* Update values with more accurate heap information */
+        if (freeHeapSize > 0)
+        {
+            info.fordblks = freeHeapSize;
+            info.fsmblks = freeHeapSize;
+            info.keepcost = freeHeapSize;
+        }
+
+        free(pHeaps);
     }
 
-    /* Set values based on heap walk */
-    info.ordblks = freeBlocks;
-    info.fsmblks = freeSize; /* Free memory in smaller blocks */
-
-    /*
-     * Set uordblks to committed memory minus free space.
-     * This ensures mem_used calculation will be accurate.
-     */
-    info.uordblks = pmc.PrivateUsage - freeSize;
-
-    /* Calculate potentially releasable memory */
-    info.keepcost = freeSize > 0 ? freeSize : 0;
-
-    /* For fields that don't have a direct Windows equivalent */
-    info.smblks = 0; /* Windows doesn't have fastbins */
-    info.hblks = 1;  /* Assume at least one mmap region */
+    /* Set the remaining fields based on our data */
+    info.ordblks = freeRegions;
+    info.smblks = 0;                                  /* Windows doesn't have fastbins */
+    info.hblks = dwHeapCount;                         /* Number of heaps */
+    info.usmblks = 0;                                 /* Set to 0 as it gets added to uordblks */
+    info.uordblks = pmc.PrivateUsage - info.fordblks; /* Total allocated minus free */
 
     return info;
 }
