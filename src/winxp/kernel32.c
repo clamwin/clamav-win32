@@ -437,7 +437,6 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
     NTSTATUS status;
     IO_STATUS_BLOCK iosb;
     DWORD requiredLength = 0;
-    BOOL success = FALSE;
 
     TRACE(L"GetFinalPathNameByHandleW(0x%p, 0x%p, %d, %d)\n", hFile, lpszFilePath, cchFilePath, dwFlags);
 
@@ -498,114 +497,40 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
     wcsncpy(nameMnt.TargetName.DeviceName,
             nameFull.UnicodeString.Buffer,
             nameMnt.TargetName.DeviceNameLength / sizeof(wchar_t));
-    size_t deviceNameLen = nameMnt.TargetName.DeviceNameLength / sizeof(wchar_t);
 
     TRACE(L"deviceName: [%ls]\n", deviceName);
     TRACE(L"fileName: [%ls]\n", fileName);
 
-    // Try to resolve using MountMgr first
-    if (hMountMgr != INVALID_HANDLE_VALUE)
+    // skip Mup Device
+    if (wcsncmp(deviceName, L"\\Device\\Mup", 11))
     {
-        DWORD bytesReturned = 0;
-        success = DeviceIoControl(hMountMgr,
-                                  IOCTL_MOUNTMGR_QUERY_DOS_VOLUME_PATH,
-                                  &nameMnt,
-                                  sizeof(nameMnt),
-                                  &nameMnt,
-                                  sizeof(nameMnt),
-                                  &bytesReturned,
-                                  NULL);
-
-        if (success && nameMnt.TargetPaths.MultiSzLength > 0)
+        if (hMountMgr != INVALID_HANDLE_VALUE)
         {
-            TRACE(L"Resolved via MountMgr: %ls\n", targetPath);
-            wcsncat(targetPath, nameMnt.TargetPaths.MultiSz, nameMnt.TargetPaths.MultiSzLength);
-            wcsncat(targetPath, fileName, nameLength);
-            requiredLength = wcslen(targetPath);
+            DWORD bytesReturned = 0;
+            BOOL success = DeviceIoControl(hMountMgr,
+                                      IOCTL_MOUNTMGR_QUERY_DOS_VOLUME_PATH,
+                                      &nameMnt,
+                                      sizeof(nameMnt),
+                                      &nameMnt,
+                                      sizeof(nameMnt),
+                                      &bytesReturned,
+                                      NULL);
+
+            if (success && nameMnt.TargetPaths.MultiSzLength > 0)
+            {
+                TRACE(L"Resolved via MountMgr: %ls\n", targetPath);
+                wcsncat(targetPath, nameMnt.TargetPaths.MultiSz, nameMnt.TargetPaths.MultiSzLength);
+                wcsncat(targetPath, fileName, nameLength);
+                requiredLength = wcslen(targetPath);
+            }
         }
     }
 
-    if (!success)
+    if (requiredLength == 0)
     {
-        DWORD lastError = GetLastError();
-        if ((lastError != ERROR_INVALID_FUNCTION) && (lastError != ERROR_NOT_SUPPORTED))
-        {
-            TRACE(L"GetFinalPathNameByHandleW->DeviceIoControl failed (%d)\n", lastError);
-            return 0;
-        }
-
-        // Get list of logical drives
-        wchar_t szLogicalDrives[MAX_PATH] = {0};
-        DWORD driveCount = GetLogicalDriveStringsW(MAX_PATH - 1, szLogicalDrives);
-
-        if (!driveCount || driveCount >= MAX_PATH)
-        {
-            SetLastError(ERROR_BUFFER_OVERFLOW);
-            TRACE(L"GetLogicalDriveStringsW failed or returned too many drives (%d)\n", GetLastError());
-            return 0;
-        }
-
-        // Try to match device path to a drive letter
-        wchar_t targetDevice[MAX_PATH + 1];
-        wchar_t *drive = szLogicalDrives;
-
-        while (*drive)
-        {
-            BOOL found = FALSE;
-            wchar_t driveLetter[3] = {drive[0], drive[1], L'\0'};
-
-            if (QueryDosDeviceW(driveLetter, targetDevice, MAX_PATH))
-            {
-                TRACE(L"%ls is {%ls}\n", driveLetter, targetDevice);
-                TRACE(L"targePath: %ls\n", targetPath);
-
-                // Found matching drive
-                if (wcsncmp(deviceName, targetDevice, deviceNameLen) == 0)
-                {
-                    // Handle network path
-                    if (wcsstr(targetDevice, L"\\Device\\LanmanRedirector\\;"))
-                    {
-                        /* \Device\LanmanRedirector\;C:0000000000000000\Complete Path\To File.ext */
-                        if ((wcslen(targetDevice) > 28) && (targetDevice[26] == drive[0]) && (targetDevice[27] == ':'))
-                        {
-                            wchar_t *path = wcschr(&targetDevice[28], L'\\');
-                            if (path)
-                            {
-                                // same network host, different share
-                                if (wcsncmp(path, fileName, wcslen(path)) == 0)
-                                {
-                                    TRACE(L"Matched LanmanRedirector path: %ls\n", path);
-                                    found = TRUE;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // Other network providers (e.g. VBoxMiniRdr)
-                        // \Device\VBoxMiniRdr\;Z:\VBoxSvr\shared
-                        TRACE(L"Matched Network Provider: %ls -> %ls\n", driveLetter, targetDevice);
-                        found = TRUE;
-                    }
-
-                    if (found)
-                    {
-                        wcsncat(targetPath, L"UNC", 3);
-                        wcsncat(targetPath, fileName, nameLength);
-                        requiredLength = wcslen(targetPath);
-                        break;
-                    }
-                }
-            }
-            drive += wcslen(drive) + 1;
-        }
-
-        if (requiredLength == 0)
-        {
-            TRACE(L"Could not find matching DOS path for device\n");
-            SetLastError(ERROR_PATH_NOT_FOUND);
-            return 0;
-        }
+        wcsncat(targetPath, L"UNC", 3);
+        wcsncat(targetPath, fileName, nameLength);
+        requiredLength = wcslen(targetPath);
     }
 
     if (lpszFilePath && (cchFilePath >= requiredLength))
