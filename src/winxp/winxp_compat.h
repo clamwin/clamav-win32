@@ -12,6 +12,12 @@
 #include <wchar.h>
 #include <strsafe.h>
 
+#ifdef __GNUC__
+#define HOTFUNC __attribute__ ((hot))
+#else
+#define HOTFUNC
+#endif
+
 #ifdef TRACE_COMPAT
 #include <stdio.h>
 #define TRACE(format, ...) fwprintf(stderr, L"[winxp] " format, ##__VA_ARGS__)

@@ -431,7 +431,7 @@ __attribute__((destructor)) static void close_mount_manager()
  *
  * @return Number of characters in the final path (excluding terminator), or 0 on failure
  */
-DWORD WINAPI
+HOTFUNC DWORD WINAPI
 GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags)
 {
     NTSTATUS status;
@@ -508,13 +508,13 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
         {
             DWORD bytesReturned = 0;
             BOOL success = DeviceIoControl(hMountMgr,
-                                      IOCTL_MOUNTMGR_QUERY_DOS_VOLUME_PATH,
-                                      &nameMnt,
-                                      sizeof(nameMnt),
-                                      &nameMnt,
-                                      sizeof(nameMnt),
-                                      &bytesReturned,
-                                      NULL);
+                                           IOCTL_MOUNTMGR_QUERY_DOS_VOLUME_PATH,
+                                           &nameMnt,
+                                           sizeof(nameMnt),
+                                           &nameMnt,
+                                           sizeof(nameMnt),
+                                           &bytesReturned,
+                                           NULL);
 
             if (success && nameMnt.TargetPaths.MultiSzLength > 0)
             {
