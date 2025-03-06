@@ -58,10 +58,17 @@ int dn_expand(unsigned char *msg, unsigned char *eomorig, unsigned char *comp_dn
 #define main cw_main
 #endif
 
-#ifndef PATH_MAX
-// TODO: 32767
-#define PATH_MAX 260
+#ifdef PATH_MAX
+#undef PATH_MAX
 #endif
+
+#ifdef MAX_PATH
+#undef MAX_PATH
+#endif
+
+#define MAX_PATH 32767
+#define PATH_MAX MAX_PATH
+
 #define WORDS_BIGENDIAN 0
 #define EAI_SYSTEM 0
 
