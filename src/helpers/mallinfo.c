@@ -21,7 +21,7 @@
 #include <windows.h>
 #include <psapi.h>
 
-#include <malloc.h>
+#include "platform.h"
 
 struct mallinfo mallinfo(void)
 {

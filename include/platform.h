@@ -36,6 +36,7 @@
 #include <errno.h>
 #include <process.h> /* _getpid() */
 #include <malloc.h>  /* _alloca() */
+#include <stdint.h>
 
 #ifdef _MSC_VER
 #include <direct.h>  /* _mkdir()  */
@@ -138,5 +139,22 @@ LIBCLAMAV_EXPORT extern BOOL disablefsredir(void);
 
 extern const char* cli_to_utf8_maybe_alloc(const char* s);
 extern char* cli_strdup_to_utf8(const char* s);
+
+/* mallinfo */
+struct mallinfo
+{
+    size_t arena;    /* Total size of memory allocated with sbrk/mmap */
+    int ordblks;     /* Number of free chunks */
+    int smblks;      /* Number of fastbin blocks */
+    int hblks;       /* Number of mmap blocks */
+    size_t hblkhd;   /* Space in mmap blocks */
+    size_t usmblks;  /* Maximum total allocated space */
+    size_t fsmblks;  /* Space in fastbin blocks */
+    size_t uordblks; /* Total allocated space */
+    size_t fordblks; /* Total free space */
+    size_t keepcost; /* Top-most, releasable space */
+};
+
+struct mallinfo mallinfo(void);
 
 #endif /* _PLATFORM_H */
