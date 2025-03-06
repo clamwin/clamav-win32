@@ -20,34 +20,37 @@
 
 #include "platform.h"
 #include "termios.h"
-#include "posix-errno.h"
 
-#include <assert.h>
-
-static BOOL isvalidtty(HANDLE h)
-{
-    assert(h != INVALID_HANDLE_VALUE);
-    assert(GetFileType(h) == FILE_TYPE_CHAR);
-    if ((h != INVALID_HANDLE_VALUE) && (GetFileType(h) == FILE_TYPE_CHAR))
-        return TRUE;
-    errno = EBADF;
-    return FALSE;
-}
+#include <errno.h>
 
 int tcgetattr(int fd, struct termios *termios_p)
 {
-    HANDLE h = GetStdHandle((DWORD)(fd - 10));
-    if (!isvalidtty(h)) return -1;
-    if (GetConsoleMode(h, &termios_p->c_lflag)) return 0;
-    errno = EBADF;
+    HANDLE hStdin;
+    if ((fd != 0) || ((hStdin = GetStdHandle(STD_INPUT_HANDLE)) == INVALID_HANDLE_VALUE))
+    {
+        _set_errno(EBADF);
+        return -1;
+    }
+
+    if (GetConsoleMode(hStdin, &termios_p->c_lflag))
+        return 0;
+
+    _set_errno(EBADF);
     return -1;
 }
 
 int tcsetattr(int fd, int optional_actions, const struct termios *termios_p)
 {
-    HANDLE h = GetStdHandle((DWORD)(fd - 10));
-    if (!isvalidtty(h)) return -1;
-    if (SetConsoleMode(h, termios_p->c_lflag)) return 0;
-    errno = EBADF;
-    return 0;
+    HANDLE hStdin;
+    if ((fd != 0) || ((hStdin = GetStdHandle(STD_INPUT_HANDLE)) == INVALID_HANDLE_VALUE))
+    {
+        _set_errno(EBADF);
+        return -1;
+    }
+
+    if (SetConsoleMode(hStdin, termios_p->c_lflag))
+        return 0;
+
+    _set_errno(EBADF);
+    return -1;
 }
