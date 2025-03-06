@@ -47,8 +47,17 @@ HANDLE CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LPCWSTR l
     TRACE(L"CreateWaitableTimerExW(0x%p, %ls, %d, %d, %d)\n",
           lpTimerAttributes, lpTimerName, dwFlags, dwDesiredAccess);
 
-    SetLastError(ERROR_NOT_SUPPORTED);
-    return NULL;
+    BOOL bManualReset = (dwFlags & CREATE_WAITABLE_TIMER_MANUAL_RESET) != 0;
+    HANDLE hTimer = CreateWaitableTimerW(lpTimerAttributes, bManualReset, lpTimerName);
+
+    // If the timer was created successfully but HIGH_RESOLUTION was requested,
+    if ((hTimer != NULL) && (dwFlags & CREATE_WAITABLE_TIMER_HIGH_RESOLUTION))
+    {
+        TRACE(L"Warning: High-resolution timer requested but not supported\n");
+        OutputDebugStringW(L"Warning: High-resolution timer requested but not supported\n");
+    }
+
+    return hTimer;
 }
 
 // Fallback implementation of SetThreadStackGuarantee for Windows XP.
