@@ -5,6 +5,7 @@ set(clamd_win32_sources
     ${CLAMAV_DIR}/win32/compat/net.c
     ${CLAMWIN_DIR}/src/helpers/cw_main.c
     ${CLAMWIN_DIR}/src/helpers/crashdump.c
+    ${CLAMWIN_DIR}/src/helpers/mallinfo.c
     ${CLAMWIN_DIR}/resources/clamd.rc
 )
 
@@ -29,6 +30,6 @@ endif()
 
 target_include_directories(clamd PRIVATE ${CLAMWIN_INCLUDES})
 target_compile_definitions(clamd PRIVATE ${CLAMD_DEFINES})
-target_link_libraries(clamd PRIVATE libclamav_common libclamav ws2_32)
+target_link_libraries(clamd PRIVATE libclamav_common libclamav ws2_32 psapi)
 
 list(APPEND CLAMAV_INSTALL_TARGETS clamd)
