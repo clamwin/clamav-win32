@@ -22,17 +22,44 @@
  * SOFTWARE.
  */
 
- #include "winxp_compat.h"
+#include "winxp_compat.h"
 
 #include <shlobj.h>
 #include <objbase.h>
+#include <strsafe.h>
 
-// Define KF_FLAG_CREATE if not already defined.
 #ifndef KF_FLAG_CREATE
 #define KF_FLAG_CREATE 0x00008000
 #endif
 
-// Define a structure to map Known Folder GUIDs to CSIDL values.
+#ifndef KF_FLAG_DONT_VERIFY
+#define KF_FLAG_DONT_VERIFY 0x00004000
+#endif
+
+#ifndef KF_FLAG_DONT_UNEXPAND
+#define KF_FLAG_DONT_UNEXPAND 0x00002000
+#endif
+
+#ifndef KF_FLAG_NO_ALIAS
+#define KF_FLAG_NO_ALIAS 0x00001000
+#endif
+
+#ifndef KF_FLAG_INIT
+#define KF_FLAG_INIT 0x00000800
+#endif
+
+#ifndef KF_FLAG_DEFAULT_PATH
+#define KF_FLAG_DEFAULT_PATH 0x00000400
+#endif
+
+#ifndef KF_FLAG_NOT_PARENT_RELATIVE
+#define KF_FLAG_NOT_PARENT_RELATIVE 0x00000200
+#endif
+
+#ifndef KF_FLAG_SIMPLE_IDLIST
+#define KF_FLAG_SIMPLE_IDLIST 0x00000100
+#endif
+
 typedef struct _KnownFolderMapping
 {
     const GUID *rfid;
@@ -60,18 +87,55 @@ STDAPI SHGetKnownFolderPath(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken,
 
     *ppszPath = NULL;
 
-    // Mapping table: maps a few Known Folder GUIDs to their CSIDL equivalents.
+    // Mapping table: maps Known Folder GUIDs to their CSIDL equivalents
     static const KnownFolderMapping mapping[] = {
         {&FOLDERID_Desktop, CSIDL_DESKTOP},
         {&FOLDERID_Documents, CSIDL_PERSONAL},
         {&FOLDERID_Profile, CSIDL_PROFILE},
-        // Extend this table with additional mappings as needed.
+        {&FOLDERID_Programs, CSIDL_PROGRAMS},
+        {&FOLDERID_StartMenu, CSIDL_STARTMENU},
+        {&FOLDERID_Startup, CSIDL_STARTUP},
+        {&FOLDERID_Recent, CSIDL_RECENT},
+        {&FOLDERID_SendTo, CSIDL_SENDTO},
+        {&FOLDERID_Templates, CSIDL_TEMPLATES},
+        {&FOLDERID_Favorites, CSIDL_FAVORITES},
+        {&FOLDERID_NetHood, CSIDL_NETHOOD},
+        {&FOLDERID_PrintHood, CSIDL_PRINTHOOD},
+        {&FOLDERID_History, CSIDL_HISTORY},
+        {&FOLDERID_Cookies, CSIDL_COOKIES},
+        {&FOLDERID_InternetCache, CSIDL_INTERNET_CACHE},
+        {&FOLDERID_LocalAppData, CSIDL_LOCAL_APPDATA},
+        {&FOLDERID_RoamingAppData, CSIDL_APPDATA},
+        {&FOLDERID_ProgramData, CSIDL_COMMON_APPDATA},
+        {&FOLDERID_Windows, CSIDL_WINDOWS},
+        {&FOLDERID_System, CSIDL_SYSTEM},
+        {&FOLDERID_ProgramFiles, CSIDL_PROGRAM_FILES},
+        {&FOLDERID_ProgramFilesX86, CSIDL_PROGRAM_FILESX86},
+        {&FOLDERID_ProgramFilesCommon, CSIDL_PROGRAM_FILES_COMMON},
+        {&FOLDERID_ProgramFilesCommonX86, CSIDL_PROGRAM_FILES_COMMONX86},
+        {&FOLDERID_AdminTools, CSIDL_ADMINTOOLS},
+        {&FOLDERID_CommonAdminTools, CSIDL_COMMON_ADMINTOOLS},
+        {&FOLDERID_Music, CSIDL_MYMUSIC},
+        {&FOLDERID_Pictures, CSIDL_MYPICTURES},
+        {&FOLDERID_Videos, CSIDL_MYVIDEO},
+        {&FOLDERID_NetworkFolder, CSIDL_NETWORK},
+        {&FOLDERID_Fonts, CSIDL_FONTS},
+        {&FOLDERID_CommonStartMenu, CSIDL_COMMON_STARTMENU},
+        {&FOLDERID_CommonPrograms, CSIDL_COMMON_PROGRAMS},
+        {&FOLDERID_CommonStartup, CSIDL_COMMON_STARTUP},
+        {&FOLDERID_PublicDesktop, CSIDL_COMMON_DESKTOPDIRECTORY},
+        {&FOLDERID_CommonTemplates, CSIDL_COMMON_TEMPLATES},
+        {&FOLDERID_ResourceDir, CSIDL_RESOURCES},
+        {&FOLDERID_LocalizedResourcesDir, CSIDL_RESOURCES_LOCALIZED},
+        {&FOLDERID_CommonOEMLinks, CSIDL_COMMON_OEM_LINKS},
+        {&FOLDERID_CDBurning, CSIDL_CDBURN_AREA},
     };
 
     int csidl = -1;
+
+    // Find matching GUID in the mapping table
     for (size_t i = 0; i < sizeof(mapping) / sizeof(mapping[0]); i++)
     {
-        // Compare the GUIDs by comparing their memory.
         if (memcmp(rfid, mapping[i].rfid, sizeof(GUID)) == 0)
         {
             csidl = mapping[i].csidl;
@@ -82,13 +146,20 @@ STDAPI SHGetKnownFolderPath(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken,
     if (csidl == -1)
         return E_FAIL;
 
-    // Map KF_FLAG_CREATE (if specified) to CSIDL_FLAG_CREATE.
-    int shFlags = 0;
+    int shFlags = SHGFP_TYPE_CURRENT; // Default to current
+
+    // Map flags
     if (dwFlags & KF_FLAG_CREATE)
         shFlags |= CSIDL_FLAG_CREATE;
+    if (dwFlags & KF_FLAG_DONT_VERIFY)
+        shFlags |= CSIDL_FLAG_DONT_VERIFY;
+    if (dwFlags & KF_FLAG_NO_ALIAS)
+        shFlags |= CSIDL_FLAG_NO_ALIAS;
 
-    wchar_t path[MAX_PATH];
-    HRESULT hr = SHGetFolderPathW(hToken, csidl, NULL, shFlags, path);
+    // Get the path using SHGetFolderPathW
+    wchar_t path[MAX_PATH] = {0};
+    HRESULT hr = SHGetFolderPathW(NULL, csidl, hToken, shFlags, path);
+
     if (FAILED(hr))
         return hr;
 
@@ -103,6 +174,7 @@ STDAPI SHGetKnownFolderPath(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken,
         CoTaskMemFree(result);
         return hr;
     }
+
     *ppszPath = result;
     return S_OK;
 }
