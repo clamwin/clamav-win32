@@ -24,149 +24,203 @@
 
 #include "winxp_compat.h"
 
-// --- Fallback WaitOnAddress / WakeByAddress Implementation ---
-
-// Each waiting thread inserts a Waiter node into a global list.
-typedef struct Waiter
+typedef struct _ADDRESS_WAIT_ENTRY
 {
-    void *address; // The address on which the thread is waiting.
-    HANDLE event;  // An event the thread waits on.
-    BOOL signaled; // Flag to indicate if this waiter was signaled.
-    struct Waiter *next;
-} Waiter;
+    volatile void *Address;
+    HANDLE Event;
+    struct _ADDRESS_WAIT_ENTRY *Next;
+} ADDRESS_WAIT_ENTRY;
 
-// Global list of waiters and a critical section to protect it.
-static CRITICAL_SECTION g_waiters_cs;
-static BOOL g_waiters_cs_initialized = FALSE;
-static Waiter *g_waiters = NULL;
+// Global synchronization
+CRITICAL_SECTION g_AddressWaitLock;
+ADDRESS_WAIT_ENTRY *g_AddressWaitList = NULL;
 
 // Initialize the critical section (called on first use).
-static void InitWaitersCriticalSection(void)
+__attribute__((constructor)) static void InitializeAddressWait()
 {
-    TRACE(L"InitWaitersCriticalSection\n");
-
-    if (!g_waiters_cs_initialized)
-    {
-        InitializeCriticalSection(&g_waiters_cs);
-        g_waiters_cs_initialized = TRUE;
-    }
+    TRACE(L"InitializeAddressWait\n");
+    InitializeCriticalSection(&g_AddressWaitLock);
 }
 
-// WaitOnAddress fallback.
-// Parameters:
-//   Address: pointer to the memory to monitor.
-//   CompareAddress: pointer to a buffer holding the expected value.
-//   AddressSize: size (in bytes) of the data to compare.
-//   dwMilliseconds: timeout in milliseconds.
-WINBASEAPI BOOL WINAPI WaitOnAddress(
-    volatile VOID *Address,
-    PVOID CompareAddress,
-    SIZE_T AddressSize,
-    DWORD dwMilliseconds)
+__attribute__((destructor)) static void CleanupAddressWait()
+{
+    DeleteCriticalSection(&g_AddressWaitLock);
+}
+
+/**
+ * WaitOnAddress - Waits for the value at the specified address to change
+ *
+ * @param Address - Pointer to the memory address to monitor
+ * @param CompareAddress - Pointer to the memory containing the comparison value
+ * @param AddressSize - Size of the memory to compare (1, 2, 4, or 8 bytes)
+ * @param dwMilliseconds - Timeout in milliseconds
+ *
+ * @return TRUE if the wait succeeded, FALSE if timeout or error
+ */
+BOOL WINAPI WaitOnAddress(volatile void *Address, void *CompareAddress, SIZE_T AddressSize, DWORD dwMilliseconds)
 {
     TRACE(L"WaitOnAddress(0x%p, 0x%p, %d, %d)\n", Address, CompareAddress, AddressSize, dwMilliseconds);
 
-    InitWaitersCriticalSection();
+    // Validate address size
+    if (AddressSize != 1 && AddressSize != 2 && AddressSize != 4 && AddressSize != 8)
+    {
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return FALSE;
+    }
 
-    // Quick check: if the value at Address is already different, return immediately.
-    if (memcmp((const void *)Address, CompareAddress, AddressSize) != 0)
-        return TRUE;
-
-    // Create an event for this waiter.
-    HANDLE hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-    if (!hEvent)
+    // Create wait event
+    HANDLE waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+    if (waitEvent == NULL)
         return FALSE;
 
-    // Allocate and initialize a waiter node.
-    Waiter *waiter = (Waiter *)malloc(sizeof(Waiter));
-    if (!waiter)
+    // Create wait entry
+    ADDRESS_WAIT_ENTRY *entry = (ADDRESS_WAIT_ENTRY *)malloc(sizeof(ADDRESS_WAIT_ENTRY));
+    if (entry == NULL)
     {
-        CloseHandle(hEvent);
+        CloseHandle(waitEvent);
         SetLastError(ERROR_OUTOFMEMORY);
         return FALSE;
     }
 
-    waiter->address = (void *)Address;
-    waiter->event = hEvent;
-    waiter->signaled = FALSE;
-    waiter->next = NULL;
+    entry->Address = Address;
+    entry->Event = waitEvent;
 
-    // Insert the waiter into the global list.
-    EnterCriticalSection(&g_waiters_cs);
-    waiter->next = g_waiters;
-    g_waiters = waiter;
-    LeaveCriticalSection(&g_waiters_cs);
+    // Add to wait list
+    EnterCriticalSection(&g_AddressWaitLock);
 
-    // Wait on the event.
-    DWORD dwWait = WaitForSingleObject(hEvent, dwMilliseconds);
-    BOOL ret = (dwWait == WAIT_OBJECT_0);
-
-    // Remove the waiter from the global list.
-    EnterCriticalSection(&g_waiters_cs);
+    // Check if the value has already changed
+    BOOL valueMatches = FALSE;
+    switch (AddressSize)
     {
-        Waiter **pp = &g_waiters;
-        while (*pp)
+    case 1:
+        valueMatches = (*(volatile BYTE *)Address == *(BYTE *)CompareAddress);
+        break;
+    case 2:
+        valueMatches = (*(volatile SHORT *)Address == *(SHORT *)CompareAddress);
+        break;
+    case 4:
+        valueMatches = (*(volatile LONG *)Address == *(LONG *)CompareAddress);
+        break;
+    case 8:
+        valueMatches = (*(volatile LONG64 *)Address == *(LONG64 *)CompareAddress);
+        break;
+    }
+
+    BOOL result = TRUE;
+
+    if (valueMatches)
+    {
+        // Value still matches, add to wait list
+        entry->Next = g_AddressWaitList;
+        g_AddressWaitList = entry;
+        LeaveCriticalSection(&g_AddressWaitLock);
+
+        // Wait for the event
+        DWORD waitResult = WaitForSingleObject(waitEvent, dwMilliseconds);
+
+        // Remove from wait list if timeout
+        if (waitResult == WAIT_TIMEOUT)
         {
-            if (*pp == waiter)
+            EnterCriticalSection(&g_AddressWaitLock);
+            // Search for our entry to remove it
+            ADDRESS_WAIT_ENTRY **current = &g_AddressWaitList;
+            while (*current != NULL)
             {
-                *pp = waiter->next;
-                break;
+                if (*current == entry)
+                {
+                    *current = entry->Next;
+                    break;
+                }
+                current = &((*current)->Next);
             }
-            pp = &((*pp)->next);
+            LeaveCriticalSection(&g_AddressWaitLock);
+            result = FALSE;
         }
     }
-    LeaveCriticalSection(&g_waiters_cs);
-
-    CloseHandle(hEvent);
-    free(waiter);
-    return ret;
-}
-
-// WakeByAddressSingle fallback.
-// Wakes one thread waiting on the specified Address.
-WINBASEAPI VOID WINAPI WakeByAddressSingle(PVOID Address)
-{
-    TRACE(L"WakeByAddressSingle(0x%p)\n", Address);
-
-    InitWaitersCriticalSection();
-
-    EnterCriticalSection(&g_waiters_cs);
+    else
     {
-        Waiter *curr = g_waiters;
-        while (curr)
-        {
-            if (curr->address == Address && !curr->signaled)
-            {
-                curr->signaled = TRUE;
-                SetEvent(curr->event);
-                break; // Only wake one waiter.
-            }
-            curr = curr->next;
-        }
+        // Value has already changed, no need to wait
+        LeaveCriticalSection(&g_AddressWaitLock);
     }
-    LeaveCriticalSection(&g_waiters_cs);
+
+    // Cleanup
+    CloseHandle(waitEvent);
+    free(entry);
+
+    return result;
 }
 
-// WakeByAddressAll fallback.
-// Wakes all threads waiting on the specified Address.
-WINBASEAPI VOID WINAPI WakeByAddressAll(PVOID Address)
+/**
+ * WakeByAddressAll - Wakes all threads waiting on the specified address
+ *
+ * @param Address - Pointer to the memory address to wake waiters on
+ */
+void WINAPI WakeByAddressAll(void *Address)
 {
     TRACE(L"WakeByAddressAll(0x%p)\n", Address);
 
-    InitWaitersCriticalSection();
+    EnterCriticalSection(&g_AddressWaitLock);
 
-    EnterCriticalSection(&g_waiters_cs);
+    // Find all entries for this address and signal them
+    ADDRESS_WAIT_ENTRY **current = &g_AddressWaitList;
+    while (*current != NULL)
     {
-        Waiter *curr = g_waiters;
-        while (curr)
+        ADDRESS_WAIT_ENTRY *entry = *current;
+
+        if (entry->Address == Address)
         {
-            if (curr->address == Address && !curr->signaled)
-            {
-                curr->signaled = TRUE;
-                SetEvent(curr->event);
-            }
-            curr = curr->next;
+            // Signal this thread
+            SetEvent(entry->Event);
+
+            // Remove from list
+            *current = entry->Next;
+
+            // Note: The waiting thread is responsible for freeing its entry
+        }
+        else
+        {
+            // Move to next entry
+            current = &(entry->Next);
         }
     }
-    LeaveCriticalSection(&g_waiters_cs);
+
+    LeaveCriticalSection(&g_AddressWaitLock);
+}
+
+/**
+ * WakeByAddressSingle - Wakes a single thread waiting on the specified address
+ *
+ * @param Address - Pointer to the memory address to wake a waiter on
+ */
+void WINAPI WakeByAddressSingle(void *Address)
+{
+    TRACE(L"WakeByAddressSingle(0x%p)\n", Address);
+
+    EnterCriticalSection(&g_AddressWaitLock);
+
+    // Find first entry for this address and signal it
+    ADDRESS_WAIT_ENTRY **current = &g_AddressWaitList;
+    while (*current != NULL)
+    {
+        ADDRESS_WAIT_ENTRY *entry = *current;
+
+        if (entry->Address == Address)
+        {
+            // Signal this thread
+            SetEvent(entry->Event);
+
+            // Remove from list
+            *current = entry->Next;
+
+            // We only wake one thread, so break
+            break;
+        }
+        else
+        {
+            // Move to next entry
+            current = &(entry->Next);
+        }
+    }
+
+    LeaveCriticalSection(&g_AddressWaitLock);
 }
