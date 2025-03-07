@@ -19,13 +19,12 @@
 [submodule "3rdparty/mingw-w64"]
 	path = 3rdparty/mingw-w64
 	url = git://git.code.sf.net/p/mingw-w64/mingw-w64
-[submodule "clamav"]
-	path = clamav
-	url = ../clamav.git
-	branch = 1.4.2
 [submodule "3rdparty/zlib-ng"]
 	path = 3rdparty/zlib-ng
 	url = https://github.com/zlib-ng/zlib-ng.git
 [submodule "3rdparty/openssl"]
 	path = 3rdparty/openssl
 	url = ../openssl.git
+[submodule "clamav"]
+	path = clamav
+	url = ../clamav.git
