@@ -9,7 +9,7 @@ set(clamd_win32_sources
     ${CLAMWIN_DIR}/resources/clamd.rc
 )
 
-source_group("Win32 Sources" FILES ${clamd_win32_sources})
+source_group("Win32 Files" FILES ${clamd_win32_sources})
 
 add_executable(clamd
     ${clamd_headers}

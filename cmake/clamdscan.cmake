@@ -7,7 +7,7 @@ set(clamdscan_win32_sources
     ${CLAMWIN_DIR}/resources/clamdscan.rc
 )
 
-source_group("Win32 Sources" FILES ${clamdscan_win32_sources})
+source_group("Win32 Files" FILES ${clamdscan_win32_sources})
 
 add_executable(clamdscan
     ${clamdscan_headers}
