@@ -35,7 +35,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 - libxml2: 2.13.6
 - pcre2: 10.45
 - PDCurses: git-6ba6df38
-- Winpthreads: git-6ba6df3
+- Winpthreads: git-b025331
 - zlib-ng: 2.2.4
 
 ## Getting sources
