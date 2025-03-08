@@ -61,19 +61,12 @@ VOID WINAPI InitializeSRWLock(PSRWLOCK SRWLock)
 {
     TRACE(L"InitializeSRWLock(0x%p)\n", SRWLock);
 
-    if (SRWLock)
-        SRWLock->Ptr = NULL;
+    SRWLock->Ptr = NULL;
 }
 
 VOID WINAPI AcquireSRWLockExclusive(PSRWLOCK SRWLock)
 {
     TRACE(L"AcquireSRWLockExclusive(0x%p)\n", SRWLock);
-
-    if (!SRWLock)
-    {
-        TRACE(L"AcquireSRWLockExclusive -> Invalid parameter\n");
-        return;
-    }
 
     for (;;)
     {
@@ -83,9 +76,7 @@ VOID WINAPI AcquireSRWLockExclusive(PSRWLOCK SRWLock)
         if (current == 0)
         {
             // Try to acquire it exclusively
-            if (InterlockedCompareExchangePointer(&SRWLock->Ptr,
-                                                  (PVOID)(SRWLOCK_MASK_EXCLUSIVE),
-                                                  NULL) == NULL)
+            if (!InterlockedCompareExchangePointer(&SRWLock->Ptr, (PVOID)(SRWLOCK_MASK_EXCLUSIVE), NULL))
             {
                 // Successfully acquired
                 return;
@@ -122,12 +113,6 @@ VOID WINAPI ReleaseSRWLockExclusive(PSRWLOCK SRWLock)
 {
     TRACE(L"ReleaseSRWLockExclusive(0x%p)\n", SRWLock);
 
-    if (!SRWLock)
-    {
-        TRACE(L"ReleaseSRWLockExclusive -> Invalid parameter\n");
-        return;
-    }
-
     // Simply clear the exclusive bit and any waiting bits
     // This fully releases the lock for the next acquirer
     InterlockedExchangePointer(&SRWLock->Ptr, NULL);
@@ -137,12 +122,6 @@ VOID WINAPI ReleaseSRWLockExclusive(PSRWLOCK SRWLock)
 VOID WINAPI AcquireSRWLockShared(PSRWLOCK SRWLock)
 {
     TRACE(L"AcquireSRWLockShared(0x%p)\n", SRWLock);
-
-    if (!SRWLock)
-    {
-        TRACE(L"AcquireSRWLockShared -> Invalid parameter\n");
-        return;
-    }
 
     for (;;)
     {
@@ -205,12 +184,6 @@ VOID WINAPI ReleaseSRWLockShared(PSRWLOCK SRWLock)
 {
     TRACE(L"ReleaseSRWLockShared(0x%p)\n", SRWLock);
 
-    if (!SRWLock)
-    {
-        TRACE(L"ReleaseSRWLockShared -> Invalid parameter\n");
-        return;
-    }
-
     for (;;)
     {
         LONG_PTR current = (LONG_PTR)SRWLock->Ptr;
@@ -242,16 +215,8 @@ BOOLEAN WINAPI TryAcquireSRWLockExclusive(PSRWLOCK SRWLock)
 {
     TRACE(L"TryAcquireSRWLockExclusive(0x%p)\n", SRWLock);
 
-    if (!SRWLock)
-    {
-        TRACE(L"TryAcquireSRWLockExclusive -> Invalid parameter\n");
-        return FALSE;
-    }
-
     // Only succeed if the lock is completely free
-    if (InterlockedCompareExchangePointer(&SRWLock->Ptr,
-                                          (PVOID)SRWLOCK_MASK_EXCLUSIVE,
-                                          NULL) == NULL)
+    if (!InterlockedCompareExchangePointer(&SRWLock->Ptr, (PVOID)SRWLOCK_MASK_EXCLUSIVE, NULL))
         return TRUE;
 
     return FALSE;
@@ -261,12 +226,6 @@ BOOLEAN WINAPI TryAcquireSRWLockExclusive(PSRWLOCK SRWLock)
 BOOLEAN WINAPI TryAcquireSRWLockShared(PSRWLOCK SRWLock)
 {
     TRACE(L"TryAcquireSRWLockShared(0x%p)\n", SRWLock);
-
-    if (!SRWLock)
-    {
-        TRACE(L"TryAcquireSRWLockShared -> Invalid parameter\n");
-        return FALSE;
-    }
 
     for (;;)
     {

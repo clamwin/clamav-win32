@@ -10,7 +10,7 @@ InitOnceInitialize          @6 ; kernel32.InitOnceInitialize
 InitOnceExecuteOnce         @5 ; kernel32.InitOnceExecuteOnce
 
 InitializeConditionVariable @7 ; kernel32.InitializeConditionVariable
-SignalObjectAndWait         @9 ; kernel32.SignalObjectAndWait
+SignalObjectAndWait = kernel32.SignalObjectAndWait                              @9
 
 Sleep = kernel32.Sleep      @10
 SleepConditionVariableCS    @11 ; kernel32.SleepConditionVariableCS

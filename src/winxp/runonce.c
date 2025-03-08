@@ -182,12 +182,6 @@ void WINAPI InitOnceInitialize(PINIT_ONCE pInitOnce)
 {
     TRACE(L"InitOnceInitialize(0x%p)\n", pInitOnce);
 
-    if (pInitOnce == NULL)
-    {
-        TRACE(L"InitOnceInitialize -> ERROR_INVALID_PARAMETER\n");
-        SetLastError(ERROR_INVALID_PARAMETER);
-    }
-
     // Initialize the INIT_ONCE structure by setting its Ptr to NULL (state 0)
     pInitOnce->Ptr = NULL;
 }

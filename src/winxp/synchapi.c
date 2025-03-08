@@ -81,39 +81,6 @@ void WINAPI InitializeConditionVariable(PCONDITION_VARIABLE ConditionVariable)
 }
 
 /**
- * @brief Signals an object and waits on another object
- *
- * This function atomically signals one object and waits on another object.
- * This is useful in synchronization scenarios where you need to signal one
- * thread and immediately wait for a response or another condition.
- *
- * @param hObjectToSignal Handle to the object to signal
- * @param hObjectToWaitOn Handle to the object to wait on
- * @param dwMilliseconds Maximum time to wait in milliseconds, or INFINITE
- * @param bAlertable TRUE if the wait is alertable, FALSE otherwise
- * @return DWORD The wait result: WAIT_OBJECT_0, WAIT_TIMEOUT, WAIT_ABANDONED, etc.
- */
-DWORD WINAPI SignalObjectAndWait(
-    HANDLE hObjectToSignal,
-    HANDLE hObjectToWaitOn,
-    DWORD dwMilliseconds,
-    BOOL bAlertable)
-{
-    if (!hObjectToSignal || !hObjectToWaitOn)
-    {
-        SetLastError(ERROR_INVALID_PARAMETER);
-        return WAIT_FAILED;
-    }
-
-    // Signal the first object
-    if (!SetEvent(hObjectToSignal))
-        return WAIT_FAILED;
-
-    // Wait on the second object
-    return WaitForSingleObjectEx(hObjectToWaitOn, dwMilliseconds, bAlertable);
-}
-
-/**
  * WakeConditionVariable - Wakes a single thread waiting on the specified condition variable
  *
  * @param ConditionVariable - Pointer to the condition variable
@@ -234,13 +201,6 @@ BOOL WINAPI SleepConditionVariableCS(PCONDITION_VARIABLE ConditionVariable, PCRI
 BOOL WINAPI SleepConditionVariableSRW(PCONDITION_VARIABLE ConditionVariable, PSRWLOCK SRWLock, DWORD dwMilliseconds, ULONG Flags)
 {
     TRACE(L"SleepConditionVariableSRW(0x%p, 0x%p, %d, 0x%x)\n", ConditionVariable, SRWLock, dwMilliseconds, Flags);
-
-    if (!ConditionVariable || !SRWLock)
-    {
-        TRACE(L"SleepConditionVariableSRW -> ERROR_INVALID_PARAMETER\n");
-        SetLastError(ERROR_INVALID_PARAMETER);
-        return FALSE;
-    }
 
     // Create wait event
     HANDLE waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -421,13 +381,6 @@ BOOL WINAPI WaitOnAddress(volatile void *Address, void *CompareAddress, SIZE_T A
 void WINAPI WakeAllConditionVariable(PCONDITION_VARIABLE ConditionVariable)
 {
     TRACE(L"WakeAllConditionVariable(0x%p)\n", ConditionVariable);
-
-    if (!ConditionVariable)
-    {
-        TRACE(L"WakeConditionVariable -> Invalid parameter\n");
-        SetLastError(ERROR_INVALID_PARAMETER);
-        return;
-    }
 
     EnterCriticalSection(&g_ConditionVariableLock);
 
