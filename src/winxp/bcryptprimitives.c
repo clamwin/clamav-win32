@@ -25,8 +25,9 @@
 #include "winxp_compat.h"
 
 #include <wincrypt.h>
+#include <ntstatus.h>
 
-WINBASEAPI BOOL WINAPI ProcessPrng(void *buffer, size_t size)
+BOOL WINAPI ProcessPrng(void *buffer, size_t size)
 {
     HCRYPTPROV hProv = 0;
     BOOL result;
@@ -45,4 +46,27 @@ WINBASEAPI BOOL WINAPI ProcessPrng(void *buffer, size_t size)
     CryptReleaseContext(hProv, 0);
 
     return result;
+}
+
+/*
+    UUID Version 4 Requirements:
+    - Set version bits to 0100 (4 in hex) in the 16-bit Data3 field
+    - Set variant bits to 10xxxxxx in the first byte of Data4
+*/
+BOOL WINAPI ProcessPrngGuid(GUID *pGUID)
+{
+    if (!ProcessPrng(pGUID, sizeof(GUID)))
+        return FALSE;
+
+    // Data4[0] modifications (Variant Field)
+    pGUID->Data4[0] &= 0x3F; // Clear bits 7-6 (mask: 00111111)
+    pGUID->Data4[0] |= 0x80; // Set bit 7 (variant 2: 10xxxxxx)
+    // Result: Binary pattern 10xxxxxx (Microsoft GUID variant)
+
+    // Data3 modifications (Version Field)
+    pGUID->Data3 &= 0x0FFF; // Clear upper 4 bits (mask: 0000111111111111)
+    pGUID->Data3 |= 0x4000; // Set version 4 (mask: 0100000000000000)
+    // Result: Upper 4 bits become 0100 (version 4 identifier)
+
+    return TRUE;
 }
