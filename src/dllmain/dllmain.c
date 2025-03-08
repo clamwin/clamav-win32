@@ -89,7 +89,7 @@ static void processattach(void)
             DWORD le = GetLastError();
             /* ERROR_GEN_FAILURE on wine */
             if ((le != ERROR_NOT_SUPPORTED) && (le != ERROR_CALL_NOT_IMPLEMENTED) && (le != ERROR_GEN_FAILURE))
-                fprintf(stderr, "[DllMain] Error setting up low-fragmentation heap: le=%d\n", le);
+                fprintf(stderr, "[DllMain] Error setting up low-fragmentation heap: le=%ld\n", le);
         }
     }
 

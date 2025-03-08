@@ -28,9 +28,6 @@ struct mallinfo mallinfo(void)
     HANDLE hProcess = GetCurrentProcess();
     PROCESS_MEMORY_COUNTERS_EX pmc;
     struct mallinfo info;
-    SIZE_T initialFree = 0, initialTotal = 0;
-    SIZE_T currentFree = 0, currentTotal = 0;
-    void *addr = 0;
     int freeRegions = 0;
 
     memset(&info, 0, sizeof(struct mallinfo));

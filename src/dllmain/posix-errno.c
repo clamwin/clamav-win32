@@ -308,6 +308,6 @@ int cw_leerrno(void)
             cli_warnmsg("Filename too long, please report\n");
             return (errno = ENOENT);
     }
-    cli_warnmsg("System Error #%d not mapped, please report\n", err);
+    cli_warnmsg("System Error #%ld not mapped, please report\n", err);
     return (errno = NOERROR);
 }
