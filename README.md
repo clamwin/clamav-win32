@@ -21,8 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 - [**clamav**] native msvc win64 port, legacy mingw 32bit/64bit build for WinXP+
 - [**clamav**] support for unc paths, exotic/long file names
 - [**clamav**] nice icons ;)
-- [**clamscan**] memory scanner (in memory loaded modules are scanned n-disk)
-- [**llvm**] MSVC Build
+- [**clamscan**] memory scanner (in memory loaded modules are scanned on-disk)
+- [**llvm**] msvc build Only
 - [**clamdtop**] curses ui to connect to a running clamd service
 - [**clamd/freshclam**] as Windows Service
 
@@ -37,6 +37,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 - PDCurses: git-6ba6df38
 - Winpthreads: git-b025331
 - zlib-ng: 2.2.4
+- LLVM 13.0.1
 
 ## Getting sources
 
@@ -47,9 +48,7 @@ Clone repository using:
 ## Notes
 
 - You can store database and config paths in the registry using
-  clamav.reg file (I may make a nsis installer in the future),
-  paths can be also `REG_EXPAND_SZ`, environment variables are
-  allowed here (i.e. you can use paths like `%HomeDrive%\ClamAV`).
+  clamav.reg file (I may make a nsis installer in the future).
 
   If you get SSL Certificates problems when launching **freshclam** you need to install
   [Baltimore CyberTrust Root](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt)
