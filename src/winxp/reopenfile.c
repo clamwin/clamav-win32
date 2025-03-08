@@ -38,7 +38,7 @@ int wmain(int argc, wchar_t *argv[])
     }
 
     // Step 1: Create original file handle with more permissive sharing
-    HANDLE hFileOriginal = CreateFileW(
+    HANDLE hFileOriginal = CreateFile(
         argv[1],                            // File name
         GENERIC_READ,                       // Access mode (read only)
         FILE_SHARE_READ | FILE_SHARE_WRITE, // More permissive share mode

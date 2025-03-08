@@ -37,7 +37,7 @@ int wmain(int argc, wchar_t *argv[])
         return 1;
     }
 
-    HANDLE hFile = CreateFileW(
+    HANDLE hFile = CreateFile(
         argv[1],
         GENERIC_READ,
         FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -48,7 +48,7 @@ int wmain(int argc, wchar_t *argv[])
 
     if (hFile == INVALID_HANDLE_VALUE)
     {
-        fwprintf(stderr, L"CreateFileW (%ld)\n", GetLastError());
+        fwprintf(stderr, L"CreateFile(%ld)\n", GetLastError());
         return 1;
     }
 

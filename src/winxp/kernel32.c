@@ -426,7 +426,7 @@ static HANDLE hMountMgr = INVALID_HANDLE_VALUE;
 
 __attribute__((constructor)) static void open_mount_manager()
 {
-    hMountMgr = CreateFileW(
+    hMountMgr = CreateFile(
         MOUNTMGR_DOS_DEVICE_NAME,
         0,
         FILE_SHARE_READ | FILE_SHARE_WRITE,

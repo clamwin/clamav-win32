@@ -52,7 +52,7 @@ HANDLE CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LPCWSTR l
           lpTimerAttributes, lpTimerName, dwFlags, dwDesiredAccess);
 
     BOOL bManualReset = (dwFlags & CREATE_WAITABLE_TIMER_MANUAL_RESET) != 0;
-    HANDLE hTimer = CreateWaitableTimerW(lpTimerAttributes, bManualReset, lpTimerName);
+    HANDLE hTimer = CreateWaitableTimer(lpTimerAttributes, bManualReset, lpTimerName);
 
     // If the timer was created successfully but HIGH_RESOLUTION was requested,
     if ((hTimer != NULL) && (dwFlags & CREATE_WAITABLE_TIMER_HIGH_RESOLUTION))

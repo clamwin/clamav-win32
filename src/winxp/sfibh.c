@@ -59,7 +59,7 @@ int wmain(int argc, wchar_t *argv[])
     const wchar_t *newFileName = argv[2];
 
     // Open the file with required permissions
-    HANDLE hFile = CreateFileW(
+    HANDLE hFile = CreateFile(
         oldFileName,
         DELETE,                             // dwDesiredAccess
         FILE_SHARE_READ | FILE_SHARE_WRITE, // Share mode
