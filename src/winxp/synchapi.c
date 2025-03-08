@@ -80,34 +80,6 @@ void WINAPI InitializeConditionVariable(PCONDITION_VARIABLE ConditionVariable)
     ConditionVariable->Ptr = NULL;
 }
 
-static HANDLE GetConditionEvent(PCONDITION_VARIABLE ConditionVariable)
-{
-    HANDLE hEvent = (HANDLE)ConditionVariable->Ptr;
-
-    if (hEvent)
-        return hEvent;
-
-    // Create an auto-reset event
-    HANDLE newEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-
-    if (!newEvent)
-    {
-        TRACE(L"GetConditionEvent -> Failed to create event\n");
-        return NULL;
-    }
-
-    // Try to set it atomically - if we lose the race, close our event
-    if (InterlockedCompareExchangePointer(&ConditionVariable->Ptr, newEvent, NULL))
-    {
-        CloseHandle(newEvent);
-        hEvent = (HANDLE)ConditionVariable->Ptr;
-    }
-    else
-        hEvent = newEvent;
-
-    return hEvent;
-}
-
 /**
  * @brief Signals an object and waits on another object
  *
