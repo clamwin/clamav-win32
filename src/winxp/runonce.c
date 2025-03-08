@@ -22,11 +22,15 @@
  * SOFTWARE.
  */
 
+#define InitOnceInitialize NO_InitOnceInitialize
 #define InitOnceBeginInitialize NO_InitOnceBeginInitialize
 #define InitOnceComplete NO_InitOnceComplete
+#define InitOnceExecuteOnce NO_InitOnceExecuteOnce
 #include "winxp_compat.h"
+#undef InitOnceInitialize
 #undef InitOnceBeginInitialize
 #undef InitOnceComplete
+#undef InitOnceExecuteOnce
 
 #include <ntstatus.h>
 #include <psapi.h>
@@ -168,4 +172,83 @@ WINBOOL WINAPI InitOnceComplete(PINIT_ONCE pInitOnce, DWORD dwFlags, LPVOID lpCo
     }
 
     return TRUE;
+}
+
+// InitOnceInitialize - Initializes an INIT_ONCE structure.
+// Parameters:
+//   pInitOnce - pointer to the INIT_ONCE structure to initialize
+// Returns: Always returns TRUE
+void WINAPI InitOnceInitialize(PINIT_ONCE pInitOnce)
+{
+    TRACE(L"InitOnceInitialize(0x%p)\n", pInitOnce);
+
+    if (pInitOnce == NULL)
+    {
+        TRACE(L"InitOnceInitialize -> ERROR_INVALID_PARAMETER\n");
+        SetLastError(ERROR_INVALID_PARAMETER);
+    }
+
+    // Initialize the INIT_ONCE structure by setting its Ptr to NULL (state 0)
+    pInitOnce->Ptr = NULL;
+}
+
+// Function pointer type for the InitOnce callback
+typedef BOOL(WINAPI *PINIT_ONCE_FN)(
+    PINIT_ONCE InitOnce,
+    PVOID Parameter,
+    PVOID *Context);
+
+// InitOnceExecuteOnce - Executes the given initialization routine exactly once.
+// Parameters:
+//   pInitOnce - pointer to INIT_ONCE structure
+//   pInitFn   - pointer to initialization function to be called
+//   Parameter - parameter to pass to the initialization function
+//   Context   - pointer to receive context value from initialization function
+// Returns: TRUE if initialization succeeded, FALSE otherwise
+WINBOOL WINAPI InitOnceExecuteOnce(PINIT_ONCE pInitOnce, PINIT_ONCE_FN pInitFn, PVOID Parameter, PVOID *Context)
+{
+    BOOL fPending = FALSE;
+    PVOID lpContext = NULL;
+
+    TRACE(L"InitOnceExecuteOnce(0x%p, 0x%p, 0x%p, 0x%p)\n",
+          pInitOnce,
+          pInitFn,
+          Parameter,
+          Context);
+
+    // Parameter validation
+    if (pInitOnce == NULL || pInitFn == NULL)
+    {
+        TRACE(L"InitOnceExecuteOnce -> ERROR_INVALID_PARAMETER\n");
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return FALSE;
+    }
+
+    // Begin initialization phase - determine if this thread should perform initialization
+    if (!InitOnceBeginInitialize(pInitOnce, 0, &fPending, &lpContext))
+    {
+        // InitOnceBeginInitialize already set the error code
+        TRACE(L"InitOnceExecuteOnce -> InitOnceBeginInitialize failed\n");
+        return FALSE;
+    }
+
+    // If we're not pending (another thread did the initialization), we're done
+    if (!fPending)
+    {
+        TRACE(L"InitOnceExecuteOnce -> Already initialized\n");
+        return TRUE;
+    }
+
+    // We're responsible for initialization, call the provided initialization function
+    BOOL bResult = pInitFn(pInitOnce, Parameter, Context);
+
+    // Complete the initialization process with appropriate flags
+    if (!InitOnceComplete(pInitOnce, bResult ? 0 : INIT_ONCE_INIT_FAILED, NULL))
+    {
+        // InitOnceComplete already set the error code
+        TRACE(L"InitOnceExecuteOnce -> InitOnceComplete failed\n");
+        return FALSE;
+    }
+
+    return bResult;
 }

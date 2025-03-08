@@ -4,12 +4,10 @@ EXPORTS
 ;EnterSynchronizationBarrier = kernel32.EnterSynchronizationBarrier             @2
 ;DeleteSynchronizationBarrier = kernel32.DeleteSynchronizationBarrier           @1
 
-; in runonce.c but not exported
-;InitOnceBeginInitialize = kernel32.InitOnceBeginInitialize                     @3
-;InitOnceComplete = kernel32.InitOnceComplete                                   @4
-
-;InitOnceExecuteOnce = kernel32.InitOnceExecuteOnce                             @5
-;InitOnceInitialize = kernel32.InitOnceInitialize                               @6
+InitOnceBeginInitialize     @3 ; kernel32.InitOnceBeginInitialize
+InitOnceComplete            @4 ; kernel32.InitOnceComplete
+InitOnceInitialize          @6 ; kernel32.InitOnceInitialize
+InitOnceExecuteOnce         @5 ; kernel32.InitOnceExecuteOnce
 
 InitializeConditionVariable @7 ; kernel32.InitializeConditionVariable
 SignalObjectAndWait         @9 ; kernel32.SignalObjectAndWait

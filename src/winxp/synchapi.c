@@ -77,7 +77,35 @@ void WINAPI InitializeConditionVariable(PCONDITION_VARIABLE ConditionVariable)
 {
     TRACE(L"InitializeConditionVariable(0x%p)\n", ConditionVariable);
 
-    memset(ConditionVariable, 0, sizeof(CONDITION_VARIABLE));
+    ConditionVariable->Ptr = NULL;
+}
+
+static HANDLE GetConditionEvent(PCONDITION_VARIABLE ConditionVariable)
+{
+    HANDLE hEvent = (HANDLE)ConditionVariable->Ptr;
+
+    if (hEvent)
+        return hEvent;
+
+    // Create an auto-reset event
+    HANDLE newEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+
+    if (!newEvent)
+    {
+        TRACE(L"GetConditionEvent -> Failed to create event\n");
+        return NULL;
+    }
+
+    // Try to set it atomically - if we lose the race, close our event
+    if (InterlockedCompareExchangePointer(&ConditionVariable->Ptr, newEvent, NULL))
+    {
+        CloseHandle(newEvent);
+        hEvent = (HANDLE)ConditionVariable->Ptr;
+    }
+    else
+        hEvent = newEvent;
+
+    return hEvent;
 }
 
 /**
@@ -99,7 +127,7 @@ DWORD WINAPI SignalObjectAndWait(
     DWORD dwMilliseconds,
     BOOL bAlertable)
 {
-    if (hObjectToSignal == NULL || hObjectToWaitOn == NULL)
+    if (!hObjectToSignal || !hObjectToWaitOn)
     {
         SetLastError(ERROR_INVALID_PARAMETER);
         return WAIT_FAILED;
@@ -122,20 +150,25 @@ void WINAPI WakeConditionVariable(PCONDITION_VARIABLE ConditionVariable)
 {
     TRACE(L"WakeConditionVariable(0x%p)\n", ConditionVariable);
 
+    if (!ConditionVariable)
+    {
+        TRACE(L"WakeConditionVariable -> Invalid parameter\n");
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return;
+    }
+
     EnterCriticalSection(&g_ConditionVariableLock);
 
     // Get the first waiter from the Ptr field
     CONDITION_VARIABLE_WAIT_ENTRY *waiter = (CONDITION_VARIABLE_WAIT_ENTRY *)ConditionVariable->Ptr;
 
-    if (waiter != NULL)
+    if (waiter)
     {
         // Remove from list
         ConditionVariable->Ptr = waiter->Next;
 
         // Signal the event
         SetEvent(waiter->WaitEvent);
-
-        // Note: The SleepConditionVariableXX function will free the entry
     }
 
     LeaveCriticalSection(&g_ConditionVariableLock);
@@ -156,12 +189,12 @@ BOOL WINAPI SleepConditionVariableCS(PCONDITION_VARIABLE ConditionVariable, PCRI
 
     // Create wait event
     HANDLE waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-    if (waitEvent == NULL)
+    if (!waitEvent)
         return FALSE;
 
     // Create wait entry
     CONDITION_VARIABLE_WAIT_ENTRY *entry = (CONDITION_VARIABLE_WAIT_ENTRY *)malloc(sizeof(CONDITION_VARIABLE_WAIT_ENTRY));
-    if (entry == NULL)
+    if (!entry)
     {
         CloseHandle(waitEvent);
         SetLastError(ERROR_OUTOFMEMORY);
@@ -190,7 +223,7 @@ BOOL WINAPI SleepConditionVariableCS(PCONDITION_VARIABLE ConditionVariable, PCRI
 
         // Search for our entry to remove it
         CONDITION_VARIABLE_WAIT_ENTRY **current = (CONDITION_VARIABLE_WAIT_ENTRY **)&ConditionVariable->Ptr;
-        while (*current != NULL)
+        while (*current)
         {
             if (*current == entry)
             {
@@ -230,14 +263,21 @@ BOOL WINAPI SleepConditionVariableSRW(PCONDITION_VARIABLE ConditionVariable, PSR
 {
     TRACE(L"SleepConditionVariableSRW(0x%p, 0x%p, %d, 0x%x)\n", ConditionVariable, SRWLock, dwMilliseconds, Flags);
 
+    if (!ConditionVariable || !SRWLock)
+    {
+        TRACE(L"SleepConditionVariableSRW -> ERROR_INVALID_PARAMETER\n");
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return FALSE;
+    }
+
     // Create wait event
     HANDLE waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-    if (waitEvent == NULL)
+    if (!waitEvent)
         return FALSE;
 
     // Create wait entry
     CONDITION_VARIABLE_WAIT_ENTRY *entry = (CONDITION_VARIABLE_WAIT_ENTRY *)malloc(sizeof(CONDITION_VARIABLE_WAIT_ENTRY));
-    if (entry == NULL)
+    if (!entry)
     {
         CloseHandle(waitEvent);
         SetLastError(ERROR_OUTOFMEMORY);
@@ -269,7 +309,7 @@ BOOL WINAPI SleepConditionVariableSRW(PCONDITION_VARIABLE ConditionVariable, PSR
 
         // Search for our entry to remove it
         CONDITION_VARIABLE_WAIT_ENTRY **current = (CONDITION_VARIABLE_WAIT_ENTRY **)&ConditionVariable->Ptr;
-        while (*current != NULL)
+        while (*current)
         {
             if (*current == entry)
             {
@@ -321,12 +361,12 @@ BOOL WINAPI WaitOnAddress(volatile void *Address, void *CompareAddress, SIZE_T A
 
     // Create wait event
     HANDLE waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-    if (waitEvent == NULL)
+    if (!waitEvent)
         return FALSE;
 
     // Create wait entry
     ADDRESS_WAIT_ENTRY *entry = (ADDRESS_WAIT_ENTRY *)malloc(sizeof(ADDRESS_WAIT_ENTRY));
-    if (entry == NULL)
+    if (!entry)
     {
         CloseHandle(waitEvent);
         SetLastError(ERROR_OUTOFMEMORY);
@@ -375,7 +415,7 @@ BOOL WINAPI WaitOnAddress(volatile void *Address, void *CompareAddress, SIZE_T A
             EnterCriticalSection(&g_AddressWaitLock);
             // Search for our entry to remove it
             ADDRESS_WAIT_ENTRY **current = &g_AddressWaitList;
-            while (*current != NULL)
+            while (*current)
             {
                 if (*current == entry)
                 {
@@ -410,6 +450,13 @@ void WINAPI WakeAllConditionVariable(PCONDITION_VARIABLE ConditionVariable)
 {
     TRACE(L"WakeAllConditionVariable(0x%p)\n", ConditionVariable);
 
+    if (!ConditionVariable)
+    {
+        TRACE(L"WakeConditionVariable -> Invalid parameter\n");
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return;
+    }
+
     EnterCriticalSection(&g_ConditionVariableLock);
 
     // Get all waiters
@@ -419,17 +466,11 @@ void WINAPI WakeAllConditionVariable(PCONDITION_VARIABLE ConditionVariable)
     ConditionVariable->Ptr = NULL;
 
     // Wake all waiters
-    while (waiter != NULL)
+    while (waiter)
     {
         CONDITION_VARIABLE_WAIT_ENTRY *next = waiter->Next;
-
-        // Signal the event
         SetEvent(waiter->WaitEvent);
-
-        // Move to next
         waiter = next;
-
-        // Note: The SleepConditionVariableXX function will free the entries
     }
 
     LeaveCriticalSection(&g_ConditionVariableLock);
@@ -447,7 +488,7 @@ void WINAPI WakeByAddressAll(void *Address)
 
     // Find all entries for this address and signal them
     ADDRESS_WAIT_ENTRY **current = &g_AddressWaitList;
-    while (*current != NULL)
+    while (*current)
     {
         ADDRESS_WAIT_ENTRY *entry = *current;
 
@@ -484,7 +525,7 @@ void WINAPI WakeByAddressSingle(void *Address)
 
     // Find first entry for this address and signal it
     ADDRESS_WAIT_ENTRY **current = &g_AddressWaitList;
-    while (*current != NULL)
+    while (*current)
     {
         ADDRESS_WAIT_ENTRY *entry = *current;
 

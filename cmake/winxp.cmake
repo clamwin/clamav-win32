@@ -42,6 +42,8 @@ target_compile_options(reopenfile PRIVATE -Wall)
 
 file(GLOB synchapi_sources
     ${CLAMWIN_DIR}/src/winxp/synchapi.c
+    ${CLAMWIN_DIR}/src/winxp/srw.c
+    ${CLAMWIN_DIR}/src/winxp/runonce.c
     ${CLAMWIN_DIR}/resources/synchapi.rc
     ${CLAMWIN_DIR}/src/winxp/synchapi.def
 )
