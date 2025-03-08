@@ -120,58 +120,6 @@ static inline int inl_connect(SOCKET sockfd, const struct sockaddr *serv_addr, s
 }
 #define connect inl_connect
 
-/* freeaddrinfo */
-/* getaddrinfo */
-/* gethostbyaddr - herrno */
-
-/* on win32 gethostbyname fails with dotted quad strings */
-static inline struct hostent *inl_gethostbyname(const char *name)
-{
-    uint32_t a, b, c, d;
-    char dummy;
-
-    if ((sscanf(name, "%lu.%lu.%lu.%lu%c", &a, &b, &c, &d, &dummy) != 4) ||
-        (a >= 0xff) || (b >= 0xff) || (c >= 0xff) || (d >= 0xff))
-        return gethostbyname(name); /* herrno */
-    else
-    {
-        static struct hostent he;
-        static unsigned char ip_addr[4];
-        static char *ip_aliases[1] = {0};
-        static char *ip_addr_list[2] = {0,0};
-
-        memset(&he, 0, sizeof(struct hostent));
-
-        /* fill it */
-        ip_addr[0] = a;
-        ip_addr[1] = b;
-        ip_addr[2] = c;
-        ip_addr[3] = d;
-
-        he.h_name = (char *) name;
-        he.h_addr_list = ip_addr_list;
-        he.h_addr_list[0] = (char *) ip_addr;
-        he.h_aliases = ip_aliases;
-        he.h_addrtype = AF_INET;
-        he.h_length = 4;
-        return &he;
-    }
-}
-#define gethostbyname inl_gethostbyname
-
-static inline int inl_gethostname(char *name, size_t len)
-{
-    if (gethostname(name, (int) len) == SOCKET_ERROR)
-    {
-        cw_wseterrno();
-        return -1;
-    }
-    return 0;
-}
-#define gethostname inl_gethostname
-
-/* getnameinfo */
-
 static inline int inl_getpeername(SOCKET s, struct sockaddr *name, socklen_t *namelen)
 {
     if (getpeername(s, name, namelen) == SOCKET_ERROR)
