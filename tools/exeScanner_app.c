@@ -20,7 +20,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <exeScanner.h>
+
+#include "exeScanner.h"
 
 int main(int argc, char *argv[])
 {

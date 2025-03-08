@@ -72,6 +72,7 @@ target_link_libraries(libclamav PRIVATE
     ${OPENSSL_SSL_LIBRARY}
     ${OPENSSL_CRYPTO_LIBRARY}
     crypt32
+    wintrust
     ws2_32
     psapi
     clamav_rust

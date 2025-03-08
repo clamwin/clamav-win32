@@ -21,7 +21,10 @@
 #ifndef _OSDEPS_H_
 #define _OSDEPS_H_
 
+#include <stdbool.h>
+
 extern int cw_unlink(const char *pathname);
+extern long cw_sigcheck(int fd, const char *virname, bool warnfp);
 
 static volatile const char portrev_rodata[] =
 {

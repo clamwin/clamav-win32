@@ -3,8 +3,8 @@
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 VS_VERSION_INFO VERSIONINFO
-	FILEVERSION 1,1,0,0
-	PRODUCTVERSION 1,1,0,0
+	FILEVERSION 1,2,0,0
+	PRODUCTVERSION 1,2,0,0
 	FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
 	FILEFLAGS 0x1L
@@ -20,12 +20,12 @@ BEGIN
 		BLOCK "00000409"
 		BEGIN
 			VALUE "FileDescription", __DESC__
-			VALUE "FileVersion", "1, 1, 0, 0"
+			VALUE "FileVersion", "1, 2, 0, 0"
 			VALUE "InternalName", __MODULE__
-			VALUE "LegalCopyright", "Copyright (C) 2007-2010 Gianluigi Tiesi"
+			VALUE "LegalCopyright", "Copyright (C) 2007-2025 Gianluigi Tiesi"
 			VALUE "OriginalFilename", __MODULE__
 			VALUE "ProductName", "ClamWin Antivirus"
-			VALUE "ProductVersion", "1, 1, 0, 0"
+			VALUE "ProductVersion", "1, 2, 0, 0"
 		END
 	END
 	BLOCK "VarFileInfo"

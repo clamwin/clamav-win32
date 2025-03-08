@@ -1,7 +1,7 @@
 /*
  * Clamav Native Windows Port: Mini Dump files unscrambler
  *
- * Copyright (c) 2006-2008 Gianluigi Tiesi <sherpya@netfarm.it>
+ * Copyright (c) 2006-2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <windows.h>
 
-int main(int argc, char *argv[])
+int wmain(int argc, wchar_t *argv[])
 {
     HANDLE hFile, hMapFile;
     LPBYTE lpMapAddress;
@@ -30,23 +30,23 @@ int main(int argc, char *argv[])
 
     if (argc != 2)
     {
-        fprintf(stderr, "Usage %s scrambled.dmp\n", argv[0]);
+        fwprintf(stderr, L"Usage %ls scrambled.dmp\n", argv[0]);
         return -1;
     }
 
-    hFile = CreateFileA(argv[1], GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    hFile = CreateFile(argv[1], GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
     if (hFile == INVALID_HANDLE_VALUE )
     {
-        fprintf(stderr, "CreateFile() failed error code %d\n", GetLastError());
+        fprintf(stderr, "CreateFile() failed error code %ld\n", GetLastError());
         return -1;
     }
 
-    hMapFile = CreateFileMappingA(hFile, NULL, PAGE_READWRITE, 0, 0, "ClamWinDumper");
+    hMapFile = CreateFileMapping(hFile, NULL, PAGE_READWRITE, 0, 0, NULL);
 
     if (!hMapFile)
     {
-        fprintf(stderr, "CreateFileMapping() failed error code %d\n", GetLastError());
+        fprintf(stderr, "CreateFileMapping() failed error code %ld\n", GetLastError());
         CloseHandle(hFile);
         return -1;
     }
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
     if (!lpMapAddress)
     {
-        fprintf(stderr, "MapViewOfFile() failed error code %d\n", GetLastError());
+        fprintf(stderr, "MapViewOfFile() failed error code %ld\n", GetLastError());
         CloseHandle(hFile);
         CloseHandle(hMapFile);
         return -1;
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
         for (i = 0; i < GetFileSize(hFile, NULL); i++)
             lpMapAddress[i] ^= 42;
         FlushViewOfFile(lpMapAddress, 0);
-        fprintf(stderr, "%s unscrambed\n", argv[1]);
+        fwprintf(stderr, L"%ls unscrambed\n", argv[1]);
     }
 
     UnmapViewOfFile(lpMapAddress);

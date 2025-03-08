@@ -133,9 +133,9 @@ include(cmake/clamscan.cmake)
 include(cmake/freshclam.cmake)
 include(cmake/sigtool.cmake)
 include(cmake/libclamunrar.cmake)
-
 include(cmake/pdcurses.cmake)
 include(cmake/clamdtop.cmake)
+include(cmake/tools.cmake)
 
 include(${CLAMAV_DIR}/cmake/FindRust.cmake)
 add_subdirectory(${CLAMAV_DIR}/libclamav_rust)

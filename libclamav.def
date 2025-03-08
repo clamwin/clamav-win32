@@ -190,6 +190,7 @@ lsig_sub_matched
 cw_perror
 cw_strerror
 cw_unlink
+cw_sigcheck
 
 ; cw_internal
 cw_leerrno                                 @1000 NONAME
