@@ -22,7 +22,19 @@
  * SOFTWARE.
  */
 
+#define SignalObjectAndWait NO_SignalObjectAndWait
+#define InitializeConditionVariable NO_InitializeConditionVariable
+#define WakeConditionVariable NO_WakeConditionVariable
+#define WakeAllConditionVariable NO_WakeAllConditionVariable
+#define SleepConditionVariableCS NO_SleepConditionVariableCS
+#define SleepConditionVariableSRW NO_SleepConditionVariableSRW
 #include "winxp_compat.h"
+#undef SignalObjectAndWait
+#undef InitializeConditionVariable
+#undef WakeConditionVariable
+#undef WakeAllConditionVariable
+#undef SleepConditionVariableCS
+#undef SleepConditionVariableSRW
 
 typedef struct _ADDRESS_WAIT_ENTRY
 {
@@ -31,20 +43,259 @@ typedef struct _ADDRESS_WAIT_ENTRY
     struct _ADDRESS_WAIT_ENTRY *Next;
 } ADDRESS_WAIT_ENTRY;
 
+typedef struct _CONDITION_VARIABLE_WAIT_ENTRY
+{
+    HANDLE WaitEvent;
+    struct _CONDITION_VARIABLE_WAIT_ENTRY *Next;
+} CONDITION_VARIABLE_WAIT_ENTRY;
+
 // Global synchronization
 CRITICAL_SECTION g_AddressWaitLock;
+CRITICAL_SECTION g_ConditionVariableLock;
 ADDRESS_WAIT_ENTRY *g_AddressWaitList = NULL;
 
-// Initialize the critical section (called on first use).
-__attribute__((constructor)) static void InitializeAddressWait()
+__attribute__((constructor)) static void synchapi_ctor()
 {
-    TRACE(L"InitializeAddressWait\n");
+    TRACE(L"synchapi_ctor\n");
     InitializeCriticalSection(&g_AddressWaitLock);
+    InitializeCriticalSection(&g_ConditionVariableLock);
 }
 
-__attribute__((destructor)) static void CleanupAddressWait()
+__attribute__((destructor)) static void synchapi_dtor()
 {
+    TRACE(L"synchapi_dtor\n");
     DeleteCriticalSection(&g_AddressWaitLock);
+    DeleteCriticalSection(&g_ConditionVariableLock);
+}
+
+/**
+ * InitializeConditionVariable - Initializes a condition variable
+ *
+ * @param ConditionVariable - Pointer to the condition variable
+ */
+void WINAPI InitializeConditionVariable(PCONDITION_VARIABLE ConditionVariable)
+{
+    TRACE(L"InitializeConditionVariable(0x%p)\n", ConditionVariable);
+
+    memset(ConditionVariable, 0, sizeof(CONDITION_VARIABLE));
+}
+
+/**
+ * @brief Signals an object and waits on another object
+ *
+ * This function atomically signals one object and waits on another object.
+ * This is useful in synchronization scenarios where you need to signal one
+ * thread and immediately wait for a response or another condition.
+ *
+ * @param hObjectToSignal Handle to the object to signal
+ * @param hObjectToWaitOn Handle to the object to wait on
+ * @param dwMilliseconds Maximum time to wait in milliseconds, or INFINITE
+ * @param bAlertable TRUE if the wait is alertable, FALSE otherwise
+ * @return DWORD The wait result: WAIT_OBJECT_0, WAIT_TIMEOUT, WAIT_ABANDONED, etc.
+ */
+DWORD WINAPI SignalObjectAndWait(
+    HANDLE hObjectToSignal,
+    HANDLE hObjectToWaitOn,
+    DWORD dwMilliseconds,
+    BOOL bAlertable)
+{
+    if (hObjectToSignal == NULL || hObjectToWaitOn == NULL)
+    {
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return WAIT_FAILED;
+    }
+
+    // Signal the first object
+    if (!SetEvent(hObjectToSignal))
+        return WAIT_FAILED;
+
+    // Wait on the second object
+    return WaitForSingleObjectEx(hObjectToWaitOn, dwMilliseconds, bAlertable);
+}
+
+/**
+ * WakeConditionVariable - Wakes a single thread waiting on the specified condition variable
+ *
+ * @param ConditionVariable - Pointer to the condition variable
+ */
+void WINAPI WakeConditionVariable(PCONDITION_VARIABLE ConditionVariable)
+{
+    TRACE(L"WakeConditionVariable(0x%p)\n", ConditionVariable);
+
+    EnterCriticalSection(&g_ConditionVariableLock);
+
+    // Get the first waiter from the Ptr field
+    CONDITION_VARIABLE_WAIT_ENTRY *waiter = (CONDITION_VARIABLE_WAIT_ENTRY *)ConditionVariable->Ptr;
+
+    if (waiter != NULL)
+    {
+        // Remove from list
+        ConditionVariable->Ptr = waiter->Next;
+
+        // Signal the event
+        SetEvent(waiter->WaitEvent);
+
+        // Note: The SleepConditionVariableXX function will free the entry
+    }
+
+    LeaveCriticalSection(&g_ConditionVariableLock);
+}
+
+/**
+ * SleepConditionVariableCS - Puts the current thread to sleep until the condition variable is signaled
+ *
+ * @param ConditionVariable - Pointer to the condition variable
+ * @param CriticalSection - Critical section associated with the condition variable
+ * @param dwMilliseconds - Timeout in milliseconds
+ *
+ * @return TRUE if the wait succeeded, FALSE if timeout or error
+ */
+BOOL WINAPI SleepConditionVariableCS(PCONDITION_VARIABLE ConditionVariable, PCRITICAL_SECTION CriticalSection, DWORD dwMilliseconds)
+{
+    TRACE(L"SleepConditionVariableCS(0x%p, 0x%p, %d)\n", ConditionVariable, CriticalSection, dwMilliseconds);
+
+    // Create wait event
+    HANDLE waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+    if (waitEvent == NULL)
+        return FALSE;
+
+    // Create wait entry
+    CONDITION_VARIABLE_WAIT_ENTRY *entry = (CONDITION_VARIABLE_WAIT_ENTRY *)malloc(sizeof(CONDITION_VARIABLE_WAIT_ENTRY));
+    if (entry == NULL)
+    {
+        CloseHandle(waitEvent);
+        SetLastError(ERROR_OUTOFMEMORY);
+        return FALSE;
+    }
+
+    entry->WaitEvent = waitEvent;
+
+    // Add to the wait list (protected by global lock)
+    EnterCriticalSection(&g_ConditionVariableLock);
+    entry->Next = (CONDITION_VARIABLE_WAIT_ENTRY *)ConditionVariable->Ptr;
+    ConditionVariable->Ptr = entry;
+    LeaveCriticalSection(&g_ConditionVariableLock);
+
+    // Release the critical section and wait
+    LeaveCriticalSection(CriticalSection);
+
+    // Wait for the event
+    DWORD waitResult = WaitForSingleObject(waitEvent, dwMilliseconds);
+    BOOL result = (waitResult == WAIT_OBJECT_0);
+
+    // If timeout occurred, we need to remove ourselves from the wait list
+    if (waitResult == WAIT_TIMEOUT)
+    {
+        EnterCriticalSection(&g_ConditionVariableLock);
+
+        // Search for our entry to remove it
+        CONDITION_VARIABLE_WAIT_ENTRY **current = (CONDITION_VARIABLE_WAIT_ENTRY **)&ConditionVariable->Ptr;
+        while (*current != NULL)
+        {
+            if (*current == entry)
+            {
+                *current = entry->Next;
+                break;
+            }
+            current = &((*current)->Next);
+        }
+
+        LeaveCriticalSection(&g_ConditionVariableLock);
+    }
+
+    // Reacquire the critical section before returning (as per API contract)
+    EnterCriticalSection(CriticalSection);
+
+    // Cleanup
+    CloseHandle(waitEvent);
+    free(entry);
+
+    if (!result)
+        SetLastError(ERROR_TIMEOUT);
+
+    return result;
+}
+
+/**
+ * SleepConditionVariableSRW - Puts the current thread to sleep until the condition variable is signaled (SRW version)
+ *
+ * @param ConditionVariable - Pointer to the condition variable
+ * @param SRWLock - SRW lock associated with the condition variable
+ * @param dwMilliseconds - Timeout in milliseconds
+ * @param Flags - Flags (can be CONDITION_VARIABLE_LOCKMODE_SHARED)
+ *
+ * @return TRUE if the wait succeeded, FALSE if timeout or error
+ */
+BOOL WINAPI SleepConditionVariableSRW(PCONDITION_VARIABLE ConditionVariable, PSRWLOCK SRWLock, DWORD dwMilliseconds, ULONG Flags)
+{
+    TRACE(L"SleepConditionVariableSRW(0x%p, 0x%p, %d, 0x%x)\n", ConditionVariable, SRWLock, dwMilliseconds, Flags);
+
+    // Create wait event
+    HANDLE waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+    if (waitEvent == NULL)
+        return FALSE;
+
+    // Create wait entry
+    CONDITION_VARIABLE_WAIT_ENTRY *entry = (CONDITION_VARIABLE_WAIT_ENTRY *)malloc(sizeof(CONDITION_VARIABLE_WAIT_ENTRY));
+    if (entry == NULL)
+    {
+        CloseHandle(waitEvent);
+        SetLastError(ERROR_OUTOFMEMORY);
+        return FALSE;
+    }
+
+    entry->WaitEvent = waitEvent;
+
+    // Add to the wait list (protected by global lock)
+    EnterCriticalSection(&g_ConditionVariableLock);
+    entry->Next = (CONDITION_VARIABLE_WAIT_ENTRY *)ConditionVariable->Ptr;
+    ConditionVariable->Ptr = entry;
+    LeaveCriticalSection(&g_ConditionVariableLock);
+
+    // Release the SRW lock and wait
+    if (Flags & CONDITION_VARIABLE_LOCKMODE_SHARED)
+        ReleaseSRWLockShared(SRWLock);
+    else
+        ReleaseSRWLockExclusive(SRWLock);
+
+    // Wait for the event
+    DWORD waitResult = WaitForSingleObject(waitEvent, dwMilliseconds);
+    BOOL result = (waitResult == WAIT_OBJECT_0);
+
+    // If timeout occurred, we need to remove ourselves from the wait list
+    if (waitResult == WAIT_TIMEOUT)
+    {
+        EnterCriticalSection(&g_ConditionVariableLock);
+
+        // Search for our entry to remove it
+        CONDITION_VARIABLE_WAIT_ENTRY **current = (CONDITION_VARIABLE_WAIT_ENTRY **)&ConditionVariable->Ptr;
+        while (*current != NULL)
+        {
+            if (*current == entry)
+            {
+                *current = entry->Next;
+                break;
+            }
+            current = &((*current)->Next);
+        }
+
+        LeaveCriticalSection(&g_ConditionVariableLock);
+    }
+
+    // Reacquire the SRW lock before returning (as per API contract)
+    if (Flags & CONDITION_VARIABLE_LOCKMODE_SHARED)
+        AcquireSRWLockShared(SRWLock);
+    else
+        AcquireSRWLockExclusive(SRWLock);
+
+    // Cleanup
+    CloseHandle(waitEvent);
+    free(entry);
+
+    if (!result)
+        SetLastError(ERROR_TIMEOUT);
+
+    return result;
 }
 
 /**
@@ -150,6 +401,39 @@ BOOL WINAPI WaitOnAddress(volatile void *Address, void *CompareAddress, SIZE_T A
     return result;
 }
 
+/**
+ * WakeAllConditionVariable - Wakes all threads waiting on the specified condition variable
+ *
+ * @param ConditionVariable - Pointer to the condition variable
+ */
+void WINAPI WakeAllConditionVariable(PCONDITION_VARIABLE ConditionVariable)
+{
+    TRACE(L"WakeAllConditionVariable(0x%p)\n", ConditionVariable);
+
+    EnterCriticalSection(&g_ConditionVariableLock);
+
+    // Get all waiters
+    CONDITION_VARIABLE_WAIT_ENTRY *waiter = (CONDITION_VARIABLE_WAIT_ENTRY *)ConditionVariable->Ptr;
+
+    // Clear the list
+    ConditionVariable->Ptr = NULL;
+
+    // Wake all waiters
+    while (waiter != NULL)
+    {
+        CONDITION_VARIABLE_WAIT_ENTRY *next = waiter->Next;
+
+        // Signal the event
+        SetEvent(waiter->WaitEvent);
+
+        // Move to next
+        waiter = next;
+
+        // Note: The SleepConditionVariableXX function will free the entries
+    }
+
+    LeaveCriticalSection(&g_ConditionVariableLock);
+}
 /**
  * WakeByAddressAll - Wakes all threads waiting on the specified address
  *
