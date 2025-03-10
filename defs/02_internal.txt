@@ -76,6 +76,11 @@ text_normalize_map
 uniq_get
 fmap
 
+; win32
+openlog
+closelog
+syslog
+
 ; mpool
 mpool_getstats
 

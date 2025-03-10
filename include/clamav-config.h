@@ -473,7 +473,7 @@
 #define USE_MPOOL 1
 
 /* use syslog */
-/* #undef USE_SYSLOG */
+#define USE_SYSLOG 1
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE
