@@ -1,6 +1,7 @@
 file(GLOB libclamav_common_sources
     ${CLAMWIN_DIR}/src/common/*.c
     ${CLAMAV_DIR}/common/*.c
+    ${CLAMAV_DIR}/win32/compat/glob.c
 )
 
 list(REMOVE_ITEM libclamav_common_sources

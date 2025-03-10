@@ -27,6 +27,7 @@ int _CRT_glob = 0;
 #endif
 
 extern int cw_main(int argc, char *argv[]);
+extern void w32_glob(int* argc_ptr, char*** argv_ptr);
 
 #undef main
 int main(int argc, char* argv[])
@@ -36,14 +37,10 @@ int main(int argc, char* argv[])
     SetUnhandledExceptionFilter(CrashHandlerExceptionFilter);
 #endif
 
-    if (_setmode(_fileno(stdin), O_BINARY) == -1)
-    {
-        perror("_setmode");
-        abort();
-    }
-
 #ifndef _WIN64
     disablefsredir();
 #endif
+
+    w32_glob(&argc, &argv);
     return cw_main(argc, argv);
 }
