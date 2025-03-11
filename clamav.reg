@@ -1,6 +1,5 @@
 REGEDIT4
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\ClamAV]
-"ConfigDir"="C:\\Clamav"
+"ConfDir"="C:\\Clamav"
 "DataDir"="C:\\Clamav\\db"
-
