@@ -27,12 +27,14 @@
 #define InitializeProcThreadAttributeList NO_InitializeProcThreadAttributeList
 #define DeleteProcThreadAttributeList NO_DeleteProcThreadAttributeList
 #define UpdateProcThreadAttribute NO_UpdateProcThreadAttribute
+#define SetThreadStackGuarantee NO_SetThreadStackGuarantee
 #include "winxp_compat.h"
 #undef CreateSymbolicLinkW
 #undef CreateWaitableTimerExW
 #undef InitializeProcThreadAttributeList
 #undef DeleteProcThreadAttributeList
 #undef UpdateProcThreadAttribute
+#undef SetThreadStackGuarantee
 
 BOOLEAN CreateSymbolicLinkW(LPCWSTR lpSymlinkFileName, LPCWSTR lpTargetFileName, DWORD dwFlags)
 {
@@ -67,7 +69,7 @@ HANDLE CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LPCWSTR l
 // Fallback implementation of SetThreadStackGuarantee for Windows XP.
 // Since XP does not support changing the thread stack guarantee, this stub simply returns TRUE.
 // The value pointed to by StackSizeInBytes is left unchanged.
-WINBASEAPI WINBOOL WINAPI SetThreadStackGuarantee(PULONG StackSizeInBytes)
+WINBOOL WINAPI SetThreadStackGuarantee(PULONG StackSizeInBytes)
 {
     TRACE(L"SetThreadStackGuarantee(%d)\n", StackSizeInBytes);
 

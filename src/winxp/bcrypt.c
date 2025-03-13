@@ -23,7 +23,8 @@
  */
 
 /* Needed by libxml2 */
-#include <windows.h>
+#include "winxp_compat.h"
+
 #include <ntstatus.h>
 #include <wincrypt.h>
 #include <bcrypt.h>

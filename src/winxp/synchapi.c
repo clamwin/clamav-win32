@@ -54,6 +54,7 @@ CRITICAL_SECTION g_AddressWaitLock;
 CRITICAL_SECTION g_ConditionVariableLock;
 ADDRESS_WAIT_ENTRY *g_AddressWaitList = NULL;
 
+#ifdef __GNUC__
 __attribute__((constructor)) static void synchapi_ctor()
 {
     TRACE(L"synchapi_ctor\n");
@@ -67,6 +68,7 @@ __attribute__((destructor)) static void synchapi_dtor()
     DeleteCriticalSection(&g_AddressWaitLock);
     DeleteCriticalSection(&g_ConditionVariableLock);
 }
+#endif // __GNUC__
 
 /**
  * InitializeConditionVariable - Initializes a condition variable

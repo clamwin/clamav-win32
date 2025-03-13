@@ -7,6 +7,11 @@ if(WINXP_TRACE)
     list(APPEND COMPAT_DEFINES TRACE_COMPAT)
 endif()
 
+list(APPEND clamav_compat_headers
+    ${CLAMWIN_DIR}/src/winxp/winxp_compat.h
+    ${CLAMWIN_DIR}/src/winxp/internals.h
+)
+
 file(GLOB clamav_compat_sources
     ${CLAMWIN_DIR}/src/winxp/stubs.c
     ${CLAMWIN_DIR}/src/winxp/bcrypt.c
@@ -17,28 +22,30 @@ file(GLOB clamav_compat_sources
 )
 
 add_library(clamav_compat STATIC
+    ${clamav_compat_headers}
     ${clamav_compat_sources}
 )
 target_compile_definitions(clamav_compat PRIVATE ${COMPAT_DEFINES})
-target_compile_options(clamav_compat PRIVATE -Wall)
+target_compile_options(clamav_compat PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
+target_compile_options(clamav_compat PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4061 /wd4820>)
 
 add_executable(gfpn ${CLAMWIN_DIR}/src/winxp/gfpn.c)
-target_link_libraries(gfpn PRIVATE clamav_compat psapi ntdll mpr)
-target_link_options(gfpn PRIVATE -municode)
 target_compile_definitions(gfpn PRIVATE ${COMPAT_DEFINES})
-target_compile_options(gfpn PRIVATE -Wall)
+target_link_libraries(gfpn PRIVATE clamav_compat psapi ntdll mpr)
+target_link_options(gfpn PRIVATE $<$<CXX_COMPILER_ID:GNU>:-municode>)
+target_compile_options(gfpn PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
 
 add_executable(sfibh ${CLAMWIN_DIR}/src/winxp/sfibh.c)
-target_link_libraries(sfibh PRIVATE clamav_compat psapi ntdll mpr)
-target_link_options(sfibh PRIVATE -municode)
 target_compile_definitions(sfibh PRIVATE ${COMPAT_DEFINES})
-target_compile_options(sfibh PRIVATE -Wall)
+target_link_libraries(sfibh PRIVATE clamav_compat psapi ntdll mpr)
+target_link_options(sfibh PRIVATE $<$<CXX_COMPILER_ID:GNU>:-municode>)
+target_compile_options(sfibh PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
 
 add_executable(reopenfile ${CLAMWIN_DIR}/src/winxp/reopenfile.c)
-target_link_libraries(reopenfile PRIVATE clamav_compat ntdll)
-target_link_options(reopenfile PRIVATE -municode)
 target_compile_definitions(reopenfile PRIVATE ${COMPAT_DEFINES})
-target_compile_options(reopenfile PRIVATE -Wall)
+target_link_libraries(reopenfile PRIVATE clamav_compat ntdll)
+target_link_options(reopenfile PRIVATE $<$<CXX_COMPILER_ID:GNU>:-municode>)
+target_compile_options(reopenfile PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
 
 file(GLOB synchapi_sources
     ${CLAMWIN_DIR}/src/winxp/synchapi.c
@@ -49,6 +56,7 @@ file(GLOB synchapi_sources
 )
 add_library(synchapi SHARED ${synchapi_sources})
 target_compile_definitions(synchapi PRIVATE ${COMPAT_DEFINES})
+target_link_options(synchapi PRIVATE $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 set_target_properties(synchapi PROPERTIES PREFIX "" OUTPUT_NAME api-ms-win-core-synch-l1-2-0)
 list(APPEND CLAMAV_INSTALL_TARGETS synchapi)
 
@@ -67,3 +75,5 @@ target_link_libraries(libclamav PRIVATE clamav_compat)
 target_link_libraries(libfreshclam PRIVATE clamav_compat)
 target_link_libraries(clambc PRIVATE clamav_compat)
 target_link_libraries(sigtool PRIVATE clamav_compat)
+
+target_link_options(libclamav PRIVATE $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)

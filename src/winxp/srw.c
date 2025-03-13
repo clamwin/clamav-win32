@@ -23,10 +23,18 @@
  */
 
 
+#define AcquireSRWLockExclusive NO_AcquireSRWLockExclusive
+#define ReleaseSRWLockExclusive NO_ReleaseSRWLockExclusive
+#define AcquireSRWLockShared NO_AcquireSRWLockShared
+#define ReleaseSRWLockShared NO_ReleaseSRWLockShared
 #define InitializeSRWLock NO_InitializeSRWLock
 #define TryAcquireSRWLockExclusive NO_TryAcquireSRWLockExclusive
 #define TryAcquireSRWLockShared NO_TryAcquireSRWLockShared
 #include "winxp_compat.h"
+#undef AcquireSRWLockExclusive
+#undef ReleaseSRWLockExclusive
+#undef AcquireSRWLockShared
+#undef ReleaseSRWLockShared
 #undef InitializeSRWLock
 #undef TryAcquireSRWLockExclusive
 #undef TryAcquireSRWLockShared

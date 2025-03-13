@@ -22,28 +22,9 @@
  * SOFTWARE.
  */
 
-#include <windows.h>
+#include "winxp_compat.h"
+
 #include <stdio.h>
-#include <winternl.h>
-
-typedef enum _FILE_INFO_BY_HANDLE_CLASS
-{
-    FileBasicInfo,
-    FileStandardInfo,
-    FileNameInfo,
-    FileRenameInfo
-} FILE_INFO_BY_HANDLE_CLASS,
-    *PFILE_INFO_BY_HANDLE_CLASS;
-
-typedef struct _FILE_RENAME_INFO
-{
-    BOOLEAN ReplaceIfExists;
-    HANDLE RootDirectory;
-    DWORD FileNameLength;
-    WCHAR FileName[1];
-} FILE_RENAME_INFO, *PFILE_RENAME_INFO;
-
-WINBOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLASS FileInformationClass, LPVOID lpFileInformation, DWORD dwBufferSize);
 
 int wmain(int argc, wchar_t *argv[])
 {

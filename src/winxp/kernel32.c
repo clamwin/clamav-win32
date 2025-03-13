@@ -26,18 +26,21 @@
 #define GetFileInformationByHandleEx NO_GetFileInformationByHandleEx
 #define SetFileInformationByHandle NO_SetFileInformationByHandle
 #define GetFinalPathNameByHandleW NO_GetFinalPathNameByHandleW
+#define GetSystemTimePreciseAsFileTime NO_GetSystemTimePreciseAsFileTime
+#define ReOpenFile NO_ReOpenFile
 #include "winxp_compat.h"
 #undef CompareStringOrdinal
 #undef GetFileInformationByHandleEx
 #undef SetFileInformationByHandle
 #undef GetFinalPathNameByHandleW
+#undef GetSystemTimePreciseAsFileTime
+#undef ReOpenFile
 
 #include <fileapi.h>
-#include <ntdef.h>
-#include <winternl.h>
 #include <psapi.h>
 #include <strsafe.h>
-#include <ddk/mountmgr.h>
+
+#include "internals.h"
 
 DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 
@@ -424,6 +427,7 @@ union ANY_BUFFER
 
 static HANDLE hMountMgr = INVALID_HANDLE_VALUE;
 
+#ifdef __GNUC__
 __attribute__((constructor)) static void open_mount_manager()
 {
     hMountMgr = CreateFile(
@@ -444,6 +448,7 @@ __attribute__((destructor)) static void close_mount_manager()
         TRACE(L"Closed MountMgr HANDLE\n");
     }
 }
+#endif // __GNUC__
 
 /*
  * GetFinalPathNameByHandleW - Retrieves the final path for the specified file
@@ -570,7 +575,7 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
 
 #define VALID_FLAGS 0x5AFFB7
 
-WINBASEAPI HANDLE WINAPI ReOpenFile(
+HANDLE WINAPI ReOpenFile(
     HANDLE hOriginalFile,
     DWORD dwDesiredAccess,
     DWORD dwShareMode,
@@ -668,7 +673,7 @@ WINBASEAPI HANDLE WINAPI ReOpenFile(
     return FileHandle;
 }
 
-WINBASEAPI VOID WINAPI GetSystemTimePreciseAsFileTime(LPFILETIME lpSystemTimeAsFileTime)
+VOID WINAPI GetSystemTimePreciseAsFileTime(LPFILETIME lpSystemTimeAsFileTime)
 {
     // Static variables to hold the baseline values.
     // They are initialized on the first call.
