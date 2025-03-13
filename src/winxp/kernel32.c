@@ -465,7 +465,7 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
 {
     NTSTATUS status;
     IO_STATUS_BLOCK iosb;
-    DWORD requiredLength = 0;
+    size_t requiredLength = 0;
 
     TRACE(L"GetFinalPathNameByHandleW(0x%p, 0x%p, %d, %d)\n", hFile, lpszFilePath, cchFilePath, dwFlags);
 
@@ -522,7 +522,7 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
     size_t nameLength = nameRel.NameInfo.FileNameLength / sizeof(wchar_t);
 
     // Extract the device path portion
-    nameMnt.TargetName.DeviceNameLength = nameFull.UnicodeString.Length - nameRel.NameInfo.FileNameLength;
+    nameMnt.TargetName.DeviceNameLength = (USHORT)(nameFull.UnicodeString.Length - nameRel.NameInfo.FileNameLength);
     wcsncpy(nameMnt.TargetName.DeviceName,
             nameFull.UnicodeString.Buffer,
             nameMnt.TargetName.DeviceNameLength / sizeof(wchar_t));
@@ -568,9 +568,9 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
         lpszFilePath[requiredLength] = L'\0';
     }
 
-    TRACE(L"GetFinalPathNameByHandleW -> %ls (%d chars)\n", targetPath, requiredLength);
+    TRACE(L"GetFinalPathNameByHandleW -> %ls (%lld chars)\n", targetPath, requiredLength);
     // Return the length of the final path (excluding the terminating null).
-    return requiredLength;
+    return (DWORD) requiredLength;
 }
 
 #define VALID_FLAGS 0x5AFFB7

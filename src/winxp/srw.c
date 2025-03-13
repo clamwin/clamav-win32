@@ -84,7 +84,7 @@ VOID WINAPI AcquireSRWLockExclusive(PSRWLOCK SRWLock)
         if (current == 0)
         {
             // Try to acquire it exclusively
-            if (!InterlockedCompareExchangePointer(&SRWLock->Ptr, (PVOID)(SRWLOCK_MASK_EXCLUSIVE), NULL))
+            if (!InterlockedCompareExchangePointer(&SRWLock->Ptr, (PVOID)(ULONG_PTR)SRWLOCK_MASK_EXCLUSIVE, NULL))
             {
                 // Successfully acquired
                 return;
@@ -224,7 +224,7 @@ BOOLEAN WINAPI TryAcquireSRWLockExclusive(PSRWLOCK SRWLock)
     TRACE(L"TryAcquireSRWLockExclusive(0x%p)\n", SRWLock);
 
     // Only succeed if the lock is completely free
-    if (!InterlockedCompareExchangePointer(&SRWLock->Ptr, (PVOID)SRWLOCK_MASK_EXCLUSIVE, NULL))
+    if (!InterlockedCompareExchangePointer(&SRWLock->Ptr, (PVOID)(ULONG_PTR)SRWLOCK_MASK_EXCLUSIVE, NULL))
         return TRUE;
 
     return FALSE;
