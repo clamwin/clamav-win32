@@ -57,6 +57,7 @@ typedef BOOL WINBOOL;
 
 #ifdef TRACE_COMPAT
 #include <stdio.h>
+#include <inttypes.h>
 #define TRACE(format, ...) fwprintf(stderr, L"[winxp] " format, ##__VA_ARGS__)
 #else
 #define TRACE(format, ...)

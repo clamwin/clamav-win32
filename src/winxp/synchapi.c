@@ -284,7 +284,7 @@ BOOL WINAPI SleepConditionVariableSRW(PCONDITION_VARIABLE ConditionVariable, PSR
  */
 BOOL WINAPI WaitOnAddress(volatile void *Address, void *CompareAddress, SIZE_T AddressSize, DWORD dwMilliseconds)
 {
-    TRACE(L"WaitOnAddress(0x%p, 0x%p, %d, %d)\n", Address, CompareAddress, AddressSize, dwMilliseconds);
+    TRACE(L"WaitOnAddress(0x%p, 0x%p, %lld, %d)\n", Address, CompareAddress, AddressSize, dwMilliseconds);
 
     // Validate address size
     if (AddressSize != 1 && AddressSize != 2 && AddressSize != 4 && AddressSize != 8)

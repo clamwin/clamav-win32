@@ -32,7 +32,7 @@ BOOL WINAPI ProcessPrng(void *buffer, size_t size)
     HCRYPTPROV hProv = 0;
     BOOL result;
 
-    TRACE(L"ProcessPrng(0x%p, %d)\n", buffer, size);
+    TRACE(L"ProcessPrng(0x%p, %lld)\n", buffer, size);
 
     // Acquire a cryptographic context. The CRYPT_VERIFYCONTEXT flag indicates that
     // no persistent key container is needed (suitable for generating random data).

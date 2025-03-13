@@ -50,7 +50,7 @@ BOOLEAN CreateSymbolicLinkW(LPCWSTR lpSymlinkFileName, LPCWSTR lpTargetFileName,
 
 HANDLE CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LPCWSTR lpTimerName, DWORD dwFlags, DWORD dwDesiredAccess)
 {
-    TRACE(L"CreateWaitableTimerExW(0x%p, %ls, %d, %d, %d)\n",
+    TRACE(L"CreateWaitableTimerExW(0x%p, %ls, %d, %d)\n",
           lpTimerAttributes, lpTimerName, dwFlags, dwDesiredAccess);
 
     BOOL bManualReset = (dwFlags & CREATE_WAITABLE_TIMER_MANUAL_RESET) != 0;
@@ -71,7 +71,7 @@ HANDLE CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LPCWSTR l
 // The value pointed to by StackSizeInBytes is left unchanged.
 WINBOOL WINAPI SetThreadStackGuarantee(PULONG StackSizeInBytes)
 {
-    TRACE(L"SetThreadStackGuarantee(%d)\n", StackSizeInBytes);
+    TRACE(L"SetThreadStackGuarantee(%p)\n", StackSizeInBytes);
 
     if (StackSizeInBytes == NULL)
     {
@@ -99,7 +99,7 @@ WINBOOL WINAPI InitializeProcThreadAttributeList(
     DWORD dwFlags,          // Must be zero.
     PSIZE_T lpSize)
 {
-    TRACE(L"InitializeProcThreadAttributeList(0x%p, %d, %d, %d)\n",
+    TRACE(L"InitializeProcThreadAttributeList(0x%p, %d, %d, %p)\n",
           lpAttributeList, dwAttributeCount, dwFlags, lpSize);
 
     if (lpSize == NULL)
@@ -158,7 +158,7 @@ WINBOOL WINAPI UpdateProcThreadAttribute(
     PVOID lpPreviousValue,
     PSIZE_T lpReturnSize)
 {
-    TRACE(L"UpdateProcThreadAttribute(0x%p, %d, 0x%p, 0x%p, %d, 0x%p, 0x%p)\n",
+    TRACE(L"UpdateProcThreadAttribute(0x%p, %d, 0x%llx, 0x%p, %lld, 0x%p, 0x%p)\n",
           lpAttributeList,
           dwFlags,
           Attribute,
