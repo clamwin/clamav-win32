@@ -1,5 +1,5 @@
 /*
- * Windows XP Compatibility Layer
+ * Legacy Windows Compatibility Layer
  *
  * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
@@ -22,25 +22,55 @@
  * SOFTWARE.
  */
 
-/* Needed by libxml2 */
-#include "winxp_compat.h"
+#include "legacy.h"
 
-#include <ntstatus.h>
-#include <wincrypt.h>
-#include <bcrypt.h>
+#include <shlobj.h>
+#include <stdio.h>
 
-NTSTATUS WINAPI BCryptGenRandom(BCRYPT_ALG_HANDLE hAlgorithm, PUCHAR pbBuffer, ULONG cbBuffer, ULONG dwFlags) {
-    if (hAlgorithm || !(dwFlags & BCRYPT_USE_SYSTEM_PREFERRED_RNG))
-        return STATUS_NOT_IMPLEMENTED;
+BOOL WINAPI GetUserProfileDirectoryA(HANDLE hToken, LPSTR lpProfileDir, LPDWORD lpcchSize)
+{
+    char szPath[MAX_PATH];
+    DWORD dwSize;
 
-    HCRYPTPROV hProvider;
-    if (CryptAcquireContext(&hProvider, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
+    if (lpcchSize == NULL)
     {
-        BOOL ret = CryptGenRandom(hProvider, cbBuffer, pbBuffer);
-        CryptReleaseContext(hProvider, 0);
-        if (ret)
-           return STATUS_SUCCESS;
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return FALSE;
     }
 
-    return STATUS_INVALID_PARAMETER;
+    if (!(dwSize = GetWindowsDirectoryA(szPath, MAX_PATH - 1)))
+        return FALSE;
+
+    dwSize++;
+
+    if (*lpcchSize < dwSize)
+    {
+        *lpcchSize = dwSize;
+        SetLastError(ERROR_INSUFFICIENT_BUFFER);
+        return FALSE;
+    }
+
+    *lpcchSize = dwSize;
+    strncpy(lpProfileDir, szPath, dwSize - 1);
+    lpProfileDir[dwSize - 1] = 0;
+    return TRUE;
+}
+
+BOOL WINAPI GetUserProfileDirectoryW(HANDLE hToken, LPWSTR lpProfileDir, LPDWORD lpcchSize)
+{
+    char szPath[MAX_PATH + 1];
+
+    if (lpcchSize == NULL)
+    {
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return FALSE;
+    }
+
+    if (!GetUserProfileDirectoryA(NULL, szPath, lpcchSize))
+        return FALSE;
+
+    if (!MultiByteToWideChar(CP_ACP, 0, szPath, *lpcchSize, lpProfileDir, *lpcchSize))
+        return FALSE;
+
+    return TRUE;
 }

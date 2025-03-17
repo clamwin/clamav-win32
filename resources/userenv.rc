@@ -1,0 +1,2 @@
+#define __MODULE__	"userenv.dll"
+#include "winxp.rc"

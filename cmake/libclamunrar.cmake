@@ -1,5 +1,5 @@
 # libclamunrar
-set(UNRAR_DEFINES RARDLL RAR_NOCRYPT _FILE_OFFSET_BITS=64)
+set(UNRAR_DEFINES RARDLL RAR_NOCRYPT _FILE_OFFSET_BITS=64 ${CLAMWIN_WINNT_VERSION})
 set(UNRAR_INCLUDES ${CLAMAV_DIR}/libclamunrar ${CLAMWIN_DIR}/resources)
 
 file(GLOB libclamunrar_headers ${CLAMAV_DIR}/libclamunrar/*.hpp)
@@ -30,6 +30,7 @@ add_library(libclamunrar SHARED
     ${CLAMWIN_DIR}/libclamunrar.def
 )
 
+target_link_options(libclamunrar PRIVATE $<$<C_COMPILER_ID:GNU>:-Wl,--enable-stdcall-fixup>)
 set_target_properties(libclamunrar PROPERTIES DEFINE_SYMBOL "" PREFIX "" OUTPUT_NAME libclamunrar)
 target_include_directories(libclamunrar PRIVATE ${UNRAR_INCLUDES})
 target_compile_definitions(libclamunrar PRIVATE ${UNRAR_DEFINES})

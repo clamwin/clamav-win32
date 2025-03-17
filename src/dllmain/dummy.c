@@ -1,7 +1,7 @@
 /*
- * main() wrapper to handle startup code
+ * Clamav Native Windows Port: dummy functions
  *
- * Copyright (c) 2008-2025 Gianluigi Tiesi <sherpya@gmail.com>
+ * Copyright (c) 2005-2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -18,31 +18,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "platform.h"
-#include "crashdump.h"
+#include <windows.h>
 
-/* Disable crt globbing, it's broken */
-#ifdef __MINGW32__
-int _CRT_glob = 0;
-#endif
+#if _WIN32_WINNT < _WIN32_WINNT_WINXP
+#include <stdio.h>
+#include <stdlib.h>
 
-extern int cw_main(int argc, char *argv[]);
-extern void w32_glob(int* argc_ptr, char*** argv_ptr);
-
-#undef main
-int main(int argc, char* argv[])
+int w32_stat(const char *path, void *buf)
 {
-#if defined(_MSC_VER) && !defined(_DEBUG) /* Avoid bypassing calls to Debugger */
-    SetErrorMode(SEM_NOGPFAULTERRORBOX);
-    SetUnhandledExceptionFilter(CrashHandlerExceptionFilter);
-#endif
-
-#ifndef _WIN64
-    disablefsredir();
-#endif
-
-#ifdef UNICODE
-    w32_glob(&argc, &argv);
-#endif
-    return cw_main(argc, argv);
+    fprintf(stderr, "w32_stat should never be called\n");
+    abort();
 }
+
+int safe_open(const char *path, int flags, ...)
+{
+    fprintf(stderr, "safe_open should never be called\n");
+    abort();
+}
+
+wchar_t *uncpath(const char *path)
+{
+    fprintf(stderr, "uncpath should never be called\n");
+    abort();
+}
+#endif

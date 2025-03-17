@@ -8,5 +8,5 @@ EXPORTS
 ;GetSecretAgreementInterface @6
 ;GetSignatureInterface @7
 ;MSCryptConvertRsaPrivateBlobToFullRsaBlob @8
-ProcessPrng @9
-ProcessPrngGuid @10
+ProcessPrng=ProcessPrng@8 @9
+ProcessPrngGuid=ProcessPrngGuid@4 @10

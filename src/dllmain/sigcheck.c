@@ -28,6 +28,12 @@
 #include <mscat.h>
 #include <softpub.h>
 
+#if _WIN32_WINNT < _WIN32_WINNT_WINXP
+long cw_sigcheck(int fd, const char *virname, bool warnfp)
+{
+    return 0;
+}
+#else
 #define FAILED_RET(call, ret)                               \
     {                                                       \
         DWORD le = GetLastError();                          \
@@ -203,3 +209,5 @@ long cw_sigcheck(int fd, const char *virname, bool warnfp)
     CryptCATAdminReleaseContext(hCatAdmin, 0);
     return result;
 }
+
+#endif // _WIN32_WINNT < _WIN32_WINNT_WINXP

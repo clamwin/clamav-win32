@@ -1,17 +1,21 @@
-set(ZLIB_DIR ${3RDPARTY_DIR}/zlib-ng)
-
-set(ZLIB_COMPAT ON)
-set(ZLIB_ENABLE_TESTS OFF)
-set(ZLIBNG_ENABLE_TESTS OFF)
-set(WITH_GTEST OFF)
-
-if (MSVC)
-    set(HAVE_UNISTD_H 0)
+# disable zlib-ng on win9x
+if(ENABLE_LEGACY STREQUAL "win9x")
+    set(ZLIB_DIR ${3RDPARTY_DIR}/zlib)
+    set(ZLIB_BUILD_EXAMPLES OFF)
+    list(APPEND CLAMWIN_INCLUDES ${ZLIB_DIR})
+    install(FILES ${ZLIB_DIR}/LICENSE DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME zlib.txt)
+else()
+    set(ZLIB_DIR ${3RDPARTY_DIR}/zlib-ng)
+    set(ZLIB_COMPAT ON)
+    set(ZLIB_ENABLE_TESTS OFF)
+    set(ZLIBNG_ENABLE_TESTS OFF)
+    set(WITH_GTEST OFF)
+    if(MSVC)
+        set(HAVE_UNISTD_H 0)
+    endif()
+    install(FILES ${ZLIB_DIR}/LICENSE.md DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME zlib-ng.md)
 endif()
 
 add_subdirectory(${ZLIB_DIR} EXCLUDE_FROM_ALL)
-
 list(APPEND CLAMWIN_INCLUDES ${zlib_BINARY_DIR})
-list(APPEND CLAMWIN_LIBRARIES zlib)
-
-install(FILES ${ZLIB_DIR}/LICENSE.md DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME zlib-ng.md)
+list(APPEND CLAMWIN_LIBRARIES zlibstatic)

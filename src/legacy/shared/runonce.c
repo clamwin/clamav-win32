@@ -1,5 +1,5 @@
 /*
- * Windows XP Compatibility Layer
+ * Legacy Windows Compatibility Layer
  *
  * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
@@ -22,15 +22,7 @@
  * SOFTWARE.
  */
 
-#define InitOnceInitialize NO_InitOnceInitialize
-#define InitOnceBeginInitialize NO_InitOnceBeginInitialize
-#define InitOnceComplete NO_InitOnceComplete
-#define InitOnceExecuteOnce NO_InitOnceExecuteOnce
-#include "winxp_compat.h"
-#undef InitOnceInitialize
-#undef InitOnceBeginInitialize
-#undef InitOnceComplete
-#undef InitOnceExecuteOnce
+#include "legacy.h"
 
 #include <ntstatus.h>
 #include <psapi.h>
@@ -51,7 +43,7 @@
 // Returns TRUE on success, FALSE on error (with an appropriate error code set)
 WINBOOL WINAPI InitOnceBeginInitialize(PINIT_ONCE pInitOnce, DWORD dwFlags, PBOOL lpPending, LPVOID *lpContext)
 {
-    TRACE(L"InitOnceBeginInitialize(0x%p, 0x%08x, 0x%p, 0x%p)\n",
+    TRACE("InitOnceBeginInitialize(0x%p, 0x%08lx, 0x%p, 0x%p)\n",
           pInitOnce,
           dwFlags,
           lpPending,
@@ -61,7 +53,7 @@ WINBOOL WINAPI InitOnceBeginInitialize(PINIT_ONCE pInitOnce, DWORD dwFlags, PBOO
     //  lpContext must be NULL and dwFlags must be 0.
     if (pInitOnce == NULL || lpPending == NULL || lpContext != NULL || dwFlags != 0)
     {
-        TRACE(L"InitOnceBeginInitialize -> ERROR_INVALID_PARAMETER\n");
+        TRACE("InitOnceBeginInitialize -> ERROR_INVALID_PARAMETER\n");
         SetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
     }
@@ -142,12 +134,12 @@ WINBOOL WINAPI InitOnceBeginInitialize(PINIT_ONCE pInitOnce, DWORD dwFlags, PBOO
 // Returns TRUE on success, or FALSE if an invalid parameter is provided.
 WINBOOL WINAPI InitOnceComplete(PINIT_ONCE pInitOnce, DWORD dwFlags, LPVOID lpContext)
 {
-    TRACE("InitOnceComplete(0x%p, 0x%08x, 0x%p)\n", pInitOnce, dwFlags, lpContext);
+    TRACE("InitOnceComplete(0x%p, 0x%08lx, 0x%p)\n", pInitOnce, dwFlags, lpContext);
 
     // Basic parameter validation
     if (pInitOnce == NULL || lpContext != NULL || (dwFlags & ~INIT_ONCE_INIT_FAILED) != 0)
     {
-        TRACE(L"InitOnceComplete -> ERROR_INVALID_PARAMETER\n");
+        TRACE("InitOnceComplete -> ERROR_INVALID_PARAMETER\n");
         SetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
     }
@@ -155,7 +147,7 @@ WINBOOL WINAPI InitOnceComplete(PINIT_ONCE pInitOnce, DWORD dwFlags, LPVOID lpCo
     // Ensure we're only marking something that's in the "initializing" state
     if (pInitOnce->Ptr != (LPVOID)1)
     {
-        TRACE(L"InitOnceComplete -> ERROR_INVALID_STATE\n");
+        TRACE("InitOnceComplete -> ERROR_INVALID_STATE\n");
         SetLastError(ERROR_INVALID_STATE);
         return FALSE;
     }
@@ -180,7 +172,7 @@ WINBOOL WINAPI InitOnceComplete(PINIT_ONCE pInitOnce, DWORD dwFlags, LPVOID lpCo
 // Returns: Always returns TRUE
 void WINAPI InitOnceInitialize(PINIT_ONCE pInitOnce)
 {
-    TRACE(L"InitOnceInitialize(0x%p)\n", pInitOnce);
+    TRACE("InitOnceInitialize(0x%p)\n", pInitOnce);
 
     // Initialize the INIT_ONCE structure by setting its Ptr to NULL (state 0)
     pInitOnce->Ptr = NULL;
@@ -204,7 +196,7 @@ WINBOOL WINAPI InitOnceExecuteOnce(PINIT_ONCE pInitOnce, PINIT_ONCE_FN pInitFn, 
     BOOL fPending = FALSE;
     PVOID lpContext = NULL;
 
-    TRACE(L"InitOnceExecuteOnce(0x%p, 0x%p, 0x%p, 0x%p)\n",
+    TRACE("InitOnceExecuteOnce(0x%p, 0x%p, 0x%p, 0x%p)\n",
           pInitOnce,
           pInitFn,
           Parameter,
@@ -213,7 +205,7 @@ WINBOOL WINAPI InitOnceExecuteOnce(PINIT_ONCE pInitOnce, PINIT_ONCE_FN pInitFn, 
     // Parameter validation
     if (pInitOnce == NULL || pInitFn == NULL)
     {
-        TRACE(L"InitOnceExecuteOnce -> ERROR_INVALID_PARAMETER\n");
+        TRACE("InitOnceExecuteOnce -> ERROR_INVALID_PARAMETER\n");
         SetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
     }
@@ -222,14 +214,14 @@ WINBOOL WINAPI InitOnceExecuteOnce(PINIT_ONCE pInitOnce, PINIT_ONCE_FN pInitFn, 
     if (!InitOnceBeginInitialize(pInitOnce, 0, &fPending, &lpContext))
     {
         // InitOnceBeginInitialize already set the error code
-        TRACE(L"InitOnceExecuteOnce -> InitOnceBeginInitialize failed\n");
+        TRACE("InitOnceExecuteOnce -> InitOnceBeginInitialize failed\n");
         return FALSE;
     }
 
     // If we're not pending (another thread did the initialization), we're done
     if (!fPending)
     {
-        TRACE(L"InitOnceExecuteOnce -> Already initialized\n");
+        TRACE("InitOnceExecuteOnce -> Already initialized\n");
         return TRUE;
     }
 
@@ -240,7 +232,7 @@ WINBOOL WINAPI InitOnceExecuteOnce(PINIT_ONCE pInitOnce, PINIT_ONCE_FN pInitFn, 
     if (!InitOnceComplete(pInitOnce, bResult ? 0 : INIT_ONCE_INIT_FAILED, NULL))
     {
         // InitOnceComplete already set the error code
-        TRACE(L"InitOnceExecuteOnce -> InitOnceComplete failed\n");
+        TRACE("InitOnceExecuteOnce -> InitOnceComplete failed\n");
         return FALSE;
     }
 

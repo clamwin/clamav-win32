@@ -43,41 +43,6 @@ typedef int socklen_t;
                  (((uint32_t)x << 8) & 0xff0000) | \
                  ((uint32_t)x << 24))
 
-/* Winsock internals */
-#define SO_SYNCHRONOUS_ALERT    0x10
-#define SO_SYNCHRONOUS_NONALERT 0x20
-#define SO_OPENTYPE             0x7008
-
-/* only setting O_NONBLOCK is supported - F_GETFL returns always 0 */
-#define F_GETFL     3   /* Get file status flags */
-#define F_SETFL     4   /* Set file status flags */
-
-#define O_NONBLOCK 04000
-
-/* only setting O_NONBLOCK is supported - F_GETFL returns always 0 */
-static inline int fcntl(int fd, int cmd, long arg)
-{
-    u_long mode = (arg & O_NONBLOCK);
-
-    switch (cmd)
-    {
-        case F_GETFL:
-            return 0;
-        case F_SETFL:
-            if (ioctlsocket(fd, FIONBIO, &mode))
-            {
-                cw_wseterrno();
-                return -1;
-            }
-            return 0;
-    }
-
-    errno = EBADF;
-    return -1;
-}
-
-#define sock_set_nonblock(sockfd) fcntl(sockfd, F_SETFL, O_NONBLOCK)
-
 static inline SOCKET inl_accept(SOCKET sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
     SOCKET res = accept(sockfd, addr, addrlen);
@@ -272,17 +237,6 @@ static inline SOCKET inl_socket(int domain, int type, int protocol)
     return result;
 }
 #define socket (int) inl_socket
-
-/* pollfd struct is _WIN32_WINNT >= 0x0600 */
-
-typedef struct mypollfd
-{
-    SOCKET  fd;
-    SHORT   events;
-    SHORT   revents;
-} mypollfd;
-
-#define pollfd mypollfd
 
 extern int poll_with_event(struct pollfd *fds, int nfds, int timeout, HANDLE event);
 

@@ -1,5 +1,5 @@
 /*
- * Windows XP Compatibility Layer
+ * Legacy Windows Compatibility Layer: stubs
  *
  * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
@@ -22,48 +22,16 @@
  * SOFTWARE.
  */
 
-#define CreateSymbolicLinkW NO_CreateSymbolicLinkW
-#define CreateWaitableTimerExW NO_CreateWaitableTimerExW
-#define InitializeProcThreadAttributeList NO_InitializeProcThreadAttributeList
-#define DeleteProcThreadAttributeList NO_DeleteProcThreadAttributeList
-#define UpdateProcThreadAttribute NO_UpdateProcThreadAttribute
-#define SetThreadStackGuarantee NO_SetThreadStackGuarantee
-#include "winxp_compat.h"
-#undef CreateSymbolicLinkW
-#undef CreateWaitableTimerExW
-#undef InitializeProcThreadAttributeList
-#undef DeleteProcThreadAttributeList
-#undef UpdateProcThreadAttribute
-#undef SetThreadStackGuarantee
+#include "legacy.h"
 
-BOOLEAN CreateSymbolicLinkW(LPCWSTR lpSymlinkFileName, LPCWSTR lpTargetFileName, DWORD dwFlags)
+#include <synchapi.h>
+
+BOOLEAN APIENTRY CreateSymbolicLinkW(LPCWSTR lpSymlinkFileName, LPCWSTR lpTargetFileName, DWORD dwFlags)
 {
-    TRACE(L"CreateSymbolicLinkW(%ls, %ls, %d)\n", lpSymlinkFileName, lpTargetFileName, dwFlags);
+    TRACE("CreateSymbolicLinkW(%ls, %ls, %ld)\n", lpSymlinkFileName, lpTargetFileName, dwFlags);
 
     SetLastError(ERROR_NOT_SUPPORTED);
     return FALSE;
-}
-
-#ifndef CREATE_WAITABLE_TIMER_HIGH_RESOLUTION
-#define CREATE_WAITABLE_TIMER_HIGH_RESOLUTION 0x2
-#endif
-
-HANDLE CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LPCWSTR lpTimerName, DWORD dwFlags, DWORD dwDesiredAccess)
-{
-    TRACE(L"CreateWaitableTimerExW(0x%p, %ls, %d, %d)\n",
-          lpTimerAttributes, lpTimerName, dwFlags, dwDesiredAccess);
-
-    BOOL bManualReset = (dwFlags & CREATE_WAITABLE_TIMER_MANUAL_RESET) != 0;
-    HANDLE hTimer = CreateWaitableTimer(lpTimerAttributes, bManualReset, lpTimerName);
-
-    // If the timer was created successfully but HIGH_RESOLUTION was requested,
-    if ((hTimer != NULL) && (dwFlags & CREATE_WAITABLE_TIMER_HIGH_RESOLUTION))
-    {
-        TRACE(L"Warning: High-resolution timer requested but not supported\n");
-        OutputDebugStringW(L"Warning: High-resolution timer requested but not supported\n");
-    }
-
-    return hTimer;
 }
 
 // Fallback implementation of SetThreadStackGuarantee for Windows XP.
@@ -71,7 +39,7 @@ HANDLE CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LPCWSTR l
 // The value pointed to by StackSizeInBytes is left unchanged.
 WINBOOL WINAPI SetThreadStackGuarantee(PULONG StackSizeInBytes)
 {
-    TRACE(L"SetThreadStackGuarantee(%p)\n", StackSizeInBytes);
+    TRACE("SetThreadStackGuarantee(%p)\n", StackSizeInBytes);
 
     if (StackSizeInBytes == NULL)
     {
@@ -99,7 +67,7 @@ WINBOOL WINAPI InitializeProcThreadAttributeList(
     DWORD dwFlags,          // Must be zero.
     PSIZE_T lpSize)
 {
-    TRACE(L"InitializeProcThreadAttributeList(0x%p, %d, %d, %p)\n",
+    TRACE("InitializeProcThreadAttributeList(0x%p, %ld, %ld, %p)\n",
           lpAttributeList, dwAttributeCount, dwFlags, lpSize);
 
     if (lpSize == NULL)
@@ -137,7 +105,7 @@ WINBOOL WINAPI InitializeProcThreadAttributeList(
 // In this dummy implementation, no resources are allocated, so this function simply clears the structure.
 VOID WINAPI DeleteProcThreadAttributeList(LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList)
 {
-    TRACE(L"DeleteProcThreadAttributeList(0x%p)\n", lpAttributeList);
+    TRACE("DeleteProcThreadAttributeList(0x%p)\n", lpAttributeList);
 
     if (lpAttributeList)
     {
@@ -158,7 +126,7 @@ WINBOOL WINAPI UpdateProcThreadAttribute(
     PVOID lpPreviousValue,
     PSIZE_T lpReturnSize)
 {
-    TRACE(L"UpdateProcThreadAttribute(0x%p, %d, 0x%llx, 0x%p, %lld, 0x%p, 0x%p)\n",
+    TRACE("UpdateProcThreadAttribute(0x%p, %ld, 0x%lx, 0x%p, %ld, 0x%p, 0x%p)\n",
           lpAttributeList,
           dwFlags,
           Attribute,

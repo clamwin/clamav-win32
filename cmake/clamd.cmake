@@ -17,11 +17,6 @@ add_executable(clamd
     ${clamd_win32_sources}
 )
 
-# clamav/win32/compat/net.c needs poll api
-set(CLAMD_DEFINES ${CLAMWIN_DEFINES})
-list(FILTER CLAMD_DEFINES EXCLUDE REGEX "^_WIN32_WINNT=.*$")
-list(APPEND CLAMD_DEFINES _WIN32_WINNT=0x0600)
-
 if(MSVC)
     target_sources(clamd PRIVATE ${CLAMWIN_DIR}/resources/compatibility.manifest)
 elseif(MINGW)
@@ -29,7 +24,7 @@ elseif(MINGW)
 endif()
 
 target_include_directories(clamd PRIVATE ${CLAMWIN_INCLUDES})
-target_compile_definitions(clamd PRIVATE ${CLAMD_DEFINES})
+target_compile_definitions(clamd PRIVATE ${CLAMWIN_DEFINES})
 target_link_libraries(clamd PRIVATE libclamav_common libclamav ws2_32 psapi)
 
 list(APPEND CLAMAV_INSTALL_TARGETS clamd)

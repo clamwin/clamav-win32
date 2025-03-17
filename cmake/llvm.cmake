@@ -193,7 +193,7 @@ target_include_directories(llvm PRIVATE
     ${CMAKE_BINARY_DIR}
 )
 
-if(WINXP)
+if(NOT ENABLE_LEGACY STREQUAL "OFF")
     target_compile_definitions(llvm PRIVATE PSAPI_VERSION=1)
     set_source_files_properties(
         ${LLVM_DIR}/lib/Support/DynamicLibrary.cpp

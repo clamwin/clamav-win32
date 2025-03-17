@@ -1,5 +1,5 @@
 /*
- * Windows XP Compatibility Layer
+ * Legacy Windows Compatibility Layer: dns api
  *
  * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
@@ -22,13 +22,17 @@
  * SOFTWARE.
  */
 
-#ifndef _WIN64
-    .section .rdata,"dr"
-    .global _CreateSymbolicLinkW@12
-    .global _CreateWaitableTimerExW@16
-    .align 4
-_CreateSymbolicLinkW@12:
-    .long _CreateSymbolicLinkW
-_CreateWaitableTimerExW@16:
-    .long _CreateWaitableTimerExW
-#endif
+#include "legacy.h"
+
+#include <windns.h>
+
+// TODO
+
+DNS_STATUS WINAPI DnsQuery_A(PCSTR pszName, WORD wType, DWORD Options, PIP4_ARRAY aipServers, PDNS_RECORD *ppQueryResults, PVOID *pReserved)
+{
+    return 1;
+}
+
+VOID WINAPI DnsRecordListFree(PDNS_RECORD pRecordList, DNS_FREE_TYPE FreeType)
+{
+}

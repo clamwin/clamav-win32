@@ -1,0 +1,10 @@
+EXPORTS
+
+InitOnceBeginInitialize=InitOnceBeginInitialize@16
+InitOnceComplete=InitOnceComplete@12
+InitOnceExecuteOnce=InitOnceExecuteOnce@16
+InitOnceInitialize=InitOnceInitialize@4
+
+WaitOnAddress=WaitOnAddress@16
+WakeByAddressAll=WakeByAddressAll@4
+WakeByAddressSingle=WakeByAddressSingle@4

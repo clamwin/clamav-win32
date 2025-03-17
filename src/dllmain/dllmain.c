@@ -82,6 +82,7 @@ static void processattach(void)
     }
 #endif
 
+#if _WIN32_WINNT >= _WIN32_WINNT_WINXP
     if (!IsDebuggerPresent())
     {
         if (!HeapSetInformation(GetProcessHeap(), HeapCompatibilityInformation, &HeapFragValue, sizeof(HeapFragValue)))
@@ -92,7 +93,7 @@ static void processattach(void)
                 fprintf(stderr, "[DllMain] Error setting up low-fragmentation heap: le=%ld\n", le);
         }
     }
-
+#endif
     if (WSAStartup(MAKEWORD(2,2), &wsaData) != NO_ERROR)
         fprintf(stderr, "[DllMain] Error at WSAStartup(): %d\n", WSAGetLastError());
 

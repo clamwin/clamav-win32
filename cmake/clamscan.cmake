@@ -2,7 +2,6 @@ file(GLOB clamscan_headers ${CLAMAV_DIR}/clamscan/*.h)
 file(GLOB clamscan_sources ${CLAMAV_DIR}/clamscan/*.c)
 
 set(clamscan_win32_sources
-    ${CLAMAV_DIR}/common/scanmem.c
     ${CLAMAV_DIR}/common/exeScanner.c
     ${CLAMWIN_DIR}/src/helpers/cw_main.c
     ${CLAMWIN_DIR}/src/helpers/crashdump.c
