@@ -155,7 +155,8 @@ BOOL WINAPI UnregisterWait_win9x(HANDLE WaitHandle)
 
 BOOL WINAPI SetFilePointerEx(HANDLE hFile, LARGE_INTEGER liDistanceToMove, PLARGE_INTEGER lpNewFilePointer, DWORD dwMoveMethod)
 {
-    TRACE("SetFilePointerEx\n");
+    TRACE("SetFilePointerEx(0x%p, %lld, %p, %ld)\n", hFile, liDistanceToMove.QuadPart, lpNewFilePointer, dwMoveMethod);
+
     liDistanceToMove.LowPart = SetFilePointer(hFile, liDistanceToMove.LowPart, &liDistanceToMove.HighPart, dwMoveMethod);
     if (liDistanceToMove.LowPart == INVALID_SET_FILE_POINTER)
         return FALSE;
@@ -189,47 +190,31 @@ NTSTATUS NTAPI NtReadFile(
     PLARGE_INTEGER ByteOffset,
     PULONG Key)
 {
-    OVERLAPPED overlapped = {0};
     DWORD bytesRead = 0;
     BOOL result;
 
-    // TRACE("NtReadFile\n");
+    // TRACE("NtReadFile(0x%p, 0x%p): %lu\n", FileHandle, Event, Length);
 
-    if (ByteOffset != NULL)
+    if (Event || ByteOffset)
     {
-        overlapped.Offset = ByteOffset->LowPart;
-        overlapped.OffsetHigh = ByteOffset->HighPart;
+        fprintf(stderr, "NtReadFile() unsupported Event or ByteOffset\n");
+        return STATUS_NOT_SUPPORTED;
     }
 
-    if (Event != NULL)
-        overlapped.hEvent = Event;
+    result = ReadFile(FileHandle, Buffer, Length, &bytesRead, NULL);
 
-    result = ReadFile(FileHandle, Buffer, Length, &bytesRead, &overlapped);
-
-    if (!result)
+    if (result)
     {
-        DWORD lastError = GetLastError();
-
-        if (lastError == ERROR_IO_PENDING)
-        {
-            if (WaitForSingleObject(overlapped.hEvent != NULL ? overlapped.hEvent : FileHandle, INFINITE) == WAIT_OBJECT_0)
-            {
-                GetOverlappedResult(FileHandle, &overlapped, &bytesRead, TRUE);
-                IoStatusBlock->Status = STATUS_SUCCESS;
-                IoStatusBlock->Information = bytesRead;
-                return STATUS_SUCCESS;
-            }
-        }
-
-        IoStatusBlock->Status = lastError;
+        IoStatusBlock->Status = STATUS_SUCCESS;
+        IoStatusBlock->Information = bytesRead;
+    }
+    else
+    {
+        IoStatusBlock->Status = GetLastError();
         IoStatusBlock->Information = 0;
-        return lastError;
     }
 
-    IoStatusBlock->Status = STATUS_SUCCESS;
-    IoStatusBlock->Information = bytesRead;
-
-    return STATUS_SUCCESS;
+    return IoStatusBlock->Status;
 }
 
 NTSTATUS NTAPI NtWriteFile(
@@ -243,47 +228,31 @@ NTSTATUS NTAPI NtWriteFile(
     PLARGE_INTEGER ByteOffset,
     PULONG Key)
 {
-    OVERLAPPED overlapped = {0};
     DWORD bytesWritten = 0;
     BOOL result;
 
-    // TRACE("NtWriteFile\n");
+    // TRACE("NtWriteFile(0x%p): %lu\n", FileHandle, Length);
 
-    if (ByteOffset != NULL)
+    if (Event || ByteOffset)
     {
-        overlapped.Offset = ByteOffset->LowPart;
-        overlapped.OffsetHigh = ByteOffset->HighPart;
+        fprintf(stderr, "NtWriteFile() unsupported args\n");
+        return STATUS_NOT_SUPPORTED;
     }
 
-    if (Event != NULL)
-        overlapped.hEvent = Event;
+    result = WriteFile(FileHandle, Buffer, Length, &bytesWritten, NULL);
 
-    result = WriteFile(FileHandle, Buffer, Length, &bytesWritten, &overlapped);
-
-    if (!result)
+    if (result)
     {
-        DWORD lastError = GetLastError();
-
-        if (lastError == ERROR_IO_PENDING)
-        {
-            if (WaitForSingleObject(overlapped.hEvent != NULL ? overlapped.hEvent : FileHandle, INFINITE) == WAIT_OBJECT_0)
-            {
-                GetOverlappedResult(FileHandle, &overlapped, &bytesWritten, TRUE);
-                IoStatusBlock->Status = STATUS_SUCCESS;
-                IoStatusBlock->Information = bytesWritten;
-                return STATUS_SUCCESS;
-            }
-        }
-
-        IoStatusBlock->Status = lastError;
+        IoStatusBlock->Status = STATUS_SUCCESS;
+        IoStatusBlock->Information = bytesWritten;
+    }
+    else
+    {
+        IoStatusBlock->Status = GetLastError();
         IoStatusBlock->Information = 0;
-        return lastError;
     }
 
-    IoStatusBlock->Status = STATUS_SUCCESS;
-    IoStatusBlock->Information = bytesWritten;
-
-    return STATUS_SUCCESS;
+    return IoStatusBlock->Status;
 }
 
 DWORD WINAPI GetFinalPathNameByHandleW(
