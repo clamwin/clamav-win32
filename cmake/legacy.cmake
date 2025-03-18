@@ -1,6 +1,6 @@
 enable_language(C ASM)
 
-list(APPEND LEGACY_DEFINES ${CLAMWIN_WINNT_VERSION})
+list(APPEND LEGACY_DEFINES ${CLAMWIN_WINNT_VERSION} ${UNICODE_DEFINES})
 option(LEGACY_TRACE "Enable Compatibility Layer TRACE" OFF)
 
 if(LEGACY_TRACE)
@@ -20,7 +20,6 @@ if(ENABLE_LEGACY STREQUAL "winxp")
     list(APPEND clamav_compat_sources
         ${CLAMWIN_DIR}/src/legacy/winxp/kernel32.c
     )
-    list(APPEND LEGACY_DEFINES UNICODE _UNICODE)
 elseif(ENABLE_LEGACY STREQUAL "win9x")
     list(APPEND clamav_compat_sources
         ${CLAMWIN_DIR}/src/legacy/win9x/forward.S

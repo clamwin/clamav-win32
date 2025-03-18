@@ -57,7 +57,7 @@ if(ENABLE_LEGACY STREQUAL "win9x")
     set_source_files_properties(
         ${CURL_DIR}/lib/version_win32.c
         DIRECTORY ${CURL_DIR}/lib
-        PROPERTIES COMPILE_FLAGS "-D_WIN32_WINNT=0x0400"
+        PROPERTIES COMPILE_DEFINITIONS "_WIN32_WINNT=0x0400"
     )
     set_source_files_properties(
         ${CURL_DIR}/lib/asyn-thread.c

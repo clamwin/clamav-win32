@@ -18,6 +18,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#undef UNICODE
+#undef _UNICODE
+
 // winver definitions
 #include <windows.h>
 

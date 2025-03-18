@@ -90,10 +90,13 @@ endif()
 
 if(ENABLE_LEGACY STREQUAL "winxp")
     set(CLAMWIN_WINNT_VERSION _WIN32_WINNT=_WIN32_WINNT_WINXP)
+    set(UNICODE_DEFINES UNICODE _UNICODE)
 elseif(ENABLE_LEGACY STREQUAL "win9x")
     set(CLAMWIN_WINNT_VERSION _WIN32_WINNT=_WIN32_WINNT_NT4)
+    set(UNICODE_DEFINES "")
 elseif(ENABLE_LEGACY STREQUAL "OFF")
     set(CLAMWIN_WINNT_VERSION _WIN32_WINNT=_WIN32_WINNT_VISTA)
+    set(UNICODE_DEFINES UNICODE _UNICODE)
 endif()
 
 list(APPEND CLAMWIN_DEFINES ${CLAMWIN_WINNT_VERSION})
@@ -141,6 +144,10 @@ include(cmake/libclamunrar.cmake)
 include(cmake/pdcurses.cmake)
 include(cmake/clamdtop.cmake)
 include(cmake/tools.cmake)
+
+set_source_files_properties(${CLAMWIN_DIR}/src/helpers/cw_main.c
+    PROPERTIES COMPILE_DEFINITIONS "${UNICODE_DEFINES}"
+)
 
 include(${CLAMAV_DIR}/cmake/FindRust.cmake)
 add_subdirectory(${CLAMAV_DIR}/libclamav_rust EXCLUDE_FROM_ALL)
