@@ -140,7 +140,7 @@ include(cmake/clamdtop.cmake)
 include(cmake/tools.cmake)
 
 include(${CLAMAV_DIR}/cmake/FindRust.cmake)
-add_subdirectory(${CLAMAV_DIR}/libclamav_rust)
+add_subdirectory(${CLAMAV_DIR}/libclamav_rust EXCLUDE_FROM_ALL)
 
 if(NOT ENABLE_LEGACY STREQUAL "OFF")
     message(STATUS "Legacy support enabled for: ${ENABLE_LEGACY}")
