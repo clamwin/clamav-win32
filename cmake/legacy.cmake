@@ -104,5 +104,6 @@ add_custom_command(
 add_custom_target(filter_clamav_rust ALL DEPENDS "${RUST_FILTERED_ARCHIVE}")
 set_target_properties(clamav_rust PROPERTIES IMPORTED_LOCATION "${RUST_FILTERED_ARCHIVE}")
 add_dependencies(libclamav filter_clamav_rust)
+add_dependencies(filter_clamav_rust clamav_rust)
 
 target_link_options(libclamav PRIVATE $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
