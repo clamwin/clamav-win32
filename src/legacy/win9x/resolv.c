@@ -24,13 +24,29 @@
 
 #include "platform.h"
 
-#include <iptypes.h>
 #include <iphlpapi.h>
+#include <iptypes.h>
 
 #include "resolv.h"
 #include "output.h"
 
 #define TCPIP_PARAMS "SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters"
+
+#if defined(_MSC_VER) && NTDDI_VERSION < NTDDI_WIN2KSP1
+typedef struct {
+    char HostName[MAX_HOSTNAME_LEN + 4];
+    char DomainName[MAX_DOMAIN_NAME_LEN + 4];
+    PIP_ADDR_STRING CurrentDnsServer;
+    IP_ADDR_STRING DnsServerList;
+    UINT NodeType;
+    char ScopeId[MAX_SCOPE_ID_LEN + 4];
+    UINT EnableRouting;
+    UINT EnableProxy;
+    UINT EnableDns;
+} FIXED_INFO, * PFIXED_INFO;
+
+IPHLPAPI_DLL_LINKAGE DWORD WINAPI GetNetworkParams(PFIXED_INFO pFixedInfo, PULONG pOutBufLen);
+#endif
 
 int res_init(void)
 {

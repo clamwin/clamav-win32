@@ -32,8 +32,6 @@ list(APPEND libclamav_win32_sources
 
 if(ENABLE_LEGACY STREQUAL "win9x")
     list(APPEND CLAMWIN_DEFINES C_WINDOWS)
-else()
-    list(APPEND libclamav_win32_sources ${CLAMAV_DIR}/win32/compat/w32_stat.c)
 endif()
 
 # if(MINGW AND WINXP)

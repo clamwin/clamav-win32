@@ -26,15 +26,14 @@
 struct mallinfo mallinfo(void)
 {
     HANDLE hProcess = GetCurrentProcess();
-    PROCESS_MEMORY_COUNTERS_EX pmc;
     struct mallinfo info;
     int freeRegions = 0;
 
     memset(&info, 0, sizeof(struct mallinfo));
 
 #if _WIN32_WINNT >= _WIN32_WINNT_WINXP
+    PROCESS_MEMORY_COUNTERS_EX pmc = { 0 };
     /* Get process memory information for basic metrics */
-    memset(&pmc, 0, sizeof(pmc));
     if (GetProcessMemoryInfo(hProcess, (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc)))
     {
         /* Private working set (reasonable approximation for heap) */
@@ -101,7 +100,8 @@ struct mallinfo mallinfo(void)
     info.smblks = 0;                                  /* Windows doesn't have fastbins */
     info.hblks = dwHeapCount;                         /* Number of heaps */
     info.usmblks = 0;                                 /* Set to 0 as it gets added to uordblks */
+#if _WIN32_WINNT >= _WIN32_WINNT_WINXP
     info.uordblks = pmc.PrivateUsage - info.fordblks; /* Total allocated minus free */
-
+#endif
     return info;
 }

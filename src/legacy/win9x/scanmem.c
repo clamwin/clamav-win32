@@ -289,7 +289,7 @@ int align_pe(unsigned char *buffer, size_t size)
 int dump_pe(const char *filename, PROCESSENTRY32 ProcStruct,
             MODULEENTRY32 me32)
 {
-    DWORD bytesread = 0;
+    SIZE_T bytesread = 0;
     DWORD byteswrite = 0;
     int ret = -1;
     HANDLE hFile = INVALID_HANDLE_VALUE, hProc = NULL;

@@ -20,7 +20,7 @@
 
 #include <windows.h>
 
-#if _WIN32_WINNT >= 0x0600
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 #include "actions.c"
 #else
 

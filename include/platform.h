@@ -65,19 +65,23 @@ typedef struct pollfd
 
 #if _WIN32_WINNT < _WIN32_WINNT_WINXP
 #include <wspiapi.h>
+
+#ifndef IPPROTO_IPV6
+#define IPPROTO_IPV6 41
+#endif
+
 BOOL WINAPI RegisterWaitForSingleObject_win9x(PHANDLE phNewWaitObject, HANDLE hObject, WAITORTIMERCALLBACK Callback, PVOID Context, ULONG dwMilliseconds, ULONG dwFlags);
 #define RegisterWaitForSingleObject RegisterWaitForSingleObject_win9x
 BOOL WINAPI UnregisterWaitEx_win9x(HANDLE WaitHandle, HANDLE CompletionEvent);
 #define UnregisterWaitEx UnregisterWaitEx_win9x
 #define MAX_PATH 260
-#define safe_open open
 #else
 #define MAX_PATH 32767
 #define stat(path, buf) w32_stat(path, buf)
 #endif
 
 extern int w32_stat(const char *path, struct stat *buf);
-extern int safe_open(const char *path, int flags, ...);
+extern int safe_open(const char* path, int flags, ...);
 extern wchar_t *uncpath(const char *path);
 
 #define lstat stat
