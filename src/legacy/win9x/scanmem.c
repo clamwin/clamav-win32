@@ -19,7 +19,6 @@
  */
 
 #include <windows.h>
-#include <psapi.h>
 #include <tlhelp32.h>
 
 #include <clamav.h>
@@ -86,78 +85,53 @@ static inline void free_cache(filelist_t **list)
     } while (current);
 }
 
-int walkmodules_psapi(proc_callback callback, void *data, struct mem_info *info)
+int walkmodules_th(proc_callback callback, void *data, struct mem_info *info)
 {
-    DWORD procs[1024], needed, nprocs, mneeded;
-    HANDLE hProc;
-    HMODULE mods[1024];
+    HANDLE hSnap = INVALID_HANDLE_VALUE, hModuleSnap = INVALID_HANDLE_VALUE;
     PROCESSENTRY32 ps;
     MODULEENTRY32 me32;
-    MODULEINFO mi;
-    int i, j;
 
-    logg(LOGG_INFO, " *** Memory Scan: using PsApi ***\n\n");
+    logg(LOGG_INFO, " *** Memory Scan: using ToolHelp ***\n\n");
 
-    if (!EnumProcesses(procs, sizeof(procs), &needed))
+    hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnap == INVALID_HANDLE_VALUE)
         return -1;
 
-    nprocs = needed / sizeof(DWORD);
-
-    memset(&ps, 0, sizeof(PROCESSENTRY32));
-    memset(&me32, 0, sizeof(MODULEENTRY32));
     ps.dwSize = sizeof(PROCESSENTRY32);
-    me32.dwSize = sizeof(MODULEENTRY32);
 
-    for (i = 0; i < nprocs; i++)
+    if (!Process32First(hSnap, &ps))
     {
-        if (!procs[i])
-            continue; /* System process */
+        CloseHandle(hSnap);
+        return -1;
+    }
 
-        hProc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE,
-                            procs[i]);
-
-        if (!hProc)
+    do
+    {
+        /* system process */
+        if (!ps.th32ProcessID)
             continue;
 
-        if (!EnumProcessModules(hProc, mods, sizeof(mods),
-                                &mneeded))
+        hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, ps.th32ProcessID);
+
+        if (hModuleSnap == INVALID_HANDLE_VALUE)
+            continue;
+
+        me32.dwSize = sizeof(MODULEENTRY32);
+        if (!Module32First(hModuleSnap, &me32))
         {
-            CloseHandle(hProc);
+            CloseHandle(hModuleSnap);
             continue;
         }
 
-        if (!GetModuleBaseNameA(hProc, mods[0], ps.szExeFile,
-                                MAX_PATH - 1))
-        {
-            CloseHandle(hProc);
-            continue;
-        }
-
-        ps.th32ProcessID = procs[i];
-
-        for (j = 0; j < (mneeded / sizeof(HMODULE)); j++)
-        {
-            if (!GetModuleBaseNameA(hProc, mods[j], me32.szModule,
-                                    MAX_PATH - 1))
-                continue;
-
-            if (!GetModuleFileNameExA(hProc, mods[j], me32.szExePath,
-                                      MAX_PATH - 1))
-                continue;
-// FIXME
-//            if (!GetModuleInformation(hProc, mods[j], &mi,
-//                                      sizeof(mi)))
-            continue;
-
-            me32.hModule = mods[j];
-            me32.th32ProcessID = procs[i];
-            me32.modBaseAddr = mi.lpBaseOfDll;
-            me32.modBaseSize = mi.SizeOfImage;
+        do
             if (callback(ps, me32, data, info))
                 break;
-        }
-        CloseHandle(hProc);
-    }
+        while (Module32Next(hModuleSnap, &me32));
+
+        CloseHandle(hModuleSnap);
+    } while (Process32Next(hSnap, &ps));
+
+    CloseHandle(hSnap);
     return 0;
 }
 
@@ -213,8 +187,7 @@ int unload_module(DWORD pid, HANDLE hModule)
         {
             CloseHandle(ht);
             CloseHandle(hProc);
-            logg(LOGG_INFO, "The module may trying to trick us, killing the process, please "
-                            "rescan\n");
+            logg(LOGG_INFO, "The module may trying to trick us, killing the process, please rescan\n");
             return kill_process(pid);
         }
         CloseHandle(ht);
@@ -424,14 +397,12 @@ int scanmem_cb(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void *data, struct
     modulename[0] = 0;
     /* Special case, btw why I get \SystemRoot\ in process szExePath?
      There are also other cases? */
-    if ((strlen(me32.szExePath) > 12) &&
-        !strncmp(me32.szExePath, "\\SystemRoot\\", 12))
+    if ((strlen(me32.szExePath) > 12) && !strncmp(me32.szExePath, "\\SystemRoot\\", 12))
     {
         expandmodule[0] = 0;
         strncat(expandmodule, me32.szExePath, MAX_PATH - 1 - strlen(expandmodule));
         expandmodule[MAX_PATH - 1] = 0;
-        snprintf(expandmodule, MAX_PATH - 1, "%%SystemRoot%%\\%s",
-                 &me32.szExePath[12]);
+        snprintf(expandmodule, MAX_PATH - 1, "%%SystemRoot%%\\%s", &me32.szExePath[12]);
         expandmodule[MAX_PATH - 1] = 0;
         ExpandEnvironmentStringsA(expandmodule, modulename, MAX_PATH - 1);
         modulename[MAX_PATH - 1] = 0;
@@ -510,15 +481,6 @@ int scanmem(struct mem_info *info)
     data.processes = 0;
     data.modules = 0;
 
-    HMODULE psapi_ok = LoadLibraryA("psapi.dll");
-    HMODULE k32_ok = LoadLibraryA("kernel32.dll");
-
-    if (!(psapi_ok || k32_ok))
-    {
-        logg(LOGG_INFO, " *** Memory Scanning is not supported on this OS ***\n\n");
-        return -1;
-    }
-
     if (optget(info->opts, "infected")->enabled)
         data.printclean = 0;
     if (optget(info->opts, "kill")->enabled)
@@ -538,11 +500,12 @@ int scanmem(struct mem_info *info)
     }
 
     logg(LOGG_INFO, " *** Scanning Programs in Computer Memory ***\n");
-    walkmodules_psapi(scanmem_cb, (void *)&data, info);
+    walkmodules_th(scanmem_cb, (void *)&data, info);
     free_cache(&data.files);
 
-    logg(LOGG_INFO, "\n *** Scanned %lu processes - %lu modules ***\n", data.processes,
-         data.modules);
+    logg(LOGG_INFO, "\n *** Scanned %lu processes - %lu modules ***\n",
+         data.processes, data.modules);
     logg(LOGG_INFO, " *** Computer Memory Scan Completed ***\n\n");
+
     return data.res;
 }

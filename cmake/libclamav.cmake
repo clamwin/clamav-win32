@@ -78,7 +78,6 @@ target_link_libraries(libclamav PRIVATE
     crypt32
     wintrust
     ws2_32
-    psapi
     clamav_rust
 )
 

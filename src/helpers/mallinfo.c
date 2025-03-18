@@ -32,6 +32,7 @@ struct mallinfo mallinfo(void)
 
     memset(&info, 0, sizeof(struct mallinfo));
 
+#if _WIN32_WINNT >= _WIN32_WINNT_WINXP
     /* Get process memory information for basic metrics */
     memset(&pmc, 0, sizeof(pmc));
     if (GetProcessMemoryInfo(hProcess, (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc)))
@@ -42,6 +43,7 @@ struct mallinfo mallinfo(void)
         /* Total private usage */
         info.hblkhd = pmc.PrivateUsage;
     }
+#endif
 
     /* Get heap metrics more directly */
     DWORD dwHeapCount = GetProcessHeaps(0, NULL);
