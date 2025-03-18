@@ -8,7 +8,6 @@ set(CURL_DISABLE_WEBSOCKETS ON)
 
 set(USE_NGHTTP2 OFF)
 set(USE_NGTCP2 OFF)
-set(CURL_USE_OPENSSL OFF)
 set(CURL_USE_LIBPSL OFF)
 set(CURL_USE_LIBSSH2 OFF)
 
@@ -29,6 +28,7 @@ set(CURL_ZSTD OFF)
 
 set(_ssl_enabled ON)
 set(USE_OPENSSL ON)
+set(CURL_USE_OPENSSL ON)
 set(HAVE_SSL_SET0_WBIO 1)
 set(HAVE_OPENSSL_SRP 0)
 
@@ -42,12 +42,12 @@ else()
     set(ENABLE_UNICODE ON)
 endif()
 
-if(MSVC)
-    set(HAVE_SIZEOF_SSIZE_T FALSE)
-endif()
-
 if(NOT ENABLE_LEGACY STREQUAL "OFF")
     set(CURL_TARGET_WINDOWS_VERSION "0x0501" CACHE STRING "Minimum target Windows version as hex string")
+endif()
+
+if(MSVC)
+    set(HAVE_SIZEOF_SSIZE_T FALSE)
 endif()
 
 add_subdirectory(${CURL_DIR} EXCLUDE_FROM_ALL)
@@ -67,6 +67,23 @@ if(ENABLE_LEGACY STREQUAL "win9x")
         ${CURL_DIR}/lib/hostip4.c
         DIRECTORY ${CURL_DIR}/lib
         PROPERTIES COMPILE_FLAGS "-include wspiapi.h")
+endif()
+
+if(NOT ENABLE_LEGACY STREQUAL "OFF")
+    find_package(Perl REQUIRED)
+
+    set(CURL_CA_BUNDLE_FILE "${CURL_BINARY_DIR}/lib/curl-ca-bundle.crt")
+
+    add_custom_command(
+        OUTPUT ${CURL_CA_BUNDLE_FILE}
+        COMMENT "Generating a fresh curl-ca-bundle.crt" VERBATIM USES_TERMINAL
+        COMMAND "${PERL_EXECUTABLE}" "${CURL_DIR}/scripts/mk-ca-bundle.pl" -b -l -u "${CURL_CA_BUNDLE_FILE}"
+        WORKING_DIRECTORY ${CURL_DIR}
+        DEPENDS "${CURL_DIR}/scripts/mk-ca-bundle.pl"
+    )
+
+    add_custom_target(generate-ca-bundle ALL DEPENDS ${CURL_CA_BUNDLE_FILE})
+    install(FILES ${CURL_CA_BUNDLE_FILE} DESTINATION ${CMAKE_INSTALL_PREFIX})
 endif()
 
 install(FILES ${CURL_DIR}/COPYING DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME curl.txt)
