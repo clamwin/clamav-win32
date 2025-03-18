@@ -22,7 +22,7 @@
 #include <windows.h>
 
 #if _WIN32_WINNT >= _WIN32_WINNT_WINXP
-#include <compat/win32/w32_stat.c>
+#include <w32_stat.c>
 #else
 #include <stdio.h>
 #include <stdlib.h>
