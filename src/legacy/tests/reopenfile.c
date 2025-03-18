@@ -1,5 +1,5 @@
 /*
- * Windows XP Compatibility Layer
+ * Windows XP Compatibility Layer: test for ReOpenFile
  *
  * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
  *

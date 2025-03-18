@@ -1,12 +1,12 @@
-cmake_minimum_required (VERSION 3.14)
+cmake_minimum_required(VERSION 3.14)
 project(clamav-win32 VERSION "1.4.2")
 
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set (CLAMAV_ARCH x64)
+    set(CLAMAV_ARCH x64)
 elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-    set (CLAMAV_ARCH x86)
+    set(CLAMAV_ARCH x86)
 else()
     message(FATAL_ERROR "WTF")
 endif()
@@ -15,43 +15,43 @@ set(CLAMWIN_DIR ${CMAKE_SOURCE_DIR})
 set(CLAMAV_DIR ${CLAMWIN_DIR}/clamav)
 set(3RDPARTY_DIR ${CLAMWIN_DIR}/3rdparty)
 
-option(ENABLE_LLVM "Enable JIT using LLVM Engine" OFF)
-option(WINXP "Enable support for WINXP" OFF)
-
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Do not build shared libraries" FORCE)
 set(BUILD_STATIC_LIBS ON CACHE BOOL "Build static libraries" FORCE)
 
+option(ENABLE_LLVM "Enable JIT using LLVM Engine" OFF)
+set(ENABLE_LEGACY "OFF" CACHE STRING "Enable support for legacy Windows Versions")
+set_property(CACHE ENABLE_LEGACY PROPERTY STRINGS OFF winxp win9x)
+
 include(${CLAMAV_DIR}/cmake/Version.cmake)
 
-set(PACKAGE_NAME      "${PROJECT_NAME}")
-set(PACKAGE_VERSION   "${PROJECT_VERSION}")
-set(PACKAGE_STRING    "${PROJECT_NAME} ${PROJECT_VERSION}${VERSION_SUFFIX}")
+set(PACKAGE_NAME "${PROJECT_NAME}")
+set(PACKAGE_VERSION "${PROJECT_VERSION}")
+set(PACKAGE_STRING "${PROJECT_NAME} ${PROJECT_VERSION}${VERSION_SUFFIX}")
 set(PACKAGE_BUGREPORT "https://github.com/clamwin/clamav-win32")
-set(PACKAGE_URL       "https://oss.netfarm.it/clamav/")
+set(PACKAGE_URL "https://oss.netfarm.it/clamav/")
 HexVersion(PACKAGE_VERSION_NUM ${PROJECT_VERSION_MAJOR} ${PROJECT_VERSION_MINOR} ${PROJECT_VERSION_PATCH})
 
-# libtool library versioning rules: http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
-set(LIBCLAMAV_CURRENT  12)
+set(LIBCLAMAV_CURRENT 12)
 set(LIBCLAMAV_REVISION 3)
-set(LIBCLAMAV_AGE      0)
+set(LIBCLAMAV_AGE 0)
 
 math(EXPR LIBCLAMAV_SOVERSION "${LIBCLAMAV_CURRENT} - ${LIBCLAMAV_AGE}")
 set(LIBCLAMAV_VERSION "${LIBCLAMAV_SOVERSION}.${LIBCLAMAV_AGE}.${LIBCLAMAV_REVISION}")
 HexVersion(LIBCLAMAV_VERSION_NUM ${LIBCLAMAV_CURRENT} ${LIBCLAMAV_REVISION} ${LIBCLAMAV_AGE})
 
-set(LIBFRESHCLAM_CURRENT  3)
+set(LIBFRESHCLAM_CURRENT 3)
 set(LIBFRESHCLAM_REVISION 2)
-set(LIBFRESHCLAM_AGE      0)
+set(LIBFRESHCLAM_AGE 0)
 
 math(EXPR LIBFRESHCLAM_SOVERSION "${LIBFRESHCLAM_CURRENT} - ${LIBFRESHCLAM_AGE}")
 set(LIBFRESHCLAM_VERSION "${LIBFRESHCLAM_SOVERSION}.${LIBFRESHCLAM_AGE}.${LIBFRESHCLAM_REVISION}")
 HexVersion(LIBFRESHCLAM_VERSION_NUM ${LIBFRESHCLAM_CURRENT} ${LIBFRESHCLAM_REVISION} ${LIBFRESHCLAM_AGE})
 
 add_custom_command(
-        OUTPUT libclamav.dev
-        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/genversion.py
-        ${CMAKE_CURRENT_BINARY_DIR}/viewer_version.hpp
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/genversion.py ${GIT_HEAD} ${BUILD_GRADLE}
+    OUTPUT libclamav.dev
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/genversion.py
+    ${CMAKE_CURRENT_BINARY_DIR}/viewer_version.hpp
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/genversion.py ${GIT_HEAD} ${BUILD_GRADLE}
 )
 
 set(CLAMWIN_LIBRARIES)
@@ -85,23 +85,25 @@ if(TRUE)
     file(APPEND ${CMAKE_BINARY_DIR}/libclamav.def "\n${WINPTHREADS_CONTENT}")
 endif()
 
-if(WINXP)
-    if(MSVC)
-        message(WARNING "WinXP Compatibility make only sense on MinGW")
-    endif()
-    list(APPEND CLAMWIN_DEFINES _WIN32_WINNT=_WIN32_WINNT_WINXP)
-else()
-    list(APPEND CLAMWIN_DEFINES _WIN32_WINNT=_WIN32_WINNT_VISTA)
+if(ENABLE_LEGACY STREQUAL "winxp")
+    set(CLAMWIN_WINNT_VERSION _WIN32_WINNT=_WIN32_WINNT_WINXP)
+elseif(ENABLE_LEGACY STREQUAL "win9x")
+    set(CLAMWIN_WINNT_VERSION _WIN32_WINNT=_WIN32_WINNT_NT4)
+elseif(ENABLE_LEGACY STREQUAL "OFF")
+    set(CLAMWIN_WINNT_VERSION _WIN32_WINNT=_WIN32_WINNT_VISTA)
 endif()
+
+list(APPEND CLAMWIN_DEFINES ${CLAMWIN_WINNT_VERSION})
 
 configure_file(${CLAMAV_DIR}/clamav-version.h.in ${CMAKE_BINARY_DIR}/clamav-version.h)
 
 if(MINGW)
     link_libraries("-static")
-    set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--enable-stdcall-fixup ${CMAKE_SHARED_LINKER_FLAGS}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mno-ms-bitfields")
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g3 -ggdb")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g3 -ggdb")
     add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-register>)
 elseif(MSVC)
     set(CMAKE_DEBUG_POSTFIX d)
@@ -138,10 +140,14 @@ include(cmake/clamdtop.cmake)
 include(cmake/tools.cmake)
 
 include(${CLAMAV_DIR}/cmake/FindRust.cmake)
-add_subdirectory(${CLAMAV_DIR}/libclamav_rust)
+add_subdirectory(${CLAMAV_DIR}/libclamav_rust EXCLUDE_FROM_ALL)
 
-if(WINXP)
-    include(cmake/winxp.cmake)
+if(NOT ENABLE_LEGACY STREQUAL "OFF")
+    message(STATUS "Legacy support enabled for: ${ENABLE_LEGACY}")
+    if(MSVC)
+        message(WARNING "Compatibility layer makes only sense on MinGW")
+    endif()
+    include(cmake/legacy.cmake)
 endif()
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT clamscan)

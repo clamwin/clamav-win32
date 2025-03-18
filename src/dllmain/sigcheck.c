@@ -18,8 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#define UNICODE
-
 #include "osdeps.h"
 #include "others.h"
 
@@ -28,6 +26,7 @@
 #include <mscat.h>
 #include <softpub.h>
 
+#ifdef _UNICODE
 #define FAILED_RET(call, ret)                               \
     {                                                       \
         DWORD le = GetLastError();                          \
@@ -203,3 +202,10 @@ long cw_sigcheck(int fd, const char *virname, bool warnfp)
     CryptCATAdminReleaseContext(hCatAdmin, 0);
     return result;
 }
+
+#else
+long cw_sigcheck(int fd, const char *virname, bool warnfp)
+{
+    return 0;
+}
+#endif // UNICODE

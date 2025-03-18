@@ -9,10 +9,15 @@ set(libfreshclam_sources
 )
 
 set(libfreshclam_win32_sources
-    ${CLAMAV_DIR}/win32/compat/resolv.c
     ${CLAMWIN_DIR}/resources/libfreshclam.rc
     ${CLAMWIN_DIR}/libfreshclam.def
 )
+
+if(ENABLE_LEGACY STREQUAL "win9x")
+    list(APPEND libfreshclam_win32_sources ${CLAMWIN_DIR}/src/legacy/win9x/resolv.c)
+else()
+    list(APPEND libfreshclam_win32_sources ${CLAMAV_DIR}/win32/compat/resolv.c)
+endif()
 
 file(GLOB libfreshclam_common_sources
     ${CLAMAV_DIR}/common/cert_util.c
@@ -33,13 +38,16 @@ target_include_directories(libfreshclam PRIVATE ${CLAMWIN_INCLUDES} ${3RDPARTY_D
 target_compile_definitions(libfreshclam PRIVATE ${CLAMWIN_DEFINES} CURL_STATICLIB)
 target_link_libraries(libfreshclam PRIVATE
     libcurl_static
-    zlib
+    zlibstatic
     libclamav_common
     libclamav
     crypt32
     ws2_32
-    iphlpapi
-    dnsapi)
+    iphlpapi)
+
+if(NOT ENABLE_LEGACY STREQUAL "win9x")
+    target_link_libraries(libfreshclam PRIVATE dnsapi)
+endif()
 
 # freshclam
 file(GLOB freshclam_headers ${CLAMAV_DIR}/freshclam/*.h)
@@ -61,6 +69,6 @@ add_executable(freshclam
 
 target_include_directories(freshclam PRIVATE ${CLAMWIN_INCLUDES} ${CLAMAV_DIR}/libfreshclam)
 target_compile_definitions(freshclam PRIVATE ${CLAMWIN_DEFINES})
-target_link_libraries(freshclam libfreshclam libclamav_common libclamav ws2_32)
+target_link_libraries(freshclam libfreshclam libclamav_common libclamav clamav_compat ws2_32)
 
 list(APPEND CLAMAV_INSTALL_TARGETS freshclam libfreshclam)

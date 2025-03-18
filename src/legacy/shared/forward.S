@@ -1,5 +1,5 @@
 /*
- * Windows XP Compatibility Layer
+ * Legacy Windows Compatibility Layer: common
  *
  * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
@@ -22,13 +22,37 @@
  * SOFTWARE.
  */
 
-#ifndef _WIN64
-    .section .rdata,"dr"
-    .global _CreateSymbolicLinkW@12
-    .global _CreateWaitableTimerExW@16
-    .align 4
-_CreateSymbolicLinkW@12:
-    .long _CreateSymbolicLinkW
-_CreateWaitableTimerExW@16:
-    .long _CreateWaitableTimerExW
+.global __imp_WakeByAddressAll
+.global __imp_WaitOnAddress
+.global __imp_WakeByAddressSingle
+.global __imp_ProcessPrng
+
+.section .rdata,"dr"
+
+#ifdef _WIN64
+
+.align 8
+
+__imp_WakeByAddressAll:
+    .quad WakeByAddressAll
+__imp_WaitOnAddress:
+    .quad WaitOnAddress
+__imp_WakeByAddressSingle:
+    .quad WakeByAddressSingle
+__imp_ProcessPrng:
+    .quad ProcessPrng
+
+#else
+
+.align 4
+
+__imp_WakeByAddressAll:
+    .long _WakeByAddressAll@4
+__imp_WaitOnAddress:
+    .long _WaitOnAddress@16
+__imp_WakeByAddressSingle:
+    .long _WakeByAddressSingle@4
+__imp_ProcessPrng:
+    .long _ProcessPrng@8
+
 #endif

@@ -1,5 +1,5 @@
 /*
- * Windows XP Compatibility Layer
+ * Legacy Windows Compatibility Layer: Windows 9x
  *
  * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
@@ -22,25 +22,14 @@
  * SOFTWARE.
  */
 
-/* Needed by libxml2 */
-#include "winxp_compat.h"
+.global _getaddrinfo@16
+.global _freeaddrinfo@4
 
-#include <ntstatus.h>
-#include <wincrypt.h>
-#include <bcrypt.h>
+.section .text
+.align 4
 
-NTSTATUS WINAPI BCryptGenRandom(BCRYPT_ALG_HANDLE hAlgorithm, PUCHAR pbBuffer, ULONG cbBuffer, ULONG dwFlags) {
-    if (hAlgorithm || !(dwFlags & BCRYPT_USE_SYSTEM_PREFERRED_RNG))
-        return STATUS_NOT_IMPLEMENTED;
+_getaddrinfo@16:
+    call _abort
 
-    HCRYPTPROV hProvider;
-    if (CryptAcquireContext(&hProvider, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
-    {
-        BOOL ret = CryptGenRandom(hProvider, cbBuffer, pbBuffer);
-        CryptReleaseContext(hProvider, 0);
-        if (ret)
-           return STATUS_SUCCESS;
-    }
-
-    return STATUS_INVALID_PARAMETER;
-}
+_freeaddrinfo@4:
+    call _abort

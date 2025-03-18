@@ -24,6 +24,8 @@
 #include "clamav.h"
 #include "others.h"
 
+#include <fcntl.h>
+
 int cw_unlink(const char *pathname)
 {
     LPCWSTR fname = mb2wc(pathname);
@@ -39,10 +41,31 @@ int cw_unlink(const char *pathname)
 
     cli_errmsg("%s cannot be deleted, scheduling for deletetion at next reboot\n", pathname);
 
-    if (!MoveFileExW(fname, NULL, MOVEFILE_DELAY_UNTIL_REBOOT)) {
+    if (!MoveFileExW(fname, NULL, MOVEFILE_DELAY_UNTIL_REBOOT))
+    {
         cli_errmsg("%s cannot be scheduling for deletetion at next reboot\n", pathname);
         return 1;
     }
 
     return 0;
+}
+
+int fcntl(int fd, int cmd, ...)
+{
+    va_list ap;
+    va_start(ap, cmd);
+
+    if (cmd == F_GETFL)
+        return 0;
+    if (cmd == F_SETFL)
+    {
+        u_long arg = va_arg(ap, long) == O_NONBLOCK;
+        if (ioctlsocket((SOCKET)fd, FIONBIO, &arg))
+        {
+            cw_wseterrno();
+            return -1;
+        }
+        return 0;
+    }
+    return -1;
 }

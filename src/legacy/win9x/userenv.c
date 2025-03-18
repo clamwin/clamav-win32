@@ -1,5 +1,5 @@
 /*
- * Windows XP Compatibility Layer
+ * Legacy Windows Compatibility Layer
  *
  * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
@@ -22,44 +22,55 @@
  * SOFTWARE.
  */
 
-#include <windows.h>
+#include "legacy.h"
+
+#include <shlobj.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
 
-DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
-
-int wmain(int argc, wchar_t *argv[])
+BOOL WINAPI GetUserProfileDirectoryA(HANDLE hToken, LPSTR lpProfileDir, LPDWORD lpcchSize)
 {
-    if (argc != 2)
+    char szPath[MAX_PATH];
+    DWORD dwSize;
+
+    if (lpcchSize == NULL)
     {
-        wprintf(L"Invalid arguments\n");
-        return 1;
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return FALSE;
     }
 
-    HANDLE hFile = CreateFile(
-        argv[1],
-        GENERIC_READ,
-        FILE_SHARE_READ | FILE_SHARE_WRITE,
-        NULL,
-        OPEN_EXISTING,
-        FILE_ATTRIBUTE_READONLY | FILE_FLAG_BACKUP_SEMANTICS,
-        NULL);
+    if (!(dwSize = GetWindowsDirectoryA(szPath, MAX_PATH - 1)))
+        return FALSE;
 
-    if (hFile == INVALID_HANDLE_VALUE)
+    dwSize++;
+
+    if (*lpcchSize < dwSize)
     {
-        fwprintf(stderr, L"CreateFile(%ld)\n", GetLastError());
-        return 1;
+        *lpcchSize = dwSize;
+        SetLastError(ERROR_INSUFFICIENT_BUFFER);
+        return FALSE;
     }
 
-    wchar_t lpszFilePath[MAX_PATH];
+    *lpcchSize = dwSize;
+    strncpy(lpProfileDir, szPath, dwSize - 1);
+    lpProfileDir[dwSize - 1] = 0;
+    return TRUE;
+}
 
-    if (GetFinalPathNameByHandleW(hFile, lpszFilePath, MAX_PATH, VOLUME_NAME_DOS))
-        wprintf(L"Result ->[%ls]\n", lpszFilePath);
-    else
-        wprintf(L"GetFinalPathNameByHandleW() failed with %d\n", GetLastError());
+BOOL WINAPI GetUserProfileDirectoryW(HANDLE hToken, LPWSTR lpProfileDir, LPDWORD lpcchSize)
+{
+    char szPath[MAX_PATH + 1];
 
-    CloseHandle(hFile);
+    if (lpcchSize == NULL)
+    {
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return FALSE;
+    }
 
-    return 0;
+    if (!GetUserProfileDirectoryA(NULL, szPath, lpcchSize))
+        return FALSE;
+
+    if (!MultiByteToWideChar(CP_ACP, 0, szPath, *lpcchSize, lpProfileDir, *lpcchSize))
+        return FALSE;
+
+    return TRUE;
 }

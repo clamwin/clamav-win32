@@ -1,4 +1,5 @@
-The Windows XP Compatiblity Layer is licensed under:
+The Legacy Windows Compatiblity Layer (except synchapi.c)
+is licensed under:
 
 MIT License
 

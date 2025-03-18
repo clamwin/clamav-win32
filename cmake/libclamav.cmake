@@ -24,17 +24,21 @@ source_group(TREE ${CLAMAV_DIR}/libclamav PREFIX "Source Files" FILES ${libclama
 
 file(GLOB libclamav_win32_sources ${CLAMWIN_DIR}/src/dllmain/*.c)
 list(APPEND libclamav_win32_sources
-    ${CLAMAV_DIR}/win32/compat/dirent.c
     ${CLAMAV_DIR}/win32/compat/libgen.c
     ${CLAMAV_DIR}/win32/compat/random.c
     ${CLAMAV_DIR}/win32/compat/strptime.c
     ${CLAMAV_DIR}/win32/compat/utf8_util.c
-    ${CLAMAV_DIR}/win32/compat/w32_stat.c
 )
 
-if(MINGW AND WINXP)
-    list(APPEND libclamav_win32_sources ${CLAMWIN_DIR}/src/dllmain/dll_dependency.S)
+if(ENABLE_LEGACY STREQUAL "win9x")
+    list(APPEND CLAMWIN_DEFINES C_WINDOWS)
+else()
+    list(APPEND libclamav_win32_sources ${CLAMAV_DIR}/win32/compat/w32_stat.c)
 endif()
+
+# if(MINGW AND WINXP)
+# list(APPEND libclamav_win32_sources ${CLAMWIN_DIR}/src/dllmain/dll_dependency.S)
+# endif()
 
 file(GLOB_RECURSE libclamav_win32_headers ${CLAMWIN_DIR}/include/*.h)
 source_group(TREE ${CLAMWIN_DIR}/include PREFIX "Win32 Headers" FILES ${libclamav_win32_headers})
@@ -74,9 +78,12 @@ target_link_libraries(libclamav PRIVATE
     crypt32
     wintrust
     ws2_32
-    psapi
     clamav_rust
 )
+
+if(NOT ENABLE_LEGACY STREQUAL "win9x")
+    target_link_libraries(libclamav PRIVATE dnsapi)
+endif()
 
 if(ENABLE_LLVM)
     target_compile_definitions(libclamav PRIVATE LLVM_VERSION=${LLVM_VERSION})

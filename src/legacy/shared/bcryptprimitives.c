@@ -1,5 +1,5 @@
 /*
- * Windows XP Compatibility Layer
+ * Legacy Windows Compatibility Layer
  *
  * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "winxp_compat.h"
+#include "legacy.h"
 
 #include <wincrypt.h>
 #include <ntstatus.h>
@@ -32,11 +32,11 @@ BOOL WINAPI ProcessPrng(void *buffer, size_t size)
     HCRYPTPROV hProv = 0;
     BOOL result;
 
-    TRACE(L"ProcessPrng(0x%p, %lld)\n", buffer, size);
+    TRACE("ProcessPrng(0x%p, %zu)\n", buffer, size);
 
     // Acquire a cryptographic context. The CRYPT_VERIFYCONTEXT flag indicates that
     // no persistent key container is needed (suitable for generating random data).
-    if (!CryptAcquireContextW(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
+    if (!CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
         return FALSE;
 
     // Generate random bytes and fill the buffer.

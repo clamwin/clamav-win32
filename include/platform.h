@@ -39,10 +39,49 @@
 #include <stdint.h>
 
 #ifdef _MSC_VER
-#include <direct.h>  /* _mkdir()  */
+#include <direct.h> /* _mkdir()  */
 #endif
 
 #include <io.h>
+
+#ifdef PATH_MAX
+#undef PATH_MAX
+#endif
+
+#ifdef MAX_PATH
+#undef MAX_PATH
+#endif
+
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
+
+typedef struct pollfd
+{
+  SOCKET fd;
+  short events;
+  short revents;
+} WSAPOLLFD, *PWSAPOLLFD, *LPWSAPOLLFD;
+#endif
+
+#if _WIN32_WINNT < _WIN32_WINNT_WINXP
+#include <wspiapi.h>
+BOOL WINAPI RegisterWaitForSingleObject_win9x(PHANDLE phNewWaitObject, HANDLE hObject, WAITORTIMERCALLBACK Callback, PVOID Context, ULONG dwMilliseconds, ULONG dwFlags);
+#define RegisterWaitForSingleObject RegisterWaitForSingleObject_win9x
+BOOL WINAPI UnregisterWaitEx_win9x(HANDLE WaitHandle, HANDLE CompletionEvent);
+#define UnregisterWaitEx UnregisterWaitEx_win9x
+#define MAX_PATH 260
+#define safe_open open
+#else
+#define MAX_PATH 32767
+#define stat(path, buf) w32_stat(path, buf)
+#endif
+
+extern int w32_stat(const char *path, struct stat *buf);
+extern int safe_open(const char *path, int flags, ...);
+extern wchar_t *uncpath(const char *path);
+
+#define lstat stat
+#define PATH_MAX MAX_PATH
 
 #include "posix-errno.h"
 #include "cw_inline.h"
@@ -58,23 +97,8 @@ int dn_expand(unsigned char *msg, unsigned char *eomorig, unsigned char *comp_dn
 #define main cw_main
 #endif
 
-#ifdef PATH_MAX
-#undef PATH_MAX
-#endif
-
-#ifdef MAX_PATH
-#undef MAX_PATH
-#endif
-
-#define MAX_PATH 32767
-#define PATH_MAX MAX_PATH
-
 #define WORDS_BIGENDIAN 0
 #define EAI_SYSTEM 0
-
-#if _WIN32_WINNT < _WIN32_WINNT_VISTA
-DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
-#endif
 
 #define difftime(time_end, time_beg) ((double)(time_end - time_beg))
 
@@ -84,12 +108,6 @@ DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD 
 
 #define ftruncate _chsize
 extern char *strptime(const char *buf, const char *format, struct tm *tm);
-extern wchar_t* uncpath(const char* path);
-
-#define lstat stat
-#define stat(path, buf) w32_stat(path, buf)
-extern int w32_stat(const char* path, struct stat* buf);
-extern int safe_open(const char* path, int flags, ...);
 
 /* errno remap */
 #define strerror cw_strerror
@@ -110,7 +128,7 @@ extern void w32_srand(unsigned int seed);
 #define fseeko _fseeki64
 #elif defined(__GNUC__)
 #define fseeko fseeko64
-extern int __cdecl fseeko64(FILE* stream, off64_t offset, int whence);
+extern int __cdecl fseeko64(FILE *stream, off64_t offset, int whence);
 #else
 #undef HAVE_FSEEKO
 #endif
@@ -122,7 +140,7 @@ extern int __cdecl fseeko64(FILE* stream, off64_t offset, int whence);
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 #ifndef MAX
-#define MAX(a,b) (((a) > (b)) ? (a) : (b))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #endif
 
 typedef unsigned short in_port_t;
@@ -144,22 +162,22 @@ extern const char *w32_inet_ntop(int af, const void *src, char *dst, socklen_t s
 
 LIBCLAMAV_EXPORT extern BOOL disablefsredir(void);
 
-extern const char* cli_to_utf8_maybe_alloc(const char* s);
-extern char* cli_strdup_to_utf8(const char* s);
+extern const char *cli_to_utf8_maybe_alloc(const char *s);
+extern char *cli_strdup_to_utf8(const char *s);
 
 /* mallinfo */
 struct mallinfo
 {
-    size_t arena;    /* Total size of memory allocated with sbrk/mmap */
-    int ordblks;     /* Number of free chunks */
-    int smblks;      /* Number of fastbin blocks */
-    int hblks;       /* Number of mmap blocks */
-    size_t hblkhd;   /* Space in mmap blocks */
-    size_t usmblks;  /* Maximum total allocated space */
-    size_t fsmblks;  /* Space in fastbin blocks */
-    size_t uordblks; /* Total allocated space */
-    size_t fordblks; /* Total free space */
-    size_t keepcost; /* Top-most, releasable space */
+  size_t arena;    /* Total size of memory allocated with sbrk/mmap */
+  int ordblks;     /* Number of free chunks */
+  int smblks;      /* Number of fastbin blocks */
+  int hblks;       /* Number of mmap blocks */
+  size_t hblkhd;   /* Space in mmap blocks */
+  size_t usmblks;  /* Maximum total allocated space */
+  size_t fsmblks;  /* Space in fastbin blocks */
+  size_t uordblks; /* Total allocated space */
+  size_t fordblks; /* Total free space */
+  size_t keepcost; /* Top-most, releasable space */
 };
 
 struct mallinfo mallinfo(void);

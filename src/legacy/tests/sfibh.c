@@ -1,5 +1,5 @@
 /*
- * Windows XP Compatibility Layer
+ * Windows XP Compatibility Layer: test for SetFileInformationByHandle (rename)
  *
  * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "winxp_compat.h"
+#include "legacy.h"
 
 #include <stdio.h>
 
