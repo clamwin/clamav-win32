@@ -88,7 +88,7 @@ list(APPEND synchapi_sources
 
 add_library(synchapi SHARED ${synchapi_sources})
 target_compile_definitions(synchapi PRIVATE ${LEGACY_DEFINES})
-target_compile_options(clamav_compat PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall -Wno-attributes>)
+target_compile_options(synchapi PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall -Wno-attributes>)
 target_link_options(synchapi PRIVATE $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 set_target_properties(synchapi PROPERTIES PREFIX "" OUTPUT_NAME api-ms-win-core-synch-l1-2-0)
 list(APPEND CLAMAV_INSTALL_TARGETS synchapi)
