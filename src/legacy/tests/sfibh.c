@@ -57,7 +57,7 @@ int wmain(int argc, wchar_t *argv[])
     }
 
     // Prepare the rename info structure
-    DWORD bufferSize = sizeof(FILE_RENAME_INFO) + (wcslen(newFileName) * sizeof(WCHAR));
+    DWORD bufferSize = (DWORD)(sizeof(FILE_RENAME_INFO) + (wcslen(newFileName) * sizeof(WCHAR)));
     FILE_RENAME_INFO *renameInfo = malloc(bufferSize);
 
     if (!renameInfo)
@@ -70,7 +70,7 @@ int wmain(int argc, wchar_t *argv[])
     // Fill the structure
     renameInfo->ReplaceIfExists = FALSE; // Don't replace if file with new name exists
     renameInfo->RootDirectory = NULL;    // Not using a root directory handle
-    renameInfo->FileNameLength = wcslen(newFileName) * sizeof(WCHAR);
+    renameInfo->FileNameLength = (DWORD)(wcslen(newFileName) * sizeof(WCHAR));
     memcpy(renameInfo->FileName, newFileName, renameInfo->FileNameLength);
 
     if (SetFileInformationByHandle(hFile, FileRenameInfo, renameInfo, bufferSize))

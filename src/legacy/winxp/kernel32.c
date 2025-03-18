@@ -233,7 +233,9 @@ union ANY_BUFFER
 static HANDLE hMountMgr = INVALID_HANDLE_VALUE;
 
 #ifdef __GNUC__
-__attribute__((constructor)) static void open_mount_manager()
+__attribute__((constructor))
+#endif
+static void open_mount_manager()
 {
     hMountMgr = CreateFile(
         MOUNTMGR_DOS_DEVICE_NAME,
@@ -245,7 +247,10 @@ __attribute__((constructor)) static void open_mount_manager()
     TRACE("MountMgr HANDLE: %p\n", hMountMgr);
 }
 
-__attribute__((destructor)) static void close_mount_manager()
+#ifdef __GNUC__
+__attribute__((destructor))
+#endif
+static void close_mount_manager()
 {
     if (hMountMgr != INVALID_HANDLE_VALUE)
     {
@@ -253,7 +258,6 @@ __attribute__((destructor)) static void close_mount_manager()
         TRACE("Closed MountMgr HANDLE\n");
     }
 }
-#endif // __GNUC__
 
 /*
  * GetFinalPathNameByHandleW - Retrieves the final path for the specified file

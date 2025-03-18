@@ -37,7 +37,7 @@ add_library(clamav_compat STATIC
 target_include_directories(clamav_compat PRIVATE ${CLAMWIN_DIR}/src/legacy/shared)
 target_compile_definitions(clamav_compat PRIVATE ${LEGACY_DEFINES})
 target_compile_options(clamav_compat PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall -Wno-attributes>)
-target_compile_options(clamav_compat PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4061 /wd4820>)
+target_compile_options(clamav_compat PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4061 /wd4273 /wd4820>)
 
 # test tools
 if(ENABLE_LEGACY STREQUAL "winxp")
@@ -90,19 +90,21 @@ if(ENABLE_LEGACY STREQUAL "win9x")
     target_link_libraries(libclamunrar PRIVATE clamav_compat)
 endif()
 
-get_target_property(RUST_ARCHIVE clamav_rust IMPORTED_LOCATION)
-set(RUST_FILTERED_ARCHIVE "${RUST_ARCHIVE}.filtered")
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+    get_target_property(RUST_ARCHIVE clamav_rust IMPORTED_LOCATION)
+    set(RUST_FILTERED_ARCHIVE "${RUST_ARCHIVE}.filtered")
 
-add_custom_command(
-    OUTPUT "${RUST_FILTERED_ARCHIVE}"
-    COMMAND ${CMAKE_COMMAND} -E copy "${RUST_ARCHIVE}" "${RUST_FILTERED_ARCHIVE}"
-    COMMAND ${CMAKE_AR} t "${RUST_FILTERED_ARCHIVE}" > filelist.txt
-    COMMAND ${CMAKE_COMMAND} -E env bash -c 'for f in $$$(grep -E "api-ms-win-core-synch-l1-2-0\\|bcryptprimitives" filelist.txt) \; do ${CMAKE_AR} d ${RUST_FILTERED_ARCHIVE} $$f \; done'
-    DEPENDS "${RUST_ARCHIVE}"
-)
+    add_custom_command(
+        OUTPUT "${RUST_FILTERED_ARCHIVE}"
+        COMMAND ${CMAKE_COMMAND} -E copy "${RUST_ARCHIVE}" "${RUST_FILTERED_ARCHIVE}"
+        COMMAND ${CMAKE_AR} t "${RUST_FILTERED_ARCHIVE}" > filelist.txt
+        COMMAND ${CMAKE_COMMAND} -E env bash -c 'for f in $$$(grep -E "api-ms-win-core-synch-l1-2-0\\|bcryptprimitives" filelist.txt) \; do ${CMAKE_AR} d ${RUST_FILTERED_ARCHIVE} $$f \; done'
+        DEPENDS "${RUST_ARCHIVE}"
+    )
 
-add_custom_target(filter_clamav_rust DEPENDS "${RUST_FILTERED_ARCHIVE}")
-set_target_properties(clamav_rust PROPERTIES IMPORTED_LOCATION "${RUST_FILTERED_ARCHIVE}")
-add_dependencies(libclamav filter_clamav_rust)
+    add_custom_target(filter_clamav_rust DEPENDS "${RUST_FILTERED_ARCHIVE}")
+    set_target_properties(clamav_rust PROPERTIES IMPORTED_LOCATION "${RUST_FILTERED_ARCHIVE}")
+    add_dependencies(libclamav filter_clamav_rust)
+endif()
 
 target_link_options(libclamav PRIVATE $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
