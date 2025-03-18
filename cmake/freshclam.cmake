@@ -9,10 +9,15 @@ set(libfreshclam_sources
 )
 
 set(libfreshclam_win32_sources
-    ${CLAMAV_DIR}/win32/compat/resolv.c
     ${CLAMWIN_DIR}/resources/libfreshclam.rc
     ${CLAMWIN_DIR}/libfreshclam.def
 )
+
+if(ENABLE_LEGACY STREQUAL "win9x")
+    list(APPEND libfreshclam_win32_sources ${CLAMWIN_DIR}/src/legacy/win9x/resolv.c)
+else()
+    list(APPEND libfreshclam_win32_sources ${CLAMAV_DIR}/win32/compat/resolv.c)
+endif()
 
 file(GLOB libfreshclam_common_sources
     ${CLAMAV_DIR}/common/cert_util.c

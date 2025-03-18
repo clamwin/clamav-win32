@@ -28,7 +28,6 @@ elseif(ENABLE_LEGACY STREQUAL "win9x")
         ${CLAMWIN_DIR}/src/legacy/win9x/forward.S
         ${CLAMWIN_DIR}/src/legacy/win9x/rtlcapturecontext.S
         ${CLAMWIN_DIR}/src/legacy/win9x/kernel32.c
-        ${CLAMWIN_DIR}/src/legacy/win9x/dnsapi.c
     )
 endif()
 
