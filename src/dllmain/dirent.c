@@ -19,8 +19,9 @@
  *  MA 02110-1301, USA.
  */
 
-#include "platform.h"
+#include <unistd.h>
 
+#include "platform.h"
 #include "dirent.h"
 
 DIR *opendir(const char *name)

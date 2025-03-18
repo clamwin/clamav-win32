@@ -69,6 +69,6 @@ add_executable(freshclam
 
 target_include_directories(freshclam PRIVATE ${CLAMWIN_INCLUDES} ${CLAMAV_DIR}/libfreshclam)
 target_compile_definitions(freshclam PRIVATE ${CLAMWIN_DEFINES})
-target_link_libraries(freshclam libfreshclam libclamav_common libclamav clamav_compat ws2_32)
+target_link_libraries(freshclam libfreshclam libclamav_common libclamav ws2_32)
 
 list(APPEND CLAMAV_INSTALL_TARGETS freshclam libfreshclam)
