@@ -22,14 +22,14 @@
  * SOFTWARE.
  */
 
-.global __imp__getaddrinfo@16
-.global __imp__freeaddrinfo@4
+.global _getaddrinfo@16
+.global _freeaddrinfo@4
 
 .section .text
 .align 4
 
-__imp__getaddrinfo@16:
+_getaddrinfo@16:
     call _abort
 
-__imp__freeaddrinfo@4:
+_freeaddrinfo@4:
     call _abort
