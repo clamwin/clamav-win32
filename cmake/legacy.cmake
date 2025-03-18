@@ -11,11 +11,9 @@ list(APPEND clamav_compat_headers
     ${CLAMWIN_DIR}/src/legacy/shared/legacy.h
 )
 
-list(APPEND clamav_compat_sources
-    ${CLAMWIN_DIR}/src/legacy/shared/stubs.c
-    ${CLAMWIN_DIR}/src/legacy/shared/bcrypt.c
-    ${CLAMWIN_DIR}/src/legacy/shared/kernel32.c
-    ${CLAMWIN_DIR}/src/legacy/shared/runonce.c
+file(GLOB clamav_compat_sources
+    ${CLAMWIN_DIR}/src/legacy/shared/*.c
+    ${CLAMWIN_DIR}/src/legacy/shared/forward.S
 )
 
 if(ENABLE_LEGACY STREQUAL "winxp")
@@ -78,34 +76,6 @@ elseif(ENABLE_LEGACY STREQUAL "win9x")
     target_sources(clamav_compat PRIVATE ${CLAMWIN_DIR}/src/legacy/win9x/userenv.c)
 endif()
 
-# api-ms-win-core-synch-l1-2-0.dll
-list(APPEND synchapi_sources
-    ${CLAMWIN_DIR}/src/legacy/shared/runonce.c
-    ${CLAMWIN_DIR}/src/legacy/shared/synchapi.c
-    ${CLAMWIN_DIR}/src/legacy/shared/synchapi.def
-    ${CLAMWIN_DIR}/resources/synchapi.rc
-)
-
-add_library(synchapi SHARED ${synchapi_sources})
-target_compile_definitions(synchapi PRIVATE ${LEGACY_DEFINES})
-target_compile_options(synchapi PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall -Wno-attributes>)
-target_link_options(synchapi PRIVATE $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
-set_target_properties(synchapi PROPERTIES PREFIX "" OUTPUT_NAME api-ms-win-core-synch-l1-2-0)
-list(APPEND CLAMAV_INSTALL_TARGETS synchapi)
-
-# bcryptprimitives.dll
-list(APPEND bcryptprimitives_sources
-    ${CLAMWIN_DIR}/src/legacy/shared/bcryptprimitives.c
-    ${CLAMWIN_DIR}/src/legacy/shared/bcryptprimitives.def
-    ${CLAMWIN_DIR}/resources/bcryptprimitives.rc
-)
-add_library(bcryptprimitives SHARED ${bcryptprimitives_sources})
-target_compile_definitions(bcryptprimitives PRIVATE ${LEGACY_DEFINES})
-target_compile_options(clamav_compat PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall -Wno-attributes>)
-target_link_libraries(bcryptprimitives PRIVATE advapi32)
-set_target_properties(bcryptprimitives PROPERTIES PREFIX "" OUTPUT_NAME bcryptprimitives)
-list(APPEND CLAMAV_INSTALL_TARGETS bcryptprimitives)
-
 # "taint" needy executables
 target_link_libraries(libclamav PRIVATE clamav_compat)
 target_link_libraries(libfreshclam PRIVATE clamav_compat)
@@ -119,5 +89,20 @@ if(ENABLE_LEGACY STREQUAL "win9x")
     target_link_libraries(clamdtop PRIVATE clamav_compat)
     target_link_libraries(libclamunrar PRIVATE clamav_compat)
 endif()
+
+get_target_property(RUST_ARCHIVE clamav_rust IMPORTED_LOCATION)
+set(RUST_FILTERED_ARCHIVE "${RUST_ARCHIVE}.filtered")
+
+add_custom_command(
+    OUTPUT "${RUST_FILTERED_ARCHIVE}"
+    COMMAND ${CMAKE_COMMAND} -E copy "${RUST_ARCHIVE}" "${RUST_FILTERED_ARCHIVE}"
+    COMMAND ${CMAKE_AR} t "${RUST_FILTERED_ARCHIVE}" > filelist.txt
+    COMMAND ${CMAKE_COMMAND} -E env bash -c 'for f in $$$(grep -E "api-ms-win-core-synch-l1-2-0\\|bcryptprimitives" filelist.txt) \; do ${CMAKE_AR} d ${RUST_FILTERED_ARCHIVE} $$f \; done'
+    DEPENDS "${RUST_ARCHIVE}"
+)
+
+add_custom_target(filter_clamav_rust ALL DEPENDS "${RUST_FILTERED_ARCHIVE}")
+set_target_properties(clamav_rust PROPERTIES IMPORTED_LOCATION "${RUST_FILTERED_ARCHIVE}")
+add_dependencies(libclamav filter_clamav_rust)
 
 target_link_options(libclamav PRIVATE $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
