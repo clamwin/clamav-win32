@@ -3,14 +3,6 @@ project(clamav-win32 VERSION "1.4.2")
 
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(CLAMAV_ARCH x64)
-elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-    set(CLAMAV_ARCH x86)
-else()
-    message(FATAL_ERROR "WTF")
-endif()
-
 set(CLAMWIN_DIR ${CMAKE_SOURCE_DIR})
 set(CLAMAV_DIR ${CLAMWIN_DIR}/clamav)
 set(3RDPARTY_DIR ${CLAMWIN_DIR}/3rdparty)
@@ -21,6 +13,17 @@ set(BUILD_STATIC_LIBS ON CACHE BOOL "Build static libraries" FORCE)
 option(ENABLE_LLVM "Enable JIT using LLVM Engine" OFF)
 set(ENABLE_LEGACY "OFF" CACHE STRING "Enable support for legacy Windows Versions")
 set_property(CACHE ENABLE_LEGACY PROPERTY STRINGS OFF winxp win9x)
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(CLAMAV_ARCH x64)
+    if(ENABLE_LEGACY STREQUAL "win9x")
+        message(FATAL_ERROR "WTF! 64bit Windows 9x?")
+    endif()
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    set(CLAMAV_ARCH x86)
+else()
+    message(FATAL_ERROR "WTF")
+endif()
 
 include(${CLAMAV_DIR}/cmake/Version.cmake)
 
