@@ -64,6 +64,7 @@ PVOID WINAPI AddVectoredExceptionHandler(ULONG First, PVECTORED_EXCEPTION_HANDLE
 DWORD WINAPI GetProcessId(HANDLE Process)
 {
     TRACE("GetProcessId(0x%p)\n", Process);
+    fprintf(stderr, "GetProcessId is not supported!\n");
     return 0;
 }
 
@@ -179,7 +180,7 @@ NTSTATUS NTAPI NtOpenFile(
     ULONG ShareAccess,
     ULONG OpenOptions)
 {
-    fprintf(stderr, "NtOpenFile: STATUS_NOT_SUPPORTED\n");
+    fprintf(stderr, "NtOpenFile is not supported!\n");
     return STATUS_NOT_SUPPORTED;
 }
 
