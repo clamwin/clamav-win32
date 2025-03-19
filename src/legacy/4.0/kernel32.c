@@ -186,6 +186,7 @@ BOOL WINAPI SetFilePointerEx(HANDLE hFile, LARGE_INTEGER liDistanceToMove, PLARG
     return TRUE;
 }
 
+#ifndef _UNICODE
 NTSTATUS NTAPI NtOpenFile(
     PHANDLE FileHandle,
     ACCESS_MASK DesiredAccess,
@@ -273,6 +274,7 @@ NTSTATUS NTAPI NtWriteFile(
 
     return IoStatusBlock->Status;
 }
+#endif /* _UNICODE */
 
 DWORD WINAPI GetFinalPathNameByHandleW(
     HANDLE hFile,
@@ -281,6 +283,7 @@ DWORD WINAPI GetFinalPathNameByHandleW(
     DWORD dwFlags)
 {
     TRACE("GetFinalPathNameByHandleW: STATUS_NOT_SUPPORTED\n");
+    fprintf(stderr, "GetFinalPathNameByHandleW: STATUS_NOT_SUPPORTED\n");
     SetLastError(STATUS_NOT_SUPPORTED);
     return 0;
 }

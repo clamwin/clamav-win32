@@ -230,35 +230,6 @@ union ANY_BUFFER
     WCHAR Buffer[USHRT_MAX];
 };
 
-static HANDLE hMountMgr = INVALID_HANDLE_VALUE;
-
-#ifdef __GNUC__
-__attribute__((constructor))
-#endif
-static void open_mount_manager()
-{
-    hMountMgr = CreateFile(
-        MOUNTMGR_DOS_DEVICE_NAME,
-        0,
-        FILE_SHARE_READ | FILE_SHARE_WRITE,
-        NULL, OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL);
-    TRACE("MountMgr HANDLE: %p\n", hMountMgr);
-}
-
-#ifdef __GNUC__
-__attribute__((destructor))
-#endif
-static void close_mount_manager()
-{
-    if (hMountMgr != INVALID_HANDLE_VALUE)
-    {
-        CloseHandle(hMountMgr);
-        TRACE("Closed MountMgr HANDLE\n");
-    }
-}
-
 /*
  * GetFinalPathNameByHandleW - Retrieves the final path for the specified file
  *
@@ -342,6 +313,14 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
     // skip Mup Device
     if (wcsncmp(deviceName, L"\\Device\\Mup", 11))
     {
+        HANDLE hMountMgr = CreateFile(
+            MOUNTMGR_DOS_DEVICE_NAME,
+            0,
+            FILE_SHARE_READ | FILE_SHARE_WRITE,
+            NULL, OPEN_EXISTING,
+            FILE_ATTRIBUTE_NORMAL,
+            NULL);
+
         if (hMountMgr != INVALID_HANDLE_VALUE)
         {
             DWORD bytesReturned = 0;
@@ -361,6 +340,7 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
                 wcsncat(targetPath, fileName, nameLength);
                 requiredLength = wcslen(targetPath);
             }
+            CloseHandle(hMountMgr);
         }
     }
 
