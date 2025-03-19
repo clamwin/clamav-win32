@@ -18,13 +18,13 @@ file(GLOB clamav_compat_sources
 
 if(CLAMWIN_WINDOWS_VERSION EQUAL 0x0501)
     list(APPEND clamav_compat_sources
-        ${CLAMWIN_DIR}/src/legacy/winxp/kernel32.c
+        ${CLAMWIN_DIR}/src/legacy/5.0/kernel32.c
     )
 elseif(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
     list(APPEND clamav_compat_sources
-        ${CLAMWIN_DIR}/src/legacy/win9x/forward.S
-        ${CLAMWIN_DIR}/src/legacy/win9x/rtlcapturecontext.S
-        ${CLAMWIN_DIR}/src/legacy/win9x/kernel32.c
+        ${CLAMWIN_DIR}/src/legacy/4.0/forward.S
+        ${CLAMWIN_DIR}/src/legacy/4.0/rtlcapturecontext.S
+        ${CLAMWIN_DIR}/src/legacy/4.0/kernel32.c
     )
 endif()
 
@@ -76,7 +76,7 @@ if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
     get_target_property(CLAMV_RUST_LIBS clamav_rust INTERFACE_LINK_LIBRARIES)
     list(REMOVE_ITEM CLAMV_RUST_LIBS -luserenv userenv)
     set_target_properties(clamav_rust PROPERTIES INTERFACE_LINK_LIBRARIES "${CLAMV_RUST_LIBS}")
-    target_sources(clamav_compat PRIVATE ${CLAMWIN_DIR}/src/legacy/win9x/userenv.c)
+    target_sources(clamav_compat PRIVATE ${CLAMWIN_DIR}/src/legacy/4.0/userenv.c)
 endif()
 
 # "taint" needy executables

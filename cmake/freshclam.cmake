@@ -14,7 +14,7 @@ set(libfreshclam_win32_sources
 )
 
 if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
-    list(APPEND libfreshclam_win32_sources ${CLAMWIN_DIR}/src/legacy/win9x/resolv.c)
+    list(APPEND libfreshclam_win32_sources ${CLAMWIN_DIR}/src/legacy/4.0/resolv.c)
 else()
     list(APPEND libfreshclam_win32_sources ${CLAMAV_DIR}/win32/compat/resolv.c)
 endif()
