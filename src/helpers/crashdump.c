@@ -21,7 +21,6 @@
 #ifdef _MSC_VER
 
 #include "platform.h"
-#include "osdeps.h"
 
 #include <dbghelp.h>
 

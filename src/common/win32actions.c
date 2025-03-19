@@ -37,8 +37,7 @@
 #include "misc.h"
 #include "output.h"
 
-#include "osdeps.h"
-#define traverse_unlink cw_unlink
+#define traverse_unlink cli_unlink
 
 void (*action)(const char *) = NULL;
 unsigned int notmoved = 0, notremoved = 0;

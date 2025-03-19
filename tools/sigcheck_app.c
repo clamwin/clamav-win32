@@ -19,7 +19,6 @@
  */
 
 #include "platform.h"
-#include "osdeps.h"
 
 #include <clamav.h>
 
