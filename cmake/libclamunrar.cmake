@@ -1,9 +1,14 @@
+enable_language(C ASM)
+
 # libclamunrar
 set(UNRAR_DEFINES RARDLL RAR_NOCRYPT _FILE_OFFSET_BITS=64 ${CLAMWIN_WINNT_VERSION})
 set(UNRAR_INCLUDES ${CLAMAV_DIR}/libclamunrar ${CLAMWIN_DIR}/resources)
 
 file(GLOB libclamunrar_headers ${CLAMAV_DIR}/libclamunrar/*.hpp)
 file(GLOB libclamunrar_win32_sources ${CLAMWIN_DIR}/src/unrar/*.cpp)
+if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
+    list(APPEND libclamunrar_win32_sources ${CLAMWIN_DIR}/src/unrar/forward.S)
+endif()
 
 set(libclamunrar_sources
     archive.cpp arcread.cpp blake2s.cpp
