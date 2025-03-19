@@ -34,7 +34,8 @@ list(APPEND libclamav_win32_sources
     ${CLAMAV_DIR}/win32/compat/utf8_util.c
 )
 
-if(ENABLE_LEGACY STREQUAL "win9x")
+# TODO: check nt4
+if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
     list(APPEND CLAMWIN_DEFINES C_WINDOWS)
 endif()
 

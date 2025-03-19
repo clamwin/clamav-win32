@@ -32,17 +32,19 @@ set(CURL_USE_OPENSSL ON)
 set(HAVE_SSL_SET0_WBIO 1)
 set(HAVE_OPENSSL_SRP 0)
 
-if(ENABLE_LEGACY STREQUAL "win9x")
+if(CLAMWIN_UNICODE_BUILD)
+    set(ENABLE_UNICODE ON)
+endif()
+
+if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
     set(USE_WIN32_IDN OFF)
-    set(ENABLE_UNICODE OFF)
     set(ENABLE_IPV6 OFF)
     set(ENABLE_THREADED_RESOLVER OFF)
 else()
     set(USE_WIN32_IDN ON)
-    set(ENABLE_UNICODE ON)
 endif()
 
-if(NOT ENABLE_LEGACY STREQUAL "OFF")
+if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
     set(CURL_TARGET_WINDOWS_VERSION "0x0501" CACHE STRING "Minimum target Windows version as hex string")
 endif()
 
@@ -53,7 +55,7 @@ endif()
 add_subdirectory(${CURL_DIR} EXCLUDE_FROM_ALL)
 target_include_directories(libcurl_object PRIVATE ${OPENSSL_INCLUDE_DIR})
 
-if(ENABLE_LEGACY STREQUAL "win9x")
+if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
     set_source_files_properties(
         ${CURL_DIR}/lib/version_win32.c
         DIRECTORY ${CURL_DIR}/lib
@@ -69,7 +71,7 @@ if(ENABLE_LEGACY STREQUAL "win9x")
         PROPERTIES COMPILE_FLAGS "-include wspiapi.h")
 endif()
 
-if(NOT ENABLE_LEGACY STREQUAL "OFF")
+if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
     find_package(Perl REQUIRED)
 
     set(CURL_CA_BUNDLE_FILE "${CURL_BINARY_DIR}/lib/curl-ca-bundle.crt")

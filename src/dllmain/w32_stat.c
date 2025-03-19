@@ -18,18 +18,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#ifdef _UNICODE
 #undef UNICODE
 #undef _UNICODE
-
-// winver definitions
-#include <windows.h>
-
-#if _WIN32_WINNT >= _WIN32_WINNT_WINXP
 #include <w32_stat.c>
 #else
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <stdarg.h>
 #include <stdint.h>
 #include <io.h>
 
@@ -76,10 +73,9 @@ int safe_open(const char* path, int flags, ...)
     return _open(path, flags, mode);
 }
 
-
 wchar_t *uncpath(const char *path)
 {
     fprintf(stderr, "uncpath should never be called\n");
     abort();
 }
-#endif
+#endif // _UNICODE

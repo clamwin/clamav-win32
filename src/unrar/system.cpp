@@ -78,7 +78,9 @@ void Wait()
     }
 
     // Reset system sleep timer to prevent system going sleep.
+#if _WIN32_WINNT > _WIN32_WINNT_NT4
     SetThreadExecutionState(ES_SYSTEM_REQUIRED);
+#endif
 }
 
 // Load library from Windows System32 folder. Use this function to prevent

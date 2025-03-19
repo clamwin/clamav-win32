@@ -19,6 +19,8 @@
  */
 
 #include <windows.h>
+#include <tchar.h>
+#include <psapi.h>
 #include <tlhelp32.h>
 
 #include <clamav.h>
@@ -34,13 +36,19 @@ typedef int (*proc_callback)(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void
 int sock;
 static struct optstruct *clamdopts;
 
-static inline int lookup_cache(filelist_t **list, const char *filename)
+#ifdef _UNICODE
+#define ANSI(quote) quote##A
+#else
+#define ANSI(quote) quote
+#endif
+
+static inline int lookup_cache(filelist_t **list, const TCHAR *filename)
 {
     filelist_t *current = *list;
     while (current)
     {
         /* Cache hit */
-        if (!_stricmp(filename, current->filename))
+        if (!_tcsicmp(filename, current->filename))
             return current->res;
         current = current->next;
     }
@@ -48,7 +56,7 @@ static inline int lookup_cache(filelist_t **list, const char *filename)
     return -1;
 }
 
-static inline void insert_cache(filelist_t **list, const char *filename, int res)
+static inline void insert_cache(filelist_t **list, const TCHAR *filename, int res)
 {
     filelist_t *current = *list, *prev = NULL;
 
@@ -65,7 +73,7 @@ static inline void insert_cache(filelist_t **list, const char *filename, int res
     current->next = NULL;
     current->res = res;
     current->filename[0] = 0;
-    strncat(current->filename, filename, MAX_PATH - 1 - strlen(current->filename));
+    _tcsnccat(current->filename, filename, MAX_PATH - 1 - _tcslen(current->filename));
     current->filename[MAX_PATH - 1] = 0;
 }
 
@@ -85,7 +93,107 @@ static inline void free_cache(filelist_t **list)
     } while (current);
 }
 
-int walkmodules_th(proc_callback callback, void *data, struct mem_info *info)
+/* Needed to Scan System Processes */
+bool EnablePrivilege(LPTSTR PrivilegeName, DWORD yesno)
+{
+    HANDLE hToken;
+    TOKEN_PRIVILEGES tp;
+    LUID luid;
+
+    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY | TOKEN_READ, &hToken))
+        return (GetLastError() == ERROR_CALL_NOT_IMPLEMENTED);
+
+    if (!LookupPrivilegeValue(NULL, PrivilegeName, &luid))
+        return false;
+
+    tp.PrivilegeCount = 1;
+    tp.Privileges[0].Luid = luid;
+    tp.Privileges[0].Attributes = yesno;
+
+    AdjustTokenPrivileges(hToken, FALSE, &tp, 0, NULL, NULL);
+
+    CloseHandle(hToken);
+
+    return (GetLastError() == ERROR_SUCCESS);
+}
+
+#ifdef _UNICODE
+int walkmodules(proc_callback callback, void *data, struct mem_info *info)
+{
+    DWORD procs[1024], needed, nprocs, mneeded;
+    HANDLE hProc;
+    HMODULE mods[1024];
+    PROCESSENTRY32 ps;
+    MODULEENTRY32 me32;
+    MODULEINFO mi;
+    int i, j;
+
+    logg(LOGG_INFO, " *** Memory Scan: using PSAPI ***\n\n");
+
+    if (!EnumProcesses(procs, sizeof(procs), &needed))
+        return -1;
+
+    nprocs = needed / sizeof(DWORD);
+
+    memset(&ps, 0, sizeof(PROCESSENTRY32));
+    memset(&me32, 0, sizeof(MODULEENTRY32));
+    ps.dwSize = sizeof(PROCESSENTRY32);
+    me32.dwSize = sizeof(MODULEENTRY32);
+
+    for (i = 0; i < nprocs; i++)
+    {
+        if (!procs[i])
+            continue; /* System process */
+
+        hProc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE,
+                            procs[i]);
+
+        if (!hProc)
+            continue;
+
+        if (!EnumProcessModules(hProc, mods, sizeof(mods),
+                                &mneeded))
+        {
+            CloseHandle(hProc);
+            continue;
+        }
+
+        if (!GetModuleBaseName(hProc, mods[0], ps.szExeFile,
+                               MAX_PATH - 1))
+        {
+            CloseHandle(hProc);
+            continue;
+        }
+
+        ps.th32ProcessID = procs[i];
+
+        for (j = 0; j < (mneeded / sizeof(HMODULE)); j++)
+        {
+            if (!GetModuleBaseName(hProc, mods[j], me32.szModule,
+                                   MAX_PATH - 1))
+                continue;
+
+            if (!GetModuleFileNameEx(hProc, mods[j], me32.szExePath,
+                                     MAX_PATH - 1))
+                continue;
+
+            if (!GetModuleInformation(hProc, mods[j], &mi,
+                                      sizeof(mi)))
+                continue;
+
+            me32.hModule = mods[j];
+            me32.th32ProcessID = procs[i];
+            me32.modBaseAddr = mi.lpBaseOfDll;
+            me32.modBaseSize = mi.SizeOfImage;
+            if (callback(ps, me32, data, info))
+                break;
+        }
+        CloseHandle(hProc);
+    }
+    return 0;
+}
+#else
+int walkmodules(proc_callback callback, void *data, struct mem_info *info)
 {
     HANDLE hSnap = INVALID_HANDLE_VALUE, hModuleSnap = INVALID_HANDLE_VALUE;
     PROCESSENTRY32 ps;
@@ -134,6 +242,7 @@ int walkmodules_th(proc_callback callback, void *data, struct mem_info *info)
     CloseHandle(hSnap);
     return 0;
 }
+#endif // _UNICODE
 
 int kill_process(DWORD pid)
 {
@@ -387,36 +496,47 @@ int scanmem_cb(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void *data, struct
     scanmem_data *scan_data = data;
     int rc = 0;
     int isprocess = 0;
-    char modulename[MAX_PATH] = "";
-    char expandmodule[MAX_PATH] = "";
+    TCHAR modulename[MAX_PATH];
+    TCHAR expandmodule[MAX_PATH];
 
     if (!scan_data)
         return 0;
+
+    modulename[0] = expandmodule[0] = 0;
     scan_data->res = CL_CLEAN;
 
     modulename[0] = 0;
     /* Special case, btw why I get \SystemRoot\ in process szExePath?
      There are also other cases? */
-    if ((strlen(me32.szExePath) > 12) && !strncmp(me32.szExePath, "\\SystemRoot\\", 12))
+    if ((_tcslen(me32.szExePath) > 12) && !_tcsnccmp(me32.szExePath, TEXT("\\SystemRoot\\"), 12))
     {
         expandmodule[0] = 0;
-        strncat(expandmodule, me32.szExePath, MAX_PATH - 1 - strlen(expandmodule));
+        _tcsnccat(expandmodule, me32.szExePath, MAX_PATH - 1 - _tcslen(expandmodule));
         expandmodule[MAX_PATH - 1] = 0;
-        snprintf(expandmodule, MAX_PATH - 1, "%%SystemRoot%%\\%s", &me32.szExePath[12]);
+        _sntprintf(expandmodule, MAX_PATH - 1, TEXT("%%SystemRoot%%\\%s"), &me32.szExePath[12]);
         expandmodule[MAX_PATH - 1] = 0;
-        ExpandEnvironmentStringsA(expandmodule, modulename, MAX_PATH - 1);
+        ExpandEnvironmentStrings(expandmodule, modulename, MAX_PATH - 1);
         modulename[MAX_PATH - 1] = 0;
     }
 
     if (!modulename[0])
     {
-        strncpy(modulename, me32.szExePath, MAX_PATH - 1);
+        _tcsncpy(modulename, me32.szExePath, MAX_PATH - 1);
         modulename[MAX_PATH - 1] = 0;
     }
 
+#ifdef _UNICODE
+    char modulenameA[MAX_PATH];
+    if (!WideCharToMultiByte(CP_ACP, 0, modulename, -1, modulenameA, MAX_PATH - 1, NULL, NULL))
+    {
+        logg(LOGG_ERROR, "WideCharToMultiByte failed %ld\n", GetLastError());
+        return 0;
+    }
+#endif
+
     scan_data->res = lookup_cache(&scan_data->files, modulename);
-    isprocess = !_stricmp(ProcStruct.szExeFile, modulename) ||
-                !_stricmp(ProcStruct.szExeFile, me32.szModule);
+    isprocess = !_tcsicmp(ProcStruct.szExeFile, modulename) ||
+                !_tcsicmp(ProcStruct.szExeFile, me32.szModule);
 
     if (scan_data->res == -1)
     {
@@ -429,10 +549,10 @@ int scanmem_cb(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void *data, struct
 
         /* check for module exclusion */
         scan_data->res = CL_CLEAN;
-        if (!(scan_data->exclude && chkpath(modulename, clamdopts)))
-            scan_data->res = scanfile(modulename, scan_data, info);
+        if (!(scan_data->exclude && chkpath(ANSI(modulename), clamdopts)))
+            scan_data->res = scanfile(ANSI(modulename), scan_data, info);
 
-        if ((scan_data->res != CL_VIRUS) && is_packed(modulename))
+        if ((scan_data->res != CL_VIRUS) && is_packed(ANSI(modulename)))
         {
             char *dumped = cli_gentemp(NULL);
             int fd = -1;
@@ -456,14 +576,14 @@ int scanmem_cb(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void *data, struct
         }
         else if (scan_data->unload)
         {
-            logg(LOGG_INFO, "Unloading module %s from %s\n", me32.szModule, modulename);
+            logg(LOGG_INFO, "Unloading module %s from %s\n", me32.szModule, ANSI(modulename));
             if ((rc = unload_module(ProcStruct.th32ProcessID, me32.hModule)) == -1)
                 /* CreateProcessThread() is not implemented */
                 return 0;
         }
 
         if (action)
-            action(modulename);
+            action(ANSI(modulename));
         return rc;
     }
     return rc;
@@ -500,7 +620,11 @@ int scanmem(struct mem_info *info)
     }
 
     logg(LOGG_INFO, " *** Scanning Programs in Computer Memory ***\n");
-    walkmodules_th(scanmem_cb, (void *)&data, info);
+
+    if (!EnablePrivilege(SE_DEBUG_NAME, SE_PRIVILEGE_ENABLED))
+        logg(LOGG_INFO, "---Please login as an Administrator to scan System processes ---\n");
+
+    walkmodules(scanmem_cb, (void *)&data, info);
     free_cache(&data.files);
 
     logg(LOGG_INFO, "\n *** Scanned %lu processes - %lu modules ***\n",

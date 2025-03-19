@@ -24,10 +24,35 @@
 
 #define STRSAFE_NO_DEPRECATE
 #include "legacy.h"
+#include <tchar.h>
 
 #include <psapi.h>
 #include <tlhelp32.h>
 #include <ntstatus.h>
+
+#define Q(string) #string
+#define IMPORT_KERNEL32_FUNC(x) p##x = ((imp_##x)GetProcAddress(kernel32, Q(x)))
+
+typedef HANDLE (WINAPI *imp_CreateToolhelp32Snapshot)(DWORD dwFlags, DWORD th32ProcessID);
+imp_CreateToolhelp32Snapshot pCreateToolhelp32Snapshot = NULL;
+
+typedef BOOL (WINAPI *imp_Process32FirstW)(HANDLE hSnapshot, LPPROCESSENTRY32W lppe);
+imp_Process32FirstW pProcess32FirstW = NULL;
+
+typedef BOOL (WINAPI *imp_Process32NextW)(HANDLE hSnapshot, LPPROCESSENTRY32 lppe);
+imp_Process32NextW pProcess32NextW = NULL;
+
+#ifdef __GNUC__
+__attribute__((constructor))
+#endif
+static void
+init()
+{
+    HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
+    IMPORT_KERNEL32_FUNC(CreateToolhelp32Snapshot);
+    IMPORT_KERNEL32_FUNC(Process32FirstW);
+    IMPORT_KERNEL32_FUNC(Process32NextW);
+}
 
 PVOID WINAPI AddVectoredExceptionHandler(ULONG First, PVECTORED_EXCEPTION_HANDLER Handler)
 {

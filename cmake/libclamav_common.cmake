@@ -1,9 +1,5 @@
 file(GLOB libclamav_common_win32_sources ${CLAMWIN_DIR}/src/common/*.c)
 
-if(ENABLE_LEGACY STREQUAL "win9x")
-    list(APPEND libclamav_common_win32_sources ${CLAMWIN_DIR}/src/legacy/win9x/scanmem.c)
-endif()
-
 set_source_files_properties(${libclamav_common_win32_sources}
     PROPERTIES COMPILE_DEFINITIONS "${UNICODE_DEFINES}")
 
@@ -19,10 +15,6 @@ set(libclamav_common_sources
     ${CLAMAV_DIR}/common/tar.c
     ${CLAMAV_DIR}/win32/compat/glob.c
 )
-
-if(NOT ENABLE_LEGACY STREQUAL "win9x")
-    list(APPEND libclamav_common_sources ${CLAMAV_DIR}/common/scanmem.c)
-endif()
 
 add_library(libclamav_common STATIC ${libclamav_common_sources} ${libclamav_common_win32_sources})
 target_include_directories(libclamav_common PRIVATE ${CLAMWIN_INCLUDES} ${3RDPARTY_DIR}/curl/include)

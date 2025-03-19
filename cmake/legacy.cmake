@@ -16,11 +16,11 @@ file(GLOB clamav_compat_sources
     ${CLAMWIN_DIR}/src/legacy/shared/forward.S
 )
 
-if(ENABLE_LEGACY STREQUAL "winxp")
+if(CLAMWIN_WINDOWS_VERSION EQUAL 0x0501)
     list(APPEND clamav_compat_sources
         ${CLAMWIN_DIR}/src/legacy/winxp/kernel32.c
     )
-elseif(ENABLE_LEGACY STREQUAL "win9x")
+elseif(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
     list(APPEND clamav_compat_sources
         ${CLAMWIN_DIR}/src/legacy/win9x/forward.S
         ${CLAMWIN_DIR}/src/legacy/win9x/rtlcapturecontext.S
@@ -39,7 +39,7 @@ target_compile_options(clamav_compat PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall -Wno
 target_compile_options(clamav_compat PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4061 /wd4273 /wd4820>)
 
 # test tools
-if(ENABLE_LEGACY STREQUAL "winxp")
+if(CLAMWIN_WINDOWS_VERSION GREATER_EQUAL 0x0501)
     add_executable(gfpn ${CLAMWIN_DIR}/src/legacy/tests/gfpn.c)
     target_compile_definitions(gfpn PRIVATE ${LEGACY_DEFINES})
     target_link_libraries(gfpn PRIVATE clamav_compat ntdll)
@@ -58,7 +58,9 @@ if(ENABLE_LEGACY STREQUAL "winxp")
     target_link_libraries(reopenfile PRIVATE clamav_compat ntdll)
     target_link_options(reopenfile PRIVATE $<$<CXX_COMPILER_ID:GNU>:-municode>)
     target_compile_options(reopenfile PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
-elseif(ENABLE_LEGACY STREQUAL "win9x")
+endif()
+
+if(NOT CLAMWIN_UNICODE_BUILD)
     # link unicows
     find_library(UNICOWS_LIBRARY
         NAMES libunicows.a unicows libunicows
@@ -67,7 +69,9 @@ elseif(ENABLE_LEGACY STREQUAL "win9x")
         NO_DEFAULT_PATH)
     target_link_libraries(libclamav PRIVATE ${UNICOWS_LIBRARY})
     target_link_libraries(libclamunrar PRIVATE ${UNICOWS_LIBRARY})
+endif()
 
+if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
     # userenv
     get_target_property(CLAMV_RUST_LIBS clamav_rust INTERFACE_LINK_LIBRARIES)
     list(REMOVE_ITEM CLAMV_RUST_LIBS -luserenv userenv)
@@ -81,7 +85,7 @@ target_link_libraries(libfreshclam PRIVATE clamav_compat)
 target_link_libraries(clambc PRIVATE clamav_compat)
 target_link_libraries(sigtool PRIVATE clamav_compat)
 
-if(ENABLE_LEGACY STREQUAL "win9x")
+if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
     target_link_libraries(clamd PRIVATE clamav_compat)
     target_link_libraries(clamscan PRIVATE clamav_compat)
     target_link_libraries(clamdscan PRIVATE clamav_compat)

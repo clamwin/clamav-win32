@@ -1,4 +1,4 @@
-list(APPEND TOOLS_DEFINES UNICODE _UNICODE CLAMWIN_MAIN_HANDLED)
+list(APPEND TOOLS_DEFINES ${UNICODE_DEFINES} CLAMWIN_MAIN_HANDLED)
 
 add_executable(exeScanner
     ${CLAMWIN_DIR}/tools/exeScanner_app.c
@@ -10,7 +10,7 @@ target_include_directories(exeScanner PRIVATE ${CLAMWIN_INCLUDES})
 target_compile_definitions(exeScanner PRIVATE ${CLAMWIN_DEFINES} ${TOOLS_DEFINES})
 target_compile_options(exeScanner PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
 
-if(NOT ENABLE_LEGACY STREQUAL "win9x")
+if(CLAMWIN_WINDOWS_VERSION GREATER_EQUAL 0x0501)
     add_executable(sigcheck
         ${CLAMWIN_DIR}/tools/sigcheck_app.c
         ${CLAMWIN_DIR}/tools/sigcheck.rc

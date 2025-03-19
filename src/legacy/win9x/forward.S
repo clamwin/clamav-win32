@@ -25,11 +25,56 @@
 .global _getaddrinfo@16
 .global _freeaddrinfo@4
 
+.global _CreateToolhelp32Snapshot@8
+.global _pCreateToolhelp32Snapshot
+
+.global _Process32FirstW@8
+.global _Process32NextW@8
+
+.section .rdata,"dr"
+
+missing_getaddrinfo:
+    .asciz "getaddrinfo is not supported, aborting.\n"
+missing_freeaddrinfo:
+    .asciz "freeaddrinfo is not supported, aborting.\n"
+
+missing_th32snap:
+    .asciz "CreateToolhelp32Snapshot is not supported, aborting.\n"
+missing_proc32first:
+    .asciz "Process32FirstW is not supported, aborting.\n"
+missing_proc32next:
+    .asciz "Process32NextW is not supported, aborting.\n"
+
+.section .data
+
+p_getaddrinfo:
+    .long 0
+p_freeaddrinfo:
+    .long 0
+
+
 .section .text
 .align 4
 
-_getaddrinfo@16:
-    call _abort
+.macro DEF_STUB name, ptr, msg
+    .globl \name
+\name:
+    movl    \ptr, %eax              # Load the function pointer into %eax
+    test    %eax, %eax              # Check if the pointer is NULL
+    jne     jump_\name              # If not NULL, jump to the function implementation
+    movl    $2, (%esp)              # Prepare the parameter (stderr)
+    call    *__imp____acrt_iob_func # Retrieve the stream pointer
+    movl    $\msg, (%esp)           # Place the error message address on the stack
+    movl    %eax, 4(%esp)           # Place the stream pointer in the next stack position
+    call    _fputs                  # Call fputs to print the error message
+    jmp     _abort                  # Abort the program
+jump_\name:
+    jmp     *%eax                   # Jump to the function implementation via the pointer
+.endm
 
-_freeaddrinfo@4:
-    call _abort
+DEF_STUB _CreateToolhelp32Snapshot@8, _pCreateToolhelp32Snapshot, missing_th32snap
+DEF_STUB _Process32FirstW@8, _pProcess32FirstW, missing_proc32first
+DEF_STUB _Process32NextW@8, _pProcess32NextW, missing_proc32next
+
+DEF_STUB _getaddrinfo@16, p_getaddrinfo, missing_getaddrinfo
+DEF_STUB _freeaddrinfo@4, p_freeaddrinfo, missing_freeaddrinfo

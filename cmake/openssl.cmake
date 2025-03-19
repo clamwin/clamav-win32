@@ -1,5 +1,5 @@
 if(MINGW)
-    if(ENABLE_LEGACY STREQUAL "win9x")
+    if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
         set(OPENSSL_ROOT_DIR ${3RDPARTY_DIR}/openssl/lib/mingw/legacy)
     else()
         set(OPENSSL_ROOT_DIR ${3RDPARTY_DIR}/openssl/lib/mingw/${CLAMAV_ARCH})

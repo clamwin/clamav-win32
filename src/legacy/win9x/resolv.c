@@ -109,7 +109,7 @@ static char *get_dns(void)
     case NO_ERROR:
         break;
     case ERROR_NOT_SUPPORTED:
-        logg(LOGG_ERROR, "DNS Resolver: GetNetworkParams() not supported on this OS\n");
+        logg(LOGG_DEBUG, "DNS Resolver: GetNetworkParams() not supported on this OS\n");
         free(FixedInfo);
         return get_dns_fromreg();
     default:

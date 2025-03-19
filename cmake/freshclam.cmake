@@ -13,7 +13,7 @@ set(libfreshclam_win32_sources
     ${CLAMWIN_DIR}/libfreshclam.def
 )
 
-if(ENABLE_LEGACY STREQUAL "win9x")
+if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
     list(APPEND libfreshclam_win32_sources ${CLAMWIN_DIR}/src/legacy/win9x/resolv.c)
 else()
     list(APPEND libfreshclam_win32_sources ${CLAMAV_DIR}/win32/compat/resolv.c)
@@ -45,7 +45,7 @@ target_link_libraries(libfreshclam PRIVATE
     ws2_32
     iphlpapi)
 
-if(NOT ENABLE_LEGACY STREQUAL "win9x")
+if(CLAMWIN_WINDOWS_VERSION GREATER_EQUAL 0x0501)
     target_link_libraries(libfreshclam PRIVATE dnsapi)
 endif()
 
