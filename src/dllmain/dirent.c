@@ -31,7 +31,7 @@ DIR *opendir(const char *name)
     int len;
     struct stat sb;
 
-    if (stat(name, &sb) < 0)
+    if (w32_stat(name, &sb) < 0)
         return NULL;
 
     if (!S_ISDIR(sb.st_mode)) {

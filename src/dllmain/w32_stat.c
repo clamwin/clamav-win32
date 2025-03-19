@@ -23,6 +23,7 @@
 #undef _UNICODE
 #include <w32_stat.c>
 #else
+#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -35,6 +36,13 @@
 int w32_stat(const char* path, struct stat* buf)
 {
 #if 1
+    if ((strlen(path) == 2) && (path[1] == ':'))
+    {
+        char szDrive[] = "C:\\";
+        szDrive[1] = path[1];
+        return stat(szDrive, buf);
+    }
+
     return stat(path, buf);
 #else
     char path2[MAX_PATH];
