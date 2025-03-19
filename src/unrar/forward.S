@@ -27,7 +27,7 @@
 .section .text
 .align 4
 
-GetLongPathNameW_compat@12:
+_GetLongPathNameW_compat@12:
     xorl %eax, %eax
     ret $0xc
 
@@ -35,4 +35,4 @@ GetLongPathNameW_compat@12:
 .align 4
 
 __imp__GetLongPathNameW@12:
-    .long GetLongPathNameW_compat@12
+    .long _GetLongPathNameW_compat@12
