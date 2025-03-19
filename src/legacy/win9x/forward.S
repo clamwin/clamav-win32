@@ -22,15 +22,6 @@
  * SOFTWARE.
  */
 
-.global _getaddrinfo@16
-.global _freeaddrinfo@4
-
-.global _CreateToolhelp32Snapshot@8
-.global _pCreateToolhelp32Snapshot
-
-.global _Process32FirstW@8
-.global _Process32NextW@8
-
 .section .rdata,"dr"
 
 missing_getaddrinfo:
