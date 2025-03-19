@@ -33,7 +33,7 @@ add_library(clamav_compat STATIC
     ${clamav_compat_sources}
 )
 
-target_include_directories(clamav_compat PRIVATE ${CLAMWIN_DIR}/src/legacy/shared)
+target_include_directories(clamav_compat PRIVATE ${CLAMWIN_DIR}/src/legacy/shared ${CLAMWIN_DIR}/include)
 target_compile_definitions(clamav_compat PRIVATE ${LEGACY_DEFINES})
 target_compile_options(clamav_compat PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall -Wno-attributes>)
 target_compile_options(clamav_compat PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4061 /wd4273 /wd4820>)

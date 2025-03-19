@@ -1,7 +1,7 @@
 /*
- * Legacy Windows Compatibility Layer: unrar
+ * Clamav Native Windows Port: Dynamic loading helpers
  *
- * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
+ * Copyright (c) 2005-2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,21 @@
  * SOFTWARE.
  */
 
-.global __imp__GetLongPathNameW@12
+#ifndef _DYNLOAD_H_
+#define _DYNLOAD_H_
+#include <windows.h>
+#include <tlhelp32.h>
 
-.section .text
-.align 4
+#define Q(string) #string
+#define IMPORT_KERNEL32_FUNC(x) p##x = ((imp_##x)GetProcAddress(kernel32, Q(x)))
 
-.section .rdata,"dr"
-.align 4
+typedef BOOL(WINAPI *imp_IsWow64Process)(HANDLE hProcess, PBOOL Wow64Process);
+typedef BOOL(WINAPI *imp_Wow64DisableWow64FsRedirection)(PVOID OldValue);
 
-__imp__GetLongPathNameW@12:
-    .long _pGetLongPathNameW
+typedef DWORD(WINAPI *imp_GetLongPathNameW)(LPCWSTR lpszShortPath, LPWSTR lpszLongPath, DWORD cchBuffer);
+
+typedef HANDLE(WINAPI *imp_CreateToolhelp32Snapshot)(DWORD dwFlags, DWORD th32ProcessID);
+typedef BOOL(WINAPI *imp_Process32FirstW)(HANDLE hSnapshot, LPPROCESSENTRY32W lppe);
+typedef BOOL(WINAPI *imp_Process32NextW)(HANDLE hSnapshot, LPPROCESSENTRY32 lppe);
+
+#endif /* _DYNLOAD_H_ */

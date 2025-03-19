@@ -30,16 +30,10 @@
 #include <tlhelp32.h>
 #include <ntstatus.h>
 
-#define Q(string) #string
-#define IMPORT_KERNEL32_FUNC(x) p##x = ((imp_##x)GetProcAddress(kernel32, Q(x)))
+#include "dynload.h"
 
-typedef HANDLE (WINAPI *imp_CreateToolhelp32Snapshot)(DWORD dwFlags, DWORD th32ProcessID);
 imp_CreateToolhelp32Snapshot pCreateToolhelp32Snapshot = NULL;
-
-typedef BOOL (WINAPI *imp_Process32FirstW)(HANDLE hSnapshot, LPPROCESSENTRY32W lppe);
 imp_Process32FirstW pProcess32FirstW = NULL;
-
-typedef BOOL (WINAPI *imp_Process32NextW)(HANDLE hSnapshot, LPPROCESSENTRY32 lppe);
 imp_Process32NextW pProcess32NextW = NULL;
 
 #ifdef __GNUC__

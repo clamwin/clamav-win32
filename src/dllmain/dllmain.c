@@ -25,8 +25,7 @@
 #include <stdio.h>
 
 #ifndef _WIN64
-typedef BOOL (WINAPI *imp_IsWow64Process)(HANDLE hProcess, PBOOL Wow64Process);
-typedef BOOL (WINAPI *imp_Wow64DisableWow64FsRedirection)(PVOID OldValue);
+#include "dynload.h"
 
 BOOL bIsWow64 = FALSE;
 
@@ -61,9 +60,6 @@ void clamavInvalidParameterHandler(const wchar_t* expression,
 #define _set_invalid_parameter_handler(x)
 #endif
 
-#define Q(string) # string
-#define IMPORT_KERNEL32_FUNC(x) p##x = (( imp_##x ) GetProcAddress(kernel32, Q(x)))
-
 static void processattach(void)
 {
     ULONG HeapFragValue = 2;
@@ -76,9 +72,7 @@ static void processattach(void)
         if (!pIsWow64Process(GetCurrentProcess(), &bIsWow64))
             fprintf(stderr, "[dllmain] IsWow64Process() failed %d\n", GetLastError());
         else if (bIsWow64)
-        {
             IMPORT_KERNEL32_FUNC(Wow64DisableWow64FsRedirection);
-        }
     }
 #endif
 

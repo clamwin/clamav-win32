@@ -37,7 +37,7 @@ add_library(libclamunrar SHARED
 
 target_link_options(libclamunrar PRIVATE $<$<C_COMPILER_ID:GNU>:-Wl,--enable-stdcall-fixup>)
 set_target_properties(libclamunrar PROPERTIES DEFINE_SYMBOL "" PREFIX "" OUTPUT_NAME libclamunrar)
-target_include_directories(libclamunrar PRIVATE ${UNRAR_INCLUDES})
+target_include_directories(libclamunrar PRIVATE ${UNRAR_INCLUDES} ${CLAMWIN_DIR}/include)
 target_compile_definitions(libclamunrar PRIVATE ${UNRAR_DEFINES})
 
 # libclamunrar_iface
