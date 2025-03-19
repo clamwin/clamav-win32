@@ -32,9 +32,12 @@
 
 #include "dynload.h"
 
+imp_CreateHardLinkW pCreateHardLinkW = NULL;
 imp_CreateToolhelp32Snapshot pCreateToolhelp32Snapshot = NULL;
 imp_Process32FirstW pProcess32FirstW = NULL;
 imp_Process32NextW pProcess32NextW = NULL;
+imp_Module32FirstW pModule32FirstW = NULL;
+imp_Module32NextW pModule32NextW = NULL;
 
 #ifdef __GNUC__
 __attribute__((constructor))
@@ -43,45 +46,25 @@ static void
 init()
 {
     HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
+    IMPORT_KERNEL32_FUNC(CreateHardLinkW);
     IMPORT_KERNEL32_FUNC(CreateToolhelp32Snapshot);
     IMPORT_KERNEL32_FUNC(Process32FirstW);
     IMPORT_KERNEL32_FUNC(Process32NextW);
+    IMPORT_KERNEL32_FUNC(Module32FirstW);
+    IMPORT_KERNEL32_FUNC(Module32NextW);
 }
 
 PVOID WINAPI AddVectoredExceptionHandler(ULONG First, PVECTORED_EXCEPTION_HANDLER Handler)
 {
-    TRACE("AddVectoredExceptionHandler: STATUS_NOT_SUPPORTED\n");
+    TRACE("AddVectoredExceptionHandler: not supported\n");
+    fprintf(stderr, "SetFileInformationByHandle is not supported!\n");
     return NULL;
-}
-
-BOOL WINAPI CreateHardLinkW(LPCWSTR lpFileName, LPCWSTR lpExistingFileName, LPSECURITY_ATTRIBUTES lpSecurityAttributes)
-{
-    TRACE("CreateHardLinkW: STATUS_NOT_SUPPORTED\n");
-    return FALSE;
-}
-
-BOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLASS FileInformationClass, LPVOID lpFileInformation, DWORD dwBufferSize)
-{
-    TRACE("SetFileInformationByHandle(0x%p, %d, 0x%p, %ld)\n", hFile, FileInformationClass, lpFileInformation, dwBufferSize);
-    return FALSE;
 }
 
 DWORD WINAPI GetProcessId(HANDLE Process)
 {
     TRACE("GetProcessId(0x%p)\n", Process);
     return 0;
-}
-
-BOOL WINAPI Module32FirstW(HANDLE hSnapshot, LPMODULEENTRY32W lpme)
-{
-    TRACE("Module32FirstW: STATUS_NOT_SUPPORTED\n");
-    return FALSE;
-}
-
-BOOL WINAPI Module32NextW(HANDLE hSnapshot, LPMODULEENTRY32W lpme)
-{
-    TRACE("Module32NextW: STATUS_NOT_SUPPORTED\n");
-    return FALSE;
 }
 
 typedef struct _cbdata_t
@@ -119,12 +102,12 @@ static DWORD WINAPI WaitThread(LPVOID lpParam)
     return 0;
 }
 
-BOOL WINAPI RegisterWaitForSingleObject_win9x(PHANDLE phNewWaitObject,
-                                              HANDLE hObject,
-                                              WAITORTIMERCALLBACK Callback,
-                                              PVOID Context,
-                                              ULONG dwMilliseconds,
-                                              ULONG dwFlags)
+BOOL WINAPI RegisterWaitForSingleObject_compat(PHANDLE phNewWaitObject,
+                                               HANDLE hObject,
+                                               WAITORTIMERCALLBACK Callback,
+                                               PVOID Context,
+                                               ULONG dwMilliseconds,
+                                               ULONG dwFlags)
 {
     TRACE("RegisterWaitForSingleObject\n");
 
@@ -141,7 +124,7 @@ BOOL WINAPI RegisterWaitForSingleObject_win9x(PHANDLE phNewWaitObject,
     return TRUE;
 }
 
-BOOL WINAPI UnregisterWaitEx_win9x(HANDLE WaitHandle, HANDLE CompletionEvent)
+BOOL WINAPI UnregisterWaitEx_compat(HANDLE WaitHandle, HANDLE CompletionEvent)
 {
     TRACE("UnregisterWaitEx\n");
     tdata_t *tdata = (tdata_t *)WaitHandle;
@@ -166,12 +149,13 @@ BOOL WINAPI UnregisterWaitEx_win9x(HANDLE WaitHandle, HANDLE CompletionEvent)
     return TRUE;
 }
 
-BOOL WINAPI UnregisterWait_win9x(HANDLE WaitHandle)
+BOOL WINAPI UnregisterWait_compat(HANDLE WaitHandle)
 {
     TRACE("UnregisterWait\n");
-    return UnregisterWaitEx_win9x(WaitHandle, NULL);
+    return UnregisterWaitEx_compat(WaitHandle, NULL);
 }
 
+/* windows 2k has this function, but whatever... */
 BOOL WINAPI SetFilePointerEx(HANDLE hFile, LARGE_INTEGER liDistanceToMove, PLARGE_INTEGER lpNewFilePointer, DWORD dwMoveMethod)
 {
     TRACE("SetFilePointerEx(0x%p, %lld, %p, %ld)\n", hFile, liDistanceToMove.QuadPart, lpNewFilePointer, dwMoveMethod);
@@ -275,15 +259,3 @@ NTSTATUS NTAPI NtWriteFile(
     return IoStatusBlock->Status;
 }
 #endif /* _UNICODE */
-
-DWORD WINAPI GetFinalPathNameByHandleW(
-    HANDLE hFile,
-    LPWSTR lpszFilePath,
-    DWORD cchFilePath,
-    DWORD dwFlags)
-{
-    TRACE("GetFinalPathNameByHandleW: STATUS_NOT_SUPPORTED\n");
-    fprintf(stderr, "GetFinalPathNameByHandleW: STATUS_NOT_SUPPORTED\n");
-    SetLastError(STATUS_NOT_SUPPORTED);
-    return 0;
-}

@@ -29,12 +29,18 @@ missing_getaddrinfo:
 missing_freeaddrinfo:
     .asciz "freeaddrinfo is not supported, aborting.\n"
 
+missing_createhardlink:
+    .asciz "CreateHardLinkW is not supported, aborting.\n"
 missing_th32snap:
     .asciz "CreateToolhelp32Snapshot is not supported, aborting.\n"
 missing_proc32first:
     .asciz "Process32FirstW is not supported, aborting.\n"
 missing_proc32next:
     .asciz "Process32NextW is not supported, aborting.\n"
+missing_module32first:
+    .asciz "Module32FirstW is not supported, aborting.\n"
+missing_module32next:
+    .asciz "Module32NextW is not supported, aborting.\n"
 
 .section .data
 
@@ -63,9 +69,12 @@ jump_\name:
     jmp     *%eax                   # Jump to the function implementation via the pointer
 .endm
 
+DEF_STUB _CreateHardLinkW@12, _pCreateHardLinkW, missing_createhardlink
 DEF_STUB _CreateToolhelp32Snapshot@8, _pCreateToolhelp32Snapshot, missing_th32snap
 DEF_STUB _Process32FirstW@8, _pProcess32FirstW, missing_proc32first
 DEF_STUB _Process32NextW@8, _pProcess32NextW, missing_proc32next
+DEF_STUB _Module32FirstW@8, _pModule32FirstW, missing_module32first
+DEF_STUB _Module32NextW@8, _pModule32NextW, missing_module32next
 
 DEF_STUB _getaddrinfo@16, p_getaddrinfo, missing_getaddrinfo
 DEF_STUB _freeaddrinfo@4, p_freeaddrinfo, missing_freeaddrinfo

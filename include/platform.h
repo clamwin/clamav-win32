@@ -70,10 +70,10 @@ typedef struct pollfd
 #define IPPROTO_IPV6 41
 #endif
 
-BOOL WINAPI RegisterWaitForSingleObject_win9x(PHANDLE phNewWaitObject, HANDLE hObject, WAITORTIMERCALLBACK Callback, PVOID Context, ULONG dwMilliseconds, ULONG dwFlags);
-#define RegisterWaitForSingleObject RegisterWaitForSingleObject_win9x
-BOOL WINAPI UnregisterWaitEx_win9x(HANDLE WaitHandle, HANDLE CompletionEvent);
-#define UnregisterWaitEx UnregisterWaitEx_win9x
+BOOL WINAPI RegisterWaitForSingleObject_compat(PHANDLE phNewWaitObject, HANDLE hObject, WAITORTIMERCALLBACK Callback, PVOID Context, ULONG dwMilliseconds, ULONG dwFlags);
+#define RegisterWaitForSingleObject RegisterWaitForSingleObject_compat
+BOOL WINAPI UnregisterWaitEx_compat(HANDLE WaitHandle, HANDLE CompletionEvent);
+#define UnregisterWaitEx UnregisterWaitEx_compat
 #define MAX_PATH 260
 #else
 #define MAX_PATH 32767
