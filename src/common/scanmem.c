@@ -496,8 +496,8 @@ int scanmem_cb(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void *data, struct
     scanmem_data *scan_data = data;
     int rc = 0;
     int isprocess = 0;
-    TCHAR modulename[MAX_PATH];
-    TCHAR expandmodule[MAX_PATH];
+    TCHAR modulename[MAX_PATH + 1];
+    TCHAR expandmodule[MAX_PATH + 1];
 
     if (!scan_data)
         return 0;
@@ -505,29 +505,37 @@ int scanmem_cb(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void *data, struct
     modulename[0] = expandmodule[0] = 0;
     scan_data->res = CL_CLEAN;
 
-    modulename[0] = 0;
-    /* Special case, btw why I get \SystemRoot\ in process szExePath?
-     There are also other cases? */
-    if ((_tcslen(me32.szExePath) > 12) && !_tcsnccmp(me32.szExePath, TEXT("\\SystemRoot\\"), 12))
-    {
-        expandmodule[0] = 0;
-        _tcsnccat(expandmodule, me32.szExePath, MAX_PATH - 1 - _tcslen(expandmodule));
-        expandmodule[MAX_PATH - 1] = 0;
-        _sntprintf(expandmodule, MAX_PATH - 1, TEXT("%%SystemRoot%%\\%s"), &me32.szExePath[12]);
-        expandmodule[MAX_PATH - 1] = 0;
-        ExpandEnvironmentStrings(expandmodule, modulename, MAX_PATH - 1);
-        modulename[MAX_PATH - 1] = 0;
-    }
+    /* Special cases:
+        - \SystemRoot\System32\smss.exe
+        - \??\C:\WINDOWS\system32\csrss.exe
+    */
 
-    if (!modulename[0])
+    size_t len = _tcslen(me32.szExePath);
+    if (!_tcsnccmp(me32.szExePath, TEXT("\\??\\"), 4))
     {
-        _tcsncpy(modulename, me32.szExePath, MAX_PATH - 1);
-        modulename[MAX_PATH - 1] = 0;
+        _tcsnccat(modulename, &me32.szExePath[4], MAX_PATH - len - 4);
+        modulename[MAX_PATH] = 0;
+    }
+    else if (!_tcsnccmp(me32.szExePath, TEXT("\\SystemRoot\\"), 12))
+    {
+        _tcsnccat(expandmodule, me32.szExePath, MAX_PATH - _tcslen(expandmodule));
+        expandmodule[MAX_PATH] = 0;
+
+        _sntprintf(expandmodule, MAX_PATH - 1, TEXT("%%SystemRoot%%\\%s"), &me32.szExePath[12]);
+        expandmodule[MAX_PATH] = 0;
+
+        ExpandEnvironmentStrings(expandmodule, modulename, MAX_PATH);
+        modulename[MAX_PATH] = 0;
+    }
+    else
+    {
+        _tcsncpy(modulename, me32.szExePath, MAX_PATH);
+        modulename[MAX_PATH] = 0;
     }
 
 #ifdef _UNICODE
-    char modulenameA[MAX_PATH];
-    if (!WideCharToMultiByte(CP_ACP, 0, modulename, -1, modulenameA, MAX_PATH - 1, NULL, NULL))
+    char modulenameA[MAX_PATH + 1];
+    if (!WideCharToMultiByte(CP_ACP, 0, modulename, -1, modulenameA, MAX_PATH, NULL, NULL))
     {
         logg(LOGG_ERROR, "WideCharToMultiByte failed %ld\n", GetLastError());
         return 0;
