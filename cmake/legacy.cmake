@@ -16,11 +16,7 @@ file(GLOB clamav_compat_sources
     ${CLAMWIN_DIR}/src/legacy/shared/forward.S
 )
 
-if(CLAMWIN_WINDOWS_VERSION EQUAL 0x0501)
-    list(APPEND clamav_compat_sources
-        ${CLAMWIN_DIR}/src/legacy/5.0/kernel32.c
-    )
-elseif(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
+if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
     list(APPEND clamav_compat_sources
         ${CLAMWIN_DIR}/src/legacy/4.0/forward.S
         ${CLAMWIN_DIR}/src/legacy/4.0/rtlcapturecontext.S
