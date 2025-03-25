@@ -29,8 +29,8 @@
 
 BOOL bIsWow64 = FALSE;
 
-static imp_IsWow64Process pIsWow64Process;
-static imp_Wow64DisableWow64FsRedirection pWow64DisableWow64FsRedirection;
+static imp_IsWow64Process pIsWow64Process = NULL;
+static imp_Wow64DisableWow64FsRedirection pWow64DisableWow64FsRedirection = NULL;
 
 LIBCLAMAV_EXPORT BOOL disablefsredir(void)
 {
@@ -67,7 +67,9 @@ static void processattach(void)
 
 #ifndef _WIN64
     HMODULE kernel32 = GetModuleHandleW(L"kernel32");
-    if (IMPORT_FUNCTION(kernel32, IsWow64Process))
+    IMPORT_FUNCTION(kernel32, IsWow64Process);
+
+    if (pIsWow64Process)
     {
         if (!pIsWow64Process(GetCurrentProcess(), &bIsWow64))
             fprintf(stderr, "[dllmain] IsWow64Process() failed %d\n", GetLastError());

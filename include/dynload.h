@@ -29,12 +29,12 @@
 
 #define Q(string) #string
 #define IMPORT_FUNCTION(hLib, func)                                  \
-    ({                                                               \
+    do                                                               \
+    {                                                                \
         imp_##func symbol = (imp_##func)GetProcAddress(hLib, #func); \
         if (symbol)                                                  \
             p##func = symbol;                                        \
-        symbol;                                                      \
-    })
+    } while (0)
 
 typedef BOOL(WINAPI *imp_IsWow64Process)(HANDLE hProcess, PBOOL Wow64Process);
 typedef BOOL(WINAPI *imp_Wow64DisableWow64FsRedirection)(PVOID OldValue);
