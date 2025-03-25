@@ -34,6 +34,8 @@ imp_pGetLongPathNameW:
 .section .rdata,"dr"
 .align 4
 
+#ifdef _UNICODE
 __imp__GetLongPathNameW@12:
     .long imp_pGetLongPathNameW
+#endif
 #endif
