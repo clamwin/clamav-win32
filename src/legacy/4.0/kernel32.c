@@ -205,7 +205,7 @@ DWORD WINAPI GetProcessId(HANDLE Process)
         return 0;
     }
 
-    return pbi.UniqueProcessId;
+    return (DWORD)pbi.UniqueProcessId;
 }
 #else
 DWORD WINAPI GetProcessId(HANDLE Process)
