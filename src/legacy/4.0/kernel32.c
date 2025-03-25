@@ -69,16 +69,15 @@ DWORD WINAPI WaitThreadProc(LPVOID lpParameter)
     PWAIT_CONTEXT ctx = (PWAIT_CONTEXT)lpParameter;
     HANDLE handles[2] = {ctx->hObject, ctx->hCancelEvent};
 
-    TRACE("WaitThreadProc: waiting for result\n");
+    TRACE("WaitThreadProc: Thread %p starting\n", GetCurrentThread());
     DWORD dwResult = WaitForMultipleObjects(2, handles, FALSE, ctx->dwMilliseconds);
-    TRACE("WaitThreadProc: wait result %ld\n", dwResult);
 
     if (dwResult == WAIT_OBJECT_0)
         ctx->Callback(ctx->Context, FALSE);
     else if (dwResult == WAIT_TIMEOUT)
         ctx->Callback(ctx->Context, TRUE);
 
-    TRACE("WaitThreadProc: bye bye\n");
+    TRACE("WaitThreadProc: done (result=%ld)\n", dwResult);
     return 0;
 }
 
@@ -156,15 +155,13 @@ BOOL WINAPI UnregisterWaitEx_compat(HANDLE hWaitObject, HANDLE hCompletionEvent)
     PWAIT_CONTEXT ctx = hWaitObject;
     SetEvent(ctx->hCancelEvent);
 
-    TRACE("UnregisterWaitEx: waiting for thread\n");
     WaitForSingleObject(ctx->hThread, INFINITE);
-    TRACE("UnregisterWaitEx: Done\n");
 
     CloseHandle(ctx->hCancelEvent);
     CloseHandle(ctx->hThread);
 
     if (hCompletionEvent)
-        SetEvent(hWaitObject);
+        SetEvent(hCompletionEvent);
 
     HeapFree(GetProcessHeap(), 0, ctx);
     return TRUE;
