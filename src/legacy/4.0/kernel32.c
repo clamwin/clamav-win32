@@ -54,45 +54,31 @@ PVOID WINAPI AddVectoredExceptionHandler(ULONG First, PVECTORED_EXCEPTION_HANDLE
     return NULL;
 }
 
-DWORD WINAPI GetProcessId(HANDLE Process)
-{
-    TRACE("GetProcessId(0x%p)\n", Process);
-    fprintf(stderr, "GetProcessId is not supported!\n");
-    return 0;
-}
-
-typedef struct _cbdata_t
+typedef struct _WAIT_CONTEXT
 {
     HANDLE hObject;
+    HANDLE hCancelEvent;
     WAITORTIMERCALLBACK Callback;
     PVOID Context;
-    ULONG dwMilliseconds;
-    ULONG dwFlags;
-    HANDLE hStop;
-} cbdata_t;
-
-typedef struct _tdata_t
-{
+    DWORD dwMilliseconds;
     HANDLE hThread;
-    DWORD dwTid;
-    cbdata_t *cbdata;
-} tdata_t;
+} WAIT_CONTEXT, *PWAIT_CONTEXT;
 
-static DWORD WINAPI WaitThread(LPVOID lpParam)
+DWORD WINAPI WaitThreadProc(LPVOID lpParameter)
 {
-    TRACE("WaitThread\n");
+    PWAIT_CONTEXT ctx = (PWAIT_CONTEXT)lpParameter;
+    HANDLE handles[2] = {ctx->hObject, ctx->hCancelEvent};
 
-    cbdata_t *cbdata = (cbdata_t *)lpParam;
-    DWORD result;
-    HANDLE wEvents[2] = {cbdata->hObject, cbdata->hStop};
+    TRACE("WaitThreadProc: waiting for result\n");
+    DWORD dwResult = WaitForMultipleObjects(2, handles, FALSE, ctx->dwMilliseconds);
+    TRACE("WaitThreadProc: wait result %ld\n", dwResult);
 
-    result = WaitForMultipleObjects(2, wEvents, FALSE, cbdata->dwMilliseconds);
+    if (dwResult == WAIT_OBJECT_0)
+        ctx->Callback(ctx->Context, FALSE);
+    else if (dwResult == WAIT_TIMEOUT)
+        ctx->Callback(ctx->Context, TRUE);
 
-    if (result == WAIT_OBJECT_0)
-        cbdata->Callback(cbdata->Context, FALSE);
-    else if (result == WAIT_TIMEOUT)
-        cbdata->Callback(cbdata->Context, TRUE);
-
+    TRACE("WaitThreadProc: bye bye\n");
     return 0;
 }
 
@@ -105,48 +91,89 @@ BOOL WINAPI RegisterWaitForSingleObject_compat(PHANDLE phNewWaitObject,
 {
     TRACE("RegisterWaitForSingleObject\n");
 
-    tdata_t *tdata = calloc(1, sizeof(tdata_t));
-    tdata->cbdata = calloc(1, sizeof(cbdata_t));
-    tdata->cbdata->hObject = hObject;
-    tdata->cbdata->Callback = Callback;
-    tdata->cbdata->Context = Context;
-    tdata->cbdata->dwMilliseconds = dwMilliseconds;
-    tdata->cbdata->dwFlags = dwFlags;
-    tdata->cbdata->hStop = CreateEvent(NULL, TRUE, FALSE, NULL);
-    tdata->hThread = CreateThread(NULL, 0, WaitThread, (LPVOID)tdata->cbdata, 0, &tdata->dwTid);
-    *phNewWaitObject = (HANDLE)tdata;
-    return TRUE;
-}
-
-BOOL WINAPI UnregisterWaitEx_compat(HANDLE WaitHandle, HANDLE CompletionEvent)
-{
-    TRACE("UnregisterWaitEx\n");
-    tdata_t *tdata = (tdata_t *)WaitHandle;
-
-    SetEvent(tdata->cbdata->hStop);
-
-    if (WaitForSingleObject(tdata->hThread, 15000) != WAIT_OBJECT_0)
+    if (!hObject || hObject == NtCurrentProcess() || hObject == NtCurrentThread() || !Callback)
     {
-        fprintf(stderr, "[legacy] Warning Thread %ld still alive, killing it\n", tdata->dwTid);
-        TerminateThread(tdata->hThread, 0);
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return FALSE;
     }
 
-    CloseHandle(tdata->cbdata->hStop);
-    CloseHandle(tdata->hThread);
+    if ((dwFlags & WT_EXECUTEONLYONCE) == 0)
+    {
+        fprintf(stderr, "[legacy] Unsupported RegisterWaitForSingleObject without WT_EXECUTEONLYONCE\n");
+        SetLastError(ERROR_NOT_SUPPORTED);
+        return FALSE;
+    }
 
-    if (CompletionEvent)
-        SetEvent(CompletionEvent);
+    PWAIT_CONTEXT ctx = HeapAlloc(GetProcessHeap(), 0, sizeof(WAIT_CONTEXT));
+    if (!ctx)
+    {
+        SetLastError(ERROR_OUTOFMEMORY);
+        return FALSE;
+    }
 
-    free(tdata->cbdata);
-    free(tdata);
+    if (!(ctx->hCancelEvent = CreateEvent(NULL, TRUE, FALSE, NULL)))
+    {
+        HeapFree(GetProcessHeap(), 0, ctx);
+        return FALSE;
+    }
+
+    ctx->hObject = hObject;
+    ctx->Callback = Callback;
+    ctx->Context = Context;
+    ctx->dwMilliseconds = dwMilliseconds;
+
+    DWORD dwThreadId;
+    if (!(ctx->hThread = CreateThread(NULL, 0, WaitThreadProc, ctx, 0, &dwThreadId)))
+    {
+        TRACE("RegisterWaitForSingleObject: CreateThread() failed with %ld\n", GetLastError());
+        CloseHandle(ctx->hCancelEvent);
+        HeapFree(GetProcessHeap(), 0, ctx);
+        return FALSE;
+    }
+
+    if (phNewWaitObject)
+        *phNewWaitObject = ctx;
 
     return TRUE;
 }
 
-BOOL WINAPI UnregisterWait_compat(HANDLE WaitHandle)
+BOOL WINAPI UnregisterWaitEx_compat(HANDLE hWaitObject, HANDLE hCompletionEvent)
 {
-    TRACE("UnregisterWait\n");
-    return UnregisterWaitEx_compat(WaitHandle, NULL);
+    TRACE("UnregisterWaitEx(0x%p, 0x%p)\n", hWaitObject, hCompletionEvent);
+
+    if (!hWaitObject)
+    {
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return FALSE;
+    }
+
+    if (hCompletionEvent == INVALID_HANDLE_VALUE)
+    {
+        fprintf(stderr, "[legacy] Unsupported UnregisterWaitEx with INVALID_HANDLE_VALUE\n");
+        return FALSE;
+    }
+
+    PWAIT_CONTEXT ctx = hWaitObject;
+    SetEvent(ctx->hCancelEvent);
+
+    TRACE("UnregisterWaitEx: waiting for thread\n");
+    WaitForSingleObject(ctx->hThread, INFINITE);
+    TRACE("UnregisterWaitEx: Done\n");
+
+    CloseHandle(ctx->hCancelEvent);
+    CloseHandle(ctx->hThread);
+
+    if (hCompletionEvent)
+        SetEvent(hWaitObject);
+
+    HeapFree(GetProcessHeap(), 0, ctx);
+    return TRUE;
+}
+
+BOOL WINAPI UnregisterWait_compat(HANDLE hWaitObject)
+{
+    TRACE("UnregisterWait(0x%p)\n", hWaitObject);
+    return UnregisterWaitEx_compat(hWaitObject, NULL);
 }
 
 /* windows 2k has this function, but whatever... */
@@ -164,7 +191,33 @@ BOOL WINAPI SetFilePointerEx(HANDLE hFile, LARGE_INTEGER liDistanceToMove, PLARG
     return TRUE;
 }
 
-#ifndef _UNICODE
+#ifdef _UNICODE
+DWORD WINAPI GetProcessId(HANDLE Process)
+{
+    PROCESS_BASIC_INFORMATION pbi;
+    NTSTATUS status = NtQueryInformationProcess(Process,
+                                                ProcessBasicInformation,
+                                                &pbi,
+                                                sizeof(PROCESS_BASIC_INFORMATION),
+                                                NULL);
+
+    if (!NT_SUCCESS(status))
+    {
+        TRACE("GetProcessId: NtQueryInformationProcess failed with 0x%08lx\n", status);
+        SetLastError(RtlNtStatusToDosError(status));
+        return 0;
+    }
+
+    return pbi.UniqueProcessId;
+}
+#else
+DWORD WINAPI GetProcessId(HANDLE Process)
+{
+    TRACE("GetProcessId(0x%p)\n", Process);
+    fprintf(stderr, "GetProcessId is not supported!\n");
+    return 0;
+}
+
 NTSTATUS NTAPI NtOpenFile(
     PHANDLE FileHandle,
     ACCESS_MASK DesiredAccess,
