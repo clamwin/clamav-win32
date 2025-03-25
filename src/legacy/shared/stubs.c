@@ -124,12 +124,12 @@ WINBOOL WINAPI UpdateProcThreadAttribute(
     PVOID lpPreviousValue,
     PSIZE_T lpReturnSize)
 {
-    TRACE("UpdateProcThreadAttribute(0x%p, %ld, 0x%Ix, 0x%p, %zu, 0x%p, 0x%p)\n",
+    TRACE("UpdateProcThreadAttribute(0x%p, %ld, 0x%" PRIxPTR ", 0x%p, %d, 0x%p, 0x%p)\n",
           lpAttributeList,
           dwFlags,
-          Attribute,
+          (uintptr_t)Attribute,
           lpValue,
-          cbSize,
+          (unsigned int)cbSize,
           lpPreviousValue,
           lpReturnSize);
 
