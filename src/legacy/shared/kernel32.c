@@ -377,14 +377,14 @@ HANDLE WINAPI CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LP
         int size = WideCharToMultiByte(CP_ACP, 0, lpTimerName, -1, NULL, 0, NULL, NULL);
         if (size)
         {
-            lpTimerNameA = malloc(size);
+            lpTimerNameA = RtlAllocateHeap(GetProcessHeap(), 0, size);
             WideCharToMultiByte(CP_ACP, 0, lpTimerName, -1, NULL, 0, NULL, NULL);
         }
     }
 
     HANDLE hTimer = CreateWaitableTimerA(lpTimerAttributes, bManualReset, lpTimerNameA);
     if (lpTimerNameA)
-        free(lpTimerNameA);
+        RtlFreeHeap(GetProcessHeap(), 0, lpTimerNameA);
 
 #endif
     // If the timer was created successfully but HIGH_RESOLUTION was requested,

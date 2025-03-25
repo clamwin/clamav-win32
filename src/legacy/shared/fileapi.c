@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 #include "legacy.h"
 
 WINBOOL WINAPI GetFileInformationByHandleEx(HANDLE hFile,
@@ -187,7 +186,7 @@ WINBOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLAS
         PFILE_BASIC_INFORMATION ntBasicInfo;
 
         ntBufferSize = sizeof(FILE_BASIC_INFORMATION);
-        if (!(ntBuffer = malloc(ntBufferSize)))
+        if (!(ntBuffer = RtlAllocateHeap(GetProcessHeap(), 0, ntBufferSize)))
         {
             SetLastError(ERROR_OUTOFMEMORY);
             return FALSE;
@@ -231,7 +230,7 @@ WINBOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLAS
 
         // Calculate the NT buffer size
         ntBufferSize = sizeof(FILE_RENAME_INFORMATION) - sizeof(wchar_t) + ntPath.Length;
-        if (!(ntBuffer = malloc(ntBufferSize)))
+        if (!(ntBuffer = RtlAllocateHeap(GetProcessHeap(), 0, ntBufferSize)))
         {
             SetLastError(ERROR_OUTOFMEMORY);
             return FALSE;
@@ -251,7 +250,7 @@ WINBOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLAS
             FileRenameInformation);
 
         // Clean up
-        free(ntBuffer);
+        RtlFreeHeap(GetProcessHeap(), 0, ntBuffer);
 
         // Convert NT status to Win32 error and set return value
         if (NT_SUCCESS(status))
@@ -293,7 +292,7 @@ WINBOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLAS
         PFILE_DISPOSITION_INFORMATION ntDispInfo;
 
         ntBufferSize = sizeof(FILE_DISPOSITION_INFORMATION);
-        if (!(ntBuffer = malloc(ntBufferSize)))
+        if (!(ntBuffer = RtlAllocateHeap(GetProcessHeap(), 0, ntBufferSize)))
         {
             SetLastError(ERROR_OUTOFMEMORY);
             return FALSE;
@@ -335,7 +334,7 @@ WINBOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLAS
 
     // Clean up
     if (ntBuffer)
-        free(ntBuffer);
+        RtlFreeHeap(GetProcessHeap(), 0, ntBuffer);
 
     return success;
 }
