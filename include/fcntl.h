@@ -16,7 +16,10 @@ extern int cw_wseterrno(void);
 #define _O_EXCL 0x0400
 #define _O_TEXT 0x4000
 #define _O_BINARY 0x8000
+#define _O_U16TEXT 0x20000
+#define _O_U8TEXT 0x40000
 
+#if (defined _CRT_DECLARE_NONSTDC_NAMES && _CRT_DECLARE_NONSTDC_NAMES) || (!defined _CRT_DECLARE_NONSTDC_NAMES && !__STDC__)
 #define O_RDONLY _O_RDONLY
 #define O_WRONLY _O_WRONLY
 #define O_RDWR _O_RDWR
@@ -26,6 +29,7 @@ extern int cw_wseterrno(void);
 #define O_EXCL _O_EXCL
 #define O_TEXT _O_TEXT
 #define O_BINARY _O_BINARY
+#endif
 
 #ifndef F_GETFL
 #define F_GETFL 1

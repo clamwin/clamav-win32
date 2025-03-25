@@ -94,8 +94,8 @@ static BOOL WINAPI IsShortName_U(PWCHAR Name, ULONG Length)
         return (Length == 1) || ((Length == 2) && Name[1] == '.');
 
     UNICODE_STRING UnicodeString = {
-        .Length = Length * sizeof(wchar_t),
-        .MaximumLength = Length * sizeof(wchar_t),
+        .Length = (USHORT)(Length * sizeof(wchar_t)),
+        .MaximumLength = (USHORT)(Length * sizeof(wchar_t)),
         .Buffer = Name};
 
     CHAR AnsiBuffer[MAX_PATH];
@@ -147,7 +147,7 @@ static BOOL WINAPI IsLongName_U(PWCHAR FileName, ULONG Length)
         return TRUE;
 
     BOOL bExt = FALSE;
-    for (int i = 0, Dots = Length - 1; i < Length; i++, Dots--)
+    for (ULONG i = 0, Dots = Length - 1; i < Length; i++, Dots--)
     {
         if (FileName[i] == L'.')
         {
@@ -177,7 +177,7 @@ static BOOL WINAPI FindLFNorSFN_U(PWCHAR Path, PWCHAR *First, PWCHAR *Last, BOOL
         while ((*p) && ((*p != L'\\') && (*p != L'/')))
             p++;
 
-        ULONG Length = p - Path;
+        ULONG Length = (ULONG)(p - Path);
 
         BOOL bFound = UseShort ? !IsShortName_U(Path, Length) : !IsLongName_U(Path, Length);
         if (bFound)
@@ -338,5 +338,5 @@ cleanup:
         RtlFreeHeap(GetProcessHeap(), 0, Buffer);
 
     SetErrorMode(uMode);
-    return ReturnLength;
+    return (DWORD)ReturnLength;
 }

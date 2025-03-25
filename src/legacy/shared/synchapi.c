@@ -130,7 +130,7 @@ void WINAPI WakeByAddressSingle(void *Address)
  */
 BOOL WINAPI WaitOnAddress(volatile void *Address, void *CompareAddress, SIZE_T AddressSize, DWORD dwMilliseconds)
 {
-    TRACE("WaitOnAddress(0x%p, 0x%p, %ld, %ld)\n", Address, CompareAddress, AddressSize, dwMilliseconds);
+    TRACE("WaitOnAddress(0x%p, 0x%p, %zu, %ld)\n", Address, CompareAddress, AddressSize, dwMilliseconds);
 
     // Validate address size
     if (AddressSize != 1 && AddressSize != 2 && AddressSize != 4 && AddressSize != 8)

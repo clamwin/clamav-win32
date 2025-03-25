@@ -51,6 +51,47 @@
 #include <tchar.h>
 #include <strsafe.h>
 
+#ifdef _MSC_VER
+typedef BOOL WINBOOL;
+typedef void* LPVOID;
+
+#define ObjectNameInformation 1
+#define FileBasicInformation 4
+#define FileNameInformation 9
+#define FileDispositionInformation 13
+#define FileNormalizedNameInformation 48
+
+typedef struct _FILE_BASIC_INFORMATION
+{
+    LARGE_INTEGER CreationTime;
+    LARGE_INTEGER LastAccessTime;
+    LARGE_INTEGER LastWriteTime;
+    LARGE_INTEGER ChangeTime;
+    ULONG FileAttributes;
+} FILE_BASIC_INFORMATION, * PFILE_BASIC_INFORMATION;
+
+typedef struct _FILE_DISPOSITION_INFORMATION
+{
+    BOOLEAN DoDeleteFile;
+} FILE_DISPOSITION_INFORMATION, * PFILE_DISPOSITION_INFORMATION;
+
+typedef struct _FILE_NAME_INFORMATION
+{
+    ULONG FileNameLength;
+    WCHAR FileName[1];
+} FILE_NAME_INFORMATION, * PFILE_NAME_INFORMATION;
+
+typedef struct _OBJECT_NAME_INFORMATION {
+    UNICODE_STRING Name;
+} OBJECT_NAME_INFORMATION, * POBJECT_NAME_INFORMATION;
+
+BOOLEAN NTAPI RtlFreeHeap(PVOID HeapHandle, ULONG Flags, PVOID HeapBase);
+PVOID NTAPI RtlAllocateHeap(PVOID HeapHandle, ULONG Flags, SIZE_T Size);
+
+NTSTATUS NTAPI NtSetInformationFile(HANDLE hFile, PIO_STATUS_BLOCK io, PVOID ptr, ULONG len, FILE_INFORMATION_CLASS FileInformationClass);
+NTSTATUS NTAPI NtQueryInformationFile(HANDLE hFile, PIO_STATUS_BLOCK io, PVOID ptr, ULONG len, FILE_INFORMATION_CLASS FileInformationClass);
+#endif
+
 DWORD WINAPI GetLongPathNameW(LPCWSTR lpszShortPath, LPWSTR lpszLongPath, DWORD cchBuffer);
 DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 WINBOOL WINAPI GetFileInformationByHandleEx(HANDLE hFile, FILE_INFO_BY_HANDLE_CLASS FileInformationClass, LPVOID lpFileInformation, DWORD dwBufferSize);
@@ -159,38 +200,6 @@ typedef enum _RTL_PATH_TYPE
 
 #define IOCTL_MOUNTMGR_QUERY_POINTS \
     CTL_CODE(MOUNTMGRCONTROLTYPE, 2, METHOD_BUFFERED, FILE_ANY_ACCESS)
-
-#ifdef _MSC_VER
-typedef BOOL WINBOOL;
-
-#define ObjectNameInformation 1
-#define FileBasicInformation 4
-#define FileNameInformation 9
-#define FileDispositionInformation 13
-
-typedef struct _FILE_BASIC_INFORMATION
-{
-    LARGE_INTEGER CreationTime;
-    LARGE_INTEGER LastAccessTime;
-    LARGE_INTEGER LastWriteTime;
-    LARGE_INTEGER ChangeTime;
-    ULONG FileAttributes;
-} FILE_BASIC_INFORMATION, *PFILE_BASIC_INFORMATION;
-
-typedef struct _FILE_DISPOSITION_INFORMATION
-{
-    BOOLEAN DoDeleteFile;
-} FILE_DISPOSITION_INFORMATION, *PFILE_DISPOSITION_INFORMATION;
-
-typedef struct _FILE_NAME_INFORMATION
-{
-    ULONG FileNameLength;
-    WCHAR FileName[1];
-} FILE_NAME_INFORMATION, *PFILE_NAME_INFORMATION;
-
-NTSTATUS NTAPI NtSetInformationFile(HANDLE hFile, PIO_STATUS_BLOCK io, PVOID ptr, ULONG len, FILE_INFORMATION_CLASS FileInformationClass);
-NTSTATUS NTAPI NtQueryInformationFile(HANDLE hFile, PIO_STATUS_BLOCK io, PVOID ptr, ULONG len, FILE_INFORMATION_CLASS FileInformationClass);
-#endif
 
 #ifdef __GNUC__
 #define HOTFUNC __attribute__((hot))

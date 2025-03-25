@@ -46,7 +46,10 @@ function(add_legacy_executable TARGET SOURCES LINK_LIBRARY)
     target_compile_definitions(${TARGET} PRIVATE ${LEGACY_DEFINES})
     target_link_libraries(${TARGET} PRIVATE ${LINK_LIBRARY})
     target_link_options(${TARGET} PRIVATE $<$<CXX_COMPILER_ID:GNU>:-municode>)
-    target_compile_options(${TARGET} PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall -Wno-attributes>)
+    target_compile_options(${TARGET} PRIVATE
+        $<$<C_COMPILER_ID:MSVC>:/wd4061 /wd4273>
+        $<$<CXX_COMPILER_ID:GNU>:-Wall -Wno-attributes>
+    )
 endfunction()
 
 # test tools

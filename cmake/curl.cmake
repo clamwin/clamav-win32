@@ -68,7 +68,7 @@ if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
         ${CURL_DIR}/lib/hostip.c
         ${CURL_DIR}/lib/hostip4.c
         DIRECTORY ${CURL_DIR}/lib
-        PROPERTIES COMPILE_FLAGS "-include wspiapi.h")
+        PROPERTIES COMPILE_FLAGS "$<$<CXX_COMPILER_ID:GNU>:-include wspiapi.h>")
 endif()
 
 if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)

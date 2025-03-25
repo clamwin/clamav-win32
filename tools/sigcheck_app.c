@@ -22,6 +22,8 @@
 
 #include <clamav.h>
 
+extern long cw_sigcheck(int fd, const char* virname, bool warnfp);
+
 const char *fmtfallback(int code)
 {
     switch (code)

@@ -31,7 +31,7 @@ static BOOL BasepGetObjectNTName(HANDLE Handle, wchar_t **lpName)
 {
     NTSTATUS status;
     POBJECT_NAME_INFORMATION NtObjectName = NULL;
-    SIZE_T size = sizeof(OBJECT_NAME_INFORMATION) + (MAX_PATH * sizeof(wchar_t));
+    ULONG size = sizeof(OBJECT_NAME_INFORMATION) + (MAX_PATH * sizeof(wchar_t));
     ULONG ReturnLength;
 
     do
@@ -59,8 +59,8 @@ static BOOL BasepGetObjectNTName(HANDLE Handle, wchar_t **lpName)
         return FALSE;
     }
 
-    SIZE_T Length = NtObjectName->Name.Length;
-    TRACE("Name(%x)=%.*ls\n", Length, NtObjectName->Name.Length / sizeof(wchar_t), NtObjectName->Name.Buffer);
+    int Length = NtObjectName->Name.Length;
+    TRACE("Name=%.*ls\n", (int)(NtObjectName->Name.Length / sizeof(wchar_t)), NtObjectName->Name.Buffer);
 
     memmove(NtObjectName, NtObjectName->Name.Buffer, Length);
     *lpName = (wchar_t *)NtObjectName;
@@ -75,7 +75,7 @@ static BOOL BasepGetFileNameInformation(HANDLE Handle, FILE_INFORMATION_CLASS Fi
 {
     NTSTATUS status;
     PFILE_NAME_INFORMATION fileName = NULL;
-    SIZE_T size = sizeof(FILE_NAME_INFORMATION) + (MAX_PATH * sizeof(wchar_t));
+    ULONG size = sizeof(FILE_NAME_INFORMATION) + (MAX_PATH * sizeof(wchar_t));
     IO_STATUS_BLOCK IoStatusBlock;
 
     TRACE("BasepGetFileNameInformation Class %d\n", FileInformationClass);
@@ -105,7 +105,7 @@ static BOOL BasepGetFileNameInformation(HANDLE Handle, FILE_INFORMATION_CLASS Fi
     }
 
     SIZE_T Length = fileName->FileNameLength;
-    TRACE("Name(%x)=%.*ls\n", Length, Length / sizeof(wchar_t), fileName->FileName);
+    TRACE("Name=%.*ls\n", (int)(Length / sizeof(wchar_t)), fileName->FileName);
 
     // TODO check
     // memmove(fileName, fileName->FileName, Length);
@@ -135,7 +135,7 @@ static BOOL BasepGetVolumeGUIDFromNTName(const wchar_t *Src, wchar_t **VolumeNam
         return FALSE;
     }
 
-    USHORT DeviceNameLength = wcslen(Src) * sizeof(wchar_t);
+    USHORT DeviceNameLength = (USHORT)(wcslen(Src) * sizeof(wchar_t));
     DWORD nInBufferSize = DeviceNameLength + sizeof(MOUNTMGR_MOUNT_POINT);
 
     PMOUNTMGR_MOUNT_POINT MountPoint = RtlAllocateHeap(GetProcessHeap(), 0, nInBufferSize);
@@ -150,7 +150,7 @@ static BOOL BasepGetVolumeGUIDFromNTName(const wchar_t *Src, wchar_t **VolumeNam
     MountPoint->DeviceNameLength = DeviceNameLength;
     MountPoint->DeviceNameOffset = sizeof(MOUNTMGR_MOUNT_POINT);
 
-    memcpy((LPVOID)MountPoint + MountPoint->DeviceNameOffset, Src, DeviceNameLength);
+    memcpy((LPBYTE)MountPoint + MountPoint->DeviceNameOffset, Src, DeviceNameLength);
     DWORD nOutBufferSize = sizeof(MOUNTMGR_MOUNT_POINTS) + 10 * (40 + sizeof(MOUNTMGR_MOUNT_POINT));
 
     PMOUNTMGR_MOUNT_POINTS MountPoints = NULL;
@@ -199,13 +199,13 @@ static BOOL BasepGetVolumeGUIDFromNTName(const wchar_t *Src, wchar_t **VolumeNam
             break;
         }
 
-        LPVOID Base = MountPoints;
+        LPBYTE Base = (LPBYTE)MountPoints;
 
-        for (int i = 0; i < MountPoints->NumberOfMountPoints; i++)
+        for (ULONG i = 0; i < MountPoints->NumberOfMountPoints; i++)
         {
             PMOUNTMGR_MOUNT_POINT Current = &MountPoints->MountPoints[i];
-            wchar_t *SymbolicLinkName = Base + Current->SymbolicLinkNameOffset;
-            TRACE("Device=%.*ls\n", Current->SymbolicLinkNameLength / sizeof(wchar_t),
+            wchar_t *SymbolicLinkName = (wchar_t *)(Base + Current->SymbolicLinkNameOffset);
+            TRACE("Device=%.*ls\n", (int)(Current->SymbolicLinkNameLength / sizeof(wchar_t)),
                   SymbolicLinkName);
 
             if (!MOUNTMGR_IS_VOLUME_NAME2(SymbolicLinkName, Current->SymbolicLinkNameLength))
@@ -285,7 +285,7 @@ static BOOL BasepGetVolumeDosLetterNameFromNTNameAndFileName(const wchar_t *Src,
             TRACE("%ls is {%ls}\n", driveLetter, targetDevice);
             // TRACE("targePath: %ls\n", targetPath);
 
-            TRACE("wcsncmp(\"%ls\", \"%ls\", %d)\n", Src, targetDevice, deviceNameLen);
+            TRACE("wcsncmp(\"%ls\", \"%ls\", %zu)\n", Src, targetDevice, deviceNameLen);
             // Found matching drive
             if (wcsncmp(Src, targetDevice, deviceNameLen) == 0)
             {
@@ -367,7 +367,7 @@ static BOOL BasepGetVolumeDosLetterNameFromNTName(const wchar_t *Src, wchar_t **
         return FALSE;
     }
 
-    DWORD Length = wcslen(Src) * sizeof(wchar_t);
+    DWORD Length = (DWORD)(wcslen(Src) * sizeof(wchar_t));
     DWORD nInBufferSize = Length + sizeof(MOUNTMGR_TARGET_NAME);
     PMOUNTMGR_TARGET_NAME TargetName = RtlAllocateHeap(GetProcessHeap(), 0, nInBufferSize);
 
@@ -379,16 +379,16 @@ static BOOL BasepGetVolumeDosLetterNameFromNTName(const wchar_t *Src, wchar_t **
 
     DWORD bytesReturned;
 
-    TargetName->DeviceNameLength = Length;
+    TargetName->DeviceNameLength = (USHORT)Length;
     memcpy(TargetName->DeviceName, Src, Length);
 
     const wchar_t Prefix[] = L"\\\\?\\";
     const SIZE_T PrefixChars = wcslen(Prefix);
     const SIZE_T PrefixLength = PrefixChars * sizeof(wchar_t);
 
-    LPVOID Buffer = NULL;
+    LPBYTE Buffer = NULL;
     PFILE_NAME_INFORMATION NameInfo = NULL;
-    DWORD nOutBufferSize = PrefixLength + sizeof(FILE_NAME_INFORMATION) + (MAX_PATH * sizeof(wchar_t));
+    SIZE_T nOutBufferSize = PrefixLength + sizeof(FILE_NAME_INFORMATION) + (MAX_PATH * sizeof(wchar_t));
 
     BOOL success = FALSE;
 
@@ -408,7 +408,7 @@ static BOOL BasepGetVolumeDosLetterNameFromNTName(const wchar_t *Src, wchar_t **
                                   TargetName,
                                   nInBufferSize,
                                   Buffer + PrefixLength,
-                                  nOutBufferSize - PrefixLength,
+                                  (DWORD)(nOutBufferSize - PrefixLength),
                                   &bytesReturned,
                                   NULL);
 
@@ -441,7 +441,7 @@ static BOOL BasepGetVolumeDosLetterNameFromNTName(const wchar_t *Src, wchar_t **
     }
     else
     {
-        *VolumeName = Buffer;
+        *VolumeName = (wchar_t *)Buffer;
         SIZE_T Length = NameInfo->FileNameLength;
         memcpy(*VolumeName, Prefix, PrefixLength);
         memmove(Buffer + 8, NameInfo->FileName, Length);
@@ -531,7 +531,7 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
 
     if (*fileName != L'\\')
     {
-        TRACE("BasepGetFileNameInformation: NameInfo does not start with \\: [%ls]", *fileName);
+        TRACE("BasepGetFileNameInformation: NameInfo does not start with \\: [%ls]", fileName);
         RtlFreeHeap(GetProcessHeap(), 0, NtObjectName);
         RtlFreeHeap(GetProcessHeap(), 0, fileName);
         SetLastError(ERROR_ACCESS_DENIED);
@@ -547,7 +547,7 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
     NtObjectName[wcslen(NtObjectName) - wcslen(fileName)] = L'\0';
 
     wchar_t *VolumeName = NULL;
-    DWORD result = 0;
+    SIZE_T result = 0;
 
     TRACE("volumeNameType=%d\n", volumeNameType);
 
@@ -612,7 +612,7 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
                 Source = Dest ? Dest : VolumeName;
             }
 
-            DWORD len = (wcslen(fileName) + wcslen(Source) + 1) * sizeof(wchar_t);
+            SIZE_T len = (wcslen(fileName) + wcslen(Source) + 1) * sizeof(wchar_t);
             normalizedName = RtlAllocateHeap(GetProcessHeap(), 0, len);
             if (!normalizedName)
             {
@@ -622,12 +622,12 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
                 goto cleanup;
             }
 
-            DWORD Length = len / sizeof(wchar_t);
+            SIZE_T Length = len / sizeof(wchar_t);
             StringCchCopyW(normalizedName, Length, Source);
             StringCchCatW(normalizedName, Length, fileName);
 
-            TRACE("GetLongPathNameW(\"%ls\", \"%ls\", %d)\n", normalizedName, normalizedName, Length);
-            DWORD LongPathLength = GetLongPathNameW(normalizedName, normalizedName, Length);
+            TRACE("GetLongPathNameW(\"%ls\", \"%ls\", %zu)\n", normalizedName, normalizedName, Length);
+            SIZE_T LongPathLength = GetLongPathNameW(normalizedName, normalizedName, (DWORD)Length);
             if (!LongPathLength)
             {
                 TRACE("GetLongPathNameW returned 0\n");
@@ -642,8 +642,8 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
             {
                 if (Dest)
                 {
-                    DWORD diff = LongPathLength - wcslen(Dest);
-                    DWORD destlen = VolumeName ? wcslen(VolumeName) : 0;
+                    SIZE_T diff = LongPathLength - wcslen(Dest);
+                    SIZE_T destlen = VolumeName ? wcslen(VolumeName) : 0;
                     LongPathLength = destlen + diff;
                     RtlFreeHeap(GetProcessHeap(), 0, Dest);
                 }
@@ -654,7 +654,7 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
             }
 
             Source = Dest ? Dest : VolumeName;
-            DWORD SrcLen = wcslen(Source);
+            SIZE_T SrcLen = wcslen(Source);
             len = (wcslen(normalizedName) - SrcLen + 1) * sizeof(wchar_t);
             memmove(normalizedName, &normalizedName[SrcLen], len);
             if (Dest)
@@ -662,7 +662,7 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
         }
     }
 
-    DWORD Length = VolumeName ? wcslen(VolumeName) : 0;
+    SIZE_T Length = VolumeName ? wcslen(VolumeName) : 0;
     result = Length + wcslen(fileName);
 
     if (result + 1 <= cchFilePath)
@@ -686,8 +686,8 @@ cleanup:
     if (VolumeName)
         RtlFreeHeap(GetProcessHeap(), 0, VolumeName);
 
-    TRACE("GetFinalPathNameByHandleW -> [%ls](%d)\n", result ? lpszFilePath : NULL, result);
-    return result;
+    TRACE("GetFinalPathNameByHandleW -> [%ls](%d)\n", result ? lpszFilePath : NULL, (DWORD)result);
+    return (DWORD)result;
 }
 
 #else
