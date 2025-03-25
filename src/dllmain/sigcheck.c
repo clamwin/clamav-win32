@@ -27,11 +27,11 @@
 #include <softpub.h>
 
 #ifdef _UNICODE
-#define FAILED_RET(call, ret)                               \
-    {                                                       \
-        DWORD le = GetLastError();                          \
-        cli_dbgmsg("sigcheck: " call " failed: %ld\n", le); \
-        ret;                                                \
+#define FAILED_RET(call, ret)                                   \
+    {                                                           \
+        DWORD le = GetLastError();                              \
+        cli_dbgmsg("sigcheck: " call " failed: 0x%08lx\n", le); \
+        ret;                                                    \
     }
 
 #define FAILED_HRESULT(call) FAILED_RET(call, return le)
@@ -56,7 +56,7 @@ static bool isIssuerTrusted(wchar_t *filename)
         if ((lErr = GetLastError()) == CRYPT_E_NO_MATCH)
             cli_dbgmsg("sigcheck: CryptQueryObject() returns CRYPT_E_NO_MATCH\n");
         else
-            cli_errmsg("sigcheck: CryptQueryObject() failed: %ld\n", lErr);
+            cli_errmsg("sigcheck: CryptQueryObject() failed: 0x%08lx\n", lErr);
         return lErr;
     }
 
