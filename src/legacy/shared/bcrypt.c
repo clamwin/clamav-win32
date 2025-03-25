@@ -24,10 +24,6 @@
 
 #include "legacy.h"
 
-#include <ntstatus.h>
-#include <wincrypt.h>
-#include <bcrypt.h>
-
 /* Needed by libxml2 */
 NTSTATUS WINAPI BCryptGenRandom(BCRYPT_ALG_HANDLE hAlgorithm, PUCHAR pbBuffer, ULONG cbBuffer, ULONG dwFlags)
 {

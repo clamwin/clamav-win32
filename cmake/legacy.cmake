@@ -29,31 +29,34 @@ add_library(clamav_compat STATIC
     ${clamav_compat_sources}
 )
 
-target_include_directories(clamav_compat PRIVATE ${CLAMWIN_DIR}/src/legacy/shared ${CLAMWIN_DIR}/include)
+set(LEGACY_INCLUDES
+    ${CLAMWIN_DIR}/src/legacy/shared
+    ${CLAMWIN_DIR}/include
+)
+
+target_include_directories(clamav_compat PRIVATE ${LEGACY_INCLUDES})
 target_compile_definitions(clamav_compat PRIVATE ${LEGACY_DEFINES})
 target_compile_options(clamav_compat PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall -Wno-attributes>)
 target_compile_options(clamav_compat PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4061 /wd4273 /wd4820>)
+target_link_libraries(clamav_compat INTERFACE ntdll)
+
+function(add_legacy_executable TARGET SOURCES LINK_LIBRARY)
+    add_executable(${TARGET} ${SOURCES})
+    target_include_directories(${TARGET} PRIVATE ${LEGACY_INCLUDES})
+    target_compile_definitions(${TARGET} PRIVATE ${LEGACY_DEFINES})
+    target_link_libraries(${TARGET} PRIVATE ${LINK_LIBRARY})
+    target_link_options(${TARGET} PRIVATE $<$<CXX_COMPILER_ID:GNU>:-municode>)
+    target_compile_options(${TARGET} PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall -Wno-attributes>)
+endfunction()
 
 # test tools
-if(CLAMWIN_WINDOWS_VERSION GREATER_EQUAL 0x0501)
-    add_executable(gfpn ${CLAMWIN_DIR}/src/legacy/tests/gfpn.c)
-    target_compile_definitions(gfpn PRIVATE ${LEGACY_DEFINES})
-    target_link_libraries(gfpn PRIVATE clamav_compat ntdll)
-    target_link_options(gfpn PRIVATE $<$<CXX_COMPILER_ID:GNU>:-municode>)
-    target_compile_options(gfpn PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
-
-    add_executable(sfibh ${CLAMWIN_DIR}/src/legacy/tests/sfibh.c)
-    target_compile_definitions(sfibh PRIVATE ${LEGACY_DEFINES})
-    target_link_libraries(sfibh PRIVATE clamav_compat)
-    target_link_options(sfibh PRIVATE $<$<CXX_COMPILER_ID:GNU>:-municode>)
-    target_compile_options(sfibh PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
-    target_include_directories(sfibh PRIVATE ${CLAMWIN_DIR}/src/legacy/shared)
-
-    add_executable(reopenfile ${CLAMWIN_DIR}/src/legacy/tests/reopenfile.c)
-    target_compile_definitions(reopenfile PRIVATE ${LEGACY_DEFINES})
-    target_link_libraries(reopenfile PRIVATE clamav_compat ntdll)
-    target_link_options(reopenfile PRIVATE $<$<CXX_COMPILER_ID:GNU>:-municode>)
-    target_compile_options(reopenfile PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
+if(CLAMWIN_UNICODE_BUILD)
+    add_legacy_executable(gfpn ${CLAMWIN_DIR}/src/legacy/tests/gfpn.c clamav_compat)
+    add_legacy_executable(gfpn-native ${CLAMWIN_DIR}/src/legacy/tests/gfpn.c ntdll)
+    add_legacy_executable(glpn ${CLAMWIN_DIR}/src/legacy/tests/glpn.c clamav_compat)
+    add_legacy_executable(glpn-native ${CLAMWIN_DIR}/src/legacy/tests/glpn.c ntdll)
+    add_legacy_executable(sfibh ${CLAMWIN_DIR}/src/legacy/tests/sfibh.c clamav_compat)
+    add_legacy_executable(reopenfile ${CLAMWIN_DIR}/src/legacy/tests/reopenfile.c clamav_compat)
 endif()
 
 if(NOT CLAMWIN_UNICODE_BUILD)

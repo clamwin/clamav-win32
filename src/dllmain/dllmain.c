@@ -67,12 +67,12 @@ static void processattach(void)
 
 #ifndef _WIN64
     HMODULE kernel32 = GetModuleHandleW(L"kernel32");
-    if (IMPORT_KERNEL32_FUNC(IsWow64Process))
+    if (IMPORT_FUNCTION(kernel32, IsWow64Process))
     {
         if (!pIsWow64Process(GetCurrentProcess(), &bIsWow64))
             fprintf(stderr, "[dllmain] IsWow64Process() failed %d\n", GetLastError());
         else if (bIsWow64)
-            IMPORT_KERNEL32_FUNC(Wow64DisableWow64FsRedirection);
+            IMPORT_FUNCTION(kernel32, Wow64DisableWow64FsRedirection);
     }
 #endif
 

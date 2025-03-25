@@ -22,13 +22,18 @@
  * SOFTWARE.
  */
 
+#ifndef _WIN64
 .global __imp__GetLongPathNameW@12
 
 .section .text
 .align 4
 
+imp_pGetLongPathNameW:
+    jmp *_pGetLongPathNameW
+
 .section .rdata,"dr"
 .align 4
 
 __imp__GetLongPathNameW@12:
-    .long _pGetLongPathNameW
+    .long imp_pGetLongPathNameW
+#endif

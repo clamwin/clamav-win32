@@ -26,8 +26,6 @@
 #include "legacy.h"
 #include "list.h"
 
-#include <synchapi.h>
-
 struct futex_entry
 {
     struct list entry;

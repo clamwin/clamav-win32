@@ -24,9 +24,6 @@
 
 #include "legacy.h"
 
-#include <ntstatus.h>
-#include <psapi.h>
-
 // Define states for our INIT_ONCE structure
 // We use pointer values to represent states:
 // 0 = not initialized

@@ -24,9 +24,6 @@
 
 #include "legacy.h"
 
-#include <wincrypt.h>
-#include <ntstatus.h>
-
 BOOL WINAPI ProcessPrng(void *buffer, size_t size)
 {
     HCRYPTPROV hProv = 0;

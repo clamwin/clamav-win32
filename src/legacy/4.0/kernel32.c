@@ -22,14 +22,7 @@
  * SOFTWARE.
  */
 
-#define STRSAFE_NO_DEPRECATE
 #include "legacy.h"
-#include <tchar.h>
-
-#include <psapi.h>
-#include <tlhelp32.h>
-#include <ntstatus.h>
-
 #include "dynload.h"
 
 imp_CreateHardLinkW pCreateHardLinkW = NULL;
@@ -46,12 +39,12 @@ static void
 init()
 {
     HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
-    IMPORT_KERNEL32_FUNC(CreateHardLinkW);
-    IMPORT_KERNEL32_FUNC(CreateToolhelp32Snapshot);
-    IMPORT_KERNEL32_FUNC(Process32FirstW);
-    IMPORT_KERNEL32_FUNC(Process32NextW);
-    IMPORT_KERNEL32_FUNC(Module32FirstW);
-    IMPORT_KERNEL32_FUNC(Module32NextW);
+    IMPORT_FUNCTION(kernel32, CreateHardLinkW);
+    IMPORT_FUNCTION(kernel32, CreateToolhelp32Snapshot);
+    IMPORT_FUNCTION(kernel32, Process32FirstW);
+    IMPORT_FUNCTION(kernel32, Process32NextW);
+    IMPORT_FUNCTION(kernel32, Module32FirstW);
+    IMPORT_FUNCTION(kernel32, Module32NextW);
 }
 
 PVOID WINAPI AddVectoredExceptionHandler(ULONG First, PVECTORED_EXCEPTION_HANDLER Handler)

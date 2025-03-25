@@ -25,6 +25,7 @@
 #ifndef _COMPAT_H_
 #define _COMPAT_H_
 
+#include <stdio.h>
 #include <stdlib.h>
 
 /* bogus msvc defines */
@@ -46,12 +47,15 @@
 #define _WIN32_WINNT _WIN32_WINNT_OLD
 #undef _WIN32_WINNT_OLD
 
+#include <ntstatus.h>
 #include <tchar.h>
 #include <strsafe.h>
 
-#ifndef NT_SUCCESS
-#define NT_SUCCESS(Status) (((NTSTATUS)(Status)) >= 0)
-#endif
+DWORD WINAPI GetLongPathNameW(LPCWSTR lpszShortPath, LPWSTR lpszLongPath, DWORD cchBuffer);
+DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
+WINBOOL WINAPI GetFileInformationByHandleEx(HANDLE hFile, FILE_INFO_BY_HANDLE_CLASS FileInformationClass, LPVOID lpFileInformation, DWORD dwBufferSize);
+WINBOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLASS FileInformationClass, LPVOID lpFileInformation, DWORD dwBufferSize);
+HANDLE WINAPI ReOpenFile(HANDLE hOriginalFile, DWORD dwDesiredAccess, DWORD dwShareMode, DWORD dwFlagsAndAttributes);
 
 typedef struct _REPARSE_DATA_BUFFER
 {
@@ -84,6 +88,8 @@ typedef struct _REPARSE_DATA_BUFFER
     } _;
 } REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
 
+// https://github.com/mic101/windows/blob/master/WRK-v1.2/public/sdk/inc/mountmgr.h
+
 typedef struct _MOUNTMGR_TARGET_NAME
 {
     USHORT DeviceNameLength;
@@ -96,6 +102,54 @@ typedef struct _MOUNTMGR_VOLUME_PATHS
     WCHAR MultiSz[1];
 } MOUNTMGR_VOLUME_PATHS, *PMOUNTMGR_VOLUME_PATHS;
 
+typedef struct _MOUNTMGR_MOUNT_POINT
+{
+    ULONG SymbolicLinkNameOffset;
+    USHORT SymbolicLinkNameLength;
+    ULONG UniqueIdOffset;
+    USHORT UniqueIdLength;
+    ULONG DeviceNameOffset;
+    USHORT DeviceNameLength;
+} MOUNTMGR_MOUNT_POINT, *PMOUNTMGR_MOUNT_POINT;
+
+typedef struct _MOUNTMGR_MOUNT_POINTS
+{
+    ULONG Size;
+    ULONG NumberOfMountPoints;
+    MOUNTMGR_MOUNT_POINT MountPoints[1];
+} MOUNTMGR_MOUNT_POINTS, *PMOUNTMGR_MOUNT_POINTS;
+
+typedef enum _RTL_PATH_TYPE
+{
+    RtlPathTypeUnknown,
+    RtlPathTypeUncAbsolute,    // "\\\\server\\share\\folder\\file.txt
+    RtlPathTypeDriveAbsolute,  // "C:\\folder\\file.txt"
+    RtlPathTypeDriveRelative,  // "C:folder\\file.txt"
+    RtlPathTypeRooted,         // "\\folder\\file.txt"
+    RtlPathTypeRelative,       // "folder\\file.txt"
+    RtlPathTypeLocalDevice,    // "\\\\.\\PhysicalDrive0"
+    RtlPathTypeRootLocalDevice // "\\\\?\\C:\\folder\\file.txt"
+} RTL_PATH_TYPE;
+
+#define MOUNTMGR_IS_VOLUME_NAME2(Buffer, Length) (            \
+    (Length == 96 || (Length == 98 && Buffer[48] == '\\')) && \
+    Buffer[0] == '\\' &&                                      \
+    (Buffer[1] == '?' || Buffer[1] == '\\') &&                \
+    Buffer[2] == '?' &&                                       \
+    Buffer[3] == '\\' &&                                      \
+    Buffer[4] == 'V' &&                                       \
+    Buffer[5] == 'o' &&                                       \
+    Buffer[6] == 'l' &&                                       \
+    Buffer[7] == 'u' &&                                       \
+    Buffer[8] == 'm' &&                                       \
+    Buffer[9] == 'e' &&                                       \
+    Buffer[10] == '{' &&                                      \
+    Buffer[19] == '-' &&                                      \
+    Buffer[24] == '-' &&                                      \
+    Buffer[29] == '-' &&                                      \
+    Buffer[34] == '-' &&                                      \
+    Buffer[47] == '}')
+
 #define MOUNTMGR_DOS_DEVICE_NAME L"\\\\.\\MountPointManager"
 
 #define MOUNTMGRCONTROLTYPE ((ULONG)'m')
@@ -103,6 +157,8 @@ typedef struct _MOUNTMGR_VOLUME_PATHS
 #define IOCTL_MOUNTMGR_QUERY_DOS_VOLUME_PATH \
     CTL_CODE(MOUNTMGRCONTROLTYPE, 12, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
+#define IOCTL_MOUNTMGR_QUERY_POINTS \
+    CTL_CODE(MOUNTMGRCONTROLTYPE, 2, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 #ifdef _MSC_VER
 typedef BOOL WINBOOL;
@@ -112,22 +168,25 @@ typedef BOOL WINBOOL;
 #define FileNameInformation 9
 #define FileDispositionInformation 13
 
-typedef struct _FILE_BASIC_INFORMATION {
+typedef struct _FILE_BASIC_INFORMATION
+{
     LARGE_INTEGER CreationTime;
     LARGE_INTEGER LastAccessTime;
     LARGE_INTEGER LastWriteTime;
     LARGE_INTEGER ChangeTime;
     ULONG FileAttributes;
-} FILE_BASIC_INFORMATION, * PFILE_BASIC_INFORMATION;
+} FILE_BASIC_INFORMATION, *PFILE_BASIC_INFORMATION;
 
-typedef struct _FILE_DISPOSITION_INFORMATION {
+typedef struct _FILE_DISPOSITION_INFORMATION
+{
     BOOLEAN DoDeleteFile;
-} FILE_DISPOSITION_INFORMATION, * PFILE_DISPOSITION_INFORMATION;
+} FILE_DISPOSITION_INFORMATION, *PFILE_DISPOSITION_INFORMATION;
 
-typedef struct _FILE_NAME_INFORMATION {
+typedef struct _FILE_NAME_INFORMATION
+{
     ULONG FileNameLength;
     WCHAR FileName[1];
-} FILE_NAME_INFORMATION, * PFILE_NAME_INFORMATION;
+} FILE_NAME_INFORMATION, *PFILE_NAME_INFORMATION;
 
 NTSTATUS NTAPI NtSetInformationFile(HANDLE hFile, PIO_STATUS_BLOCK io, PVOID ptr, ULONG len, FILE_INFORMATION_CLASS FileInformationClass);
 NTSTATUS NTAPI NtQueryInformationFile(HANDLE hFile, PIO_STATUS_BLOCK io, PVOID ptr, ULONG len, FILE_INFORMATION_CLASS FileInformationClass);
@@ -140,7 +199,6 @@ NTSTATUS NTAPI NtQueryInformationFile(HANDLE hFile, PIO_STATUS_BLOCK io, PVOID p
 #endif
 
 #ifdef LEGACY_TRACE
-#include <stdio.h>
 #include <inttypes.h>
 #define TRACE(format, ...) _ftprintf(stderr, TEXT("[legacy] ") TEXT(format), ##__VA_ARGS__)
 #else

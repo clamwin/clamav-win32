@@ -30,7 +30,6 @@
 .section .rdata,"dr"
 
 #ifdef _WIN64
-
 .align 8
 
 __imp_WakeByAddressAll:
@@ -43,7 +42,6 @@ __imp_ProcessPrng:
     .quad ProcessPrng
 
 #else
-
 .align 4
 
 __imp_WakeByAddressAll:
@@ -54,5 +52,4 @@ __imp_WakeByAddressSingle:
     .long _WakeByAddressSingle@4
 __imp_ProcessPrng:
     .long _ProcessPrng@8
-
 #endif

@@ -28,7 +28,13 @@
 #include <tlhelp32.h>
 
 #define Q(string) #string
-#define IMPORT_KERNEL32_FUNC(x) p##x = ((imp_##x)GetProcAddress(kernel32, Q(x)))
+#define IMPORT_FUNCTION(hLib, func)                                  \
+    ({                                                               \
+        imp_##func symbol = (imp_##func)GetProcAddress(hLib, #func); \
+        if (symbol)                                                  \
+            p##func = symbol;                                        \
+        symbol;                                                      \
+    })
 
 typedef BOOL(WINAPI *imp_IsWow64Process)(HANDLE hProcess, PBOOL Wow64Process);
 typedef BOOL(WINAPI *imp_Wow64DisableWow64FsRedirection)(PVOID OldValue);

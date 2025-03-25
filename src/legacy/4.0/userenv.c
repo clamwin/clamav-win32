@@ -23,10 +23,6 @@
  */
 
 #include "legacy.h"
-#include <string.h>
-
-#define HMONITOR_DECLARED 1
-#include <shlobj.h>
 
 BOOL WINAPI GetUserProfileDirectoryA(HANDLE hToken, LPSTR lpProfileDir, LPDWORD lpcchSize)
 {

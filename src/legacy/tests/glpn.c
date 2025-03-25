@@ -1,5 +1,5 @@
 /*
- * Legacy Windows Compatibility Layer: testcase for GetFinalPathNameByHandleW
+ * Legacy Windows Compatibility Layer: testcase for GetLongPathNameW
  *
  * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
@@ -26,36 +26,20 @@
 
 int wmain(int argc, wchar_t *argv[])
 {
-
-    if (argc != 2)
-    {
-        wprintf(L"Invalid arguments\n");
-        return 1;
-    }
-
-    HANDLE hFile = CreateFile(
-        argv[1],
-        GENERIC_READ,
-        FILE_SHARE_READ | FILE_SHARE_WRITE,
-        NULL,
-        OPEN_EXISTING,
-        FILE_ATTRIBUTE_READONLY | FILE_FLAG_BACKUP_SEMANTICS,
-        NULL);
-
-    if (hFile == INVALID_HANDLE_VALUE)
-    {
-        fwprintf(stderr, L"CreateFile(%ld)\n", GetLastError());
-        return 1;
-    }
-
     wchar_t lpszFilePath[MAX_PATH];
+    if (!GetTempPathW(MAX_PATH, lpszFilePath))
+    {
+        wprintf(L"GetTempPathW() failed with %d\n", GetLastError());
+        return 0;
+    }
 
-    if (GetFinalPathNameByHandleW(hFile, lpszFilePath, MAX_PATH, VOLUME_NAME_DOS))
-        wprintf(L"Result ->[%ls]\n", lpszFilePath);
+    wprintf(L"->[%ls]\n", lpszFilePath);
+
+    DWORD res;
+    if ((res = GetLongPathNameW(lpszFilePath, lpszFilePath, MAX_PATH)))
+        wprintf(L"->[%ls] (%ld)\n", lpszFilePath, res);
     else
-        wprintf(L"GetFinalPathNameByHandleW() failed with %d\n", GetLastError());
-
-    CloseHandle(hFile);
+        wprintf(L"GetLongPathNameW() failed with %d\n", GetLastError());
 
     return 0;
 }

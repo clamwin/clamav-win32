@@ -1,5 +1,5 @@
 /*
- * Windows XP Compatibility Layer: test for SetFileInformationByHandle (rename)
+ * Legacy Windows Compatibility Layer: testcase for SetFileInformationByHandle (rename)
  *
  * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
@@ -24,8 +24,6 @@
 
 #include "legacy.h"
 
-#include <stdio.h>
-
 int wmain(int argc, wchar_t *argv[])
 {
     if (argc != 3)
@@ -40,7 +38,7 @@ int wmain(int argc, wchar_t *argv[])
     const wchar_t *newFileName = argv[2];
 
     // Open the file with required permissions
-    HANDLE hFile = CreateFile(
+    HANDLE hFile = CreateFileW(
         oldFileName,
         DELETE,                             // dwDesiredAccess
         FILE_SHARE_READ | FILE_SHARE_WRITE, // Share mode

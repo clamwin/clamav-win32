@@ -1,5 +1,5 @@
 /*
- * Windows XP Compatibility Layer: test for ReOpenFile
+ * Legacy Windows Compatibility Layer: testcase for ReOpenFile
  *
  * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
@@ -22,12 +22,7 @@
  * SOFTWARE.
  */
 
-#define ReOpenFile NO_ReOpenFile
-#include <windows.h>
-#undef ReOpenFile
-#include <stdio.h>
-
-HANDLE WINAPI ReOpenFile(HANDLE hOriginalFile, DWORD dwDesiredAccess, DWORD dwShareMode, DWORD dwFlagsAndAttributes);
+#include "legacy.h"
 
 int wmain(int argc, wchar_t *argv[])
 {

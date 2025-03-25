@@ -1,4 +1,4 @@
-The Legacy Windows Compatiblity Layer (except synchapi.c)
+The Legacy Windows Compatiblity Layer (except where specified in the source)
 is licensed under:
 
 MIT License

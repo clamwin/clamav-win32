@@ -45,13 +45,7 @@ bool IsWindows11OrGreater()
 
 #if _WIN32_WINNT < _WIN32_WINNT_WINXP
 #include "dynload.h"
-
-DWORD WINAPI GetLongPathNameW_compat(LPCWSTR lpszShortPath, LPWSTR lpszLongPath, DWORD cchBuffer)
-{
-    return 0;
-}
-
-imp_GetLongPathNameW pGetLongPathNameW = GetLongPathNameW_compat;
+imp_GetLongPathNameW pGetLongPathNameW = GetLongPathNameW;
 
 #ifdef __GNUC__
 __attribute__((constructor))
@@ -60,6 +54,6 @@ static void
 init()
 {
     HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
-    IMPORT_KERNEL32_FUNC(GetLongPathNameW);
+    IMPORT_FUNCTION(kernel32, GetLongPathNameW);
 }
 #endif

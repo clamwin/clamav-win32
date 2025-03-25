@@ -24,8 +24,6 @@
 
 #include "legacy.h"
 
-#include <synchapi.h>
-
 BOOLEAN APIENTRY CreateSymbolicLinkW(LPCWSTR lpSymlinkFileName, LPCWSTR lpTargetFileName, DWORD dwFlags)
 {
     TRACE("CreateSymbolicLinkW(%ls, %ls, %ld)\n", lpSymlinkFileName, lpTargetFileName, dwFlags);
