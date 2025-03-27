@@ -24,18 +24,23 @@
 
 #ifndef _WIN64
 .global __imp__GetLongPathNameW@12
+.global __imp__TzSpecificLocalTimeToSystemTime@12
 
 .section .text
 .align 4
 
-imp_pGetLongPathNameW:
+imp_pGetLongPathNameW@12:
     jmp *_pGetLongPathNameW
+imp_pTzSpecificLocalTimeToSystemTime@12:
+    jmp *_pTzSpecificLocalTimeToSystemTime
 
 .section .rdata,"dr"
 .align 4
 
 #ifdef _UNICODE
 __imp__GetLongPathNameW@12:
-    .long imp_pGetLongPathNameW
+    .long imp_pGetLongPathNameW@12
 #endif
+__imp__TzSpecificLocalTimeToSystemTime@12:
+    .long imp_pTzSpecificLocalTimeToSystemTime@12
 #endif

@@ -31,3 +31,6 @@
 [submodule "3rdparty/zlib"]
 	path = 3rdparty/zlib
 	url = https://github.com/madler/zlib.git
+[submodule "3rdparty/unrar"]
+	path = 3rdparty/unrar
+	url = ../unrar

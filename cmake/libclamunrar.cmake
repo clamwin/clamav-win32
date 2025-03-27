@@ -1,10 +1,10 @@
 enable_language(C ASM)
 
-# libclamunrar
-set(UNRAR_DEFINES RARDLL RAR_NOCRYPT _FILE_OFFSET_BITS=64 ${CLAMWIN_WINNT_VERSION})
-set(UNRAR_INCLUDES ${CLAMAV_DIR}/libclamunrar ${CLAMWIN_DIR}/resources)
+set(UNRAR_DIR ${3RDPARTY_DIR}/unrar)
+set(UNRAR_DEFINES CLAMAV RARDLL RAR_NOCRYPT _FILE_OFFSET_BITS=64 ${CLAMWIN_WINNT_VERSION})
+set(UNRAR_INCLUDES ${UNRAR_DIR} ${CLAMWIN_DIR}/resources)
 
-file(GLOB libclamunrar_headers ${CLAMAV_DIR}/libclamunrar/*.hpp)
+file(GLOB libclamunrar_headers ${UNRAR_DIR}/*.hpp)
 file(GLOB libclamunrar_win32_sources ${CLAMWIN_DIR}/src/unrar/*.cpp)
 if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
     list(APPEND libclamunrar_win32_sources ${CLAMWIN_DIR}/src/unrar/forward.S)
@@ -16,14 +16,14 @@ set(libclamunrar_sources
     dll.cpp encname.cpp errhnd.cpp extract.cpp
     filcreat.cpp file.cpp filefn.cpp filestr.cpp
     find.cpp getbits.cpp global.cpp hash.cpp
-    headers.cpp match.cpp options.cpp
-    pathfn.cpp qopen.cpp rar.cpp rarpch.cpp
+    headers.cpp largepage.cpp match.cpp motw.cpp
+    options.cpp pathfn.cpp qopen.cpp rar.cpp rarpch.cpp
     rarvm.cpp rawread.cpp rdwrfn.cpp rijndael.cpp
     scantree.cpp secpassword.cpp sha1.cpp
     sha256.cpp smallfn.cpp strfn.cpp strlist.cpp
     threadpool.cpp timefn.cpp ui.cpp unicode.cpp
     unpack.cpp volume.cpp)
-list(TRANSFORM libclamunrar_sources PREPEND ${CLAMAV_DIR}/libclamunrar/)
+list(TRANSFORM libclamunrar_sources PREPEND ${UNRAR_DIR}/)
 
 list(APPEND libclamunrar_win32_sources ${CLAMWIN_DIR}/resources/libclamunrar.rc)
 source_group("Win32 Files" FILES ${libclamunrar_win32_sources})
@@ -54,4 +54,4 @@ target_link_libraries(libclamunrar_iface PRIVATE libclamunrar)
 
 list(APPEND CLAMAV_INSTALL_TARGETS libclamunrar libclamunrar_iface)
 
-install(FILES ${CLAMAV_DIR}/libclamunrar/license.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME UnRAR.txt)
+install(FILES ${UNRAR_DIR}/license.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME UnRAR.txt)

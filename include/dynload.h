@@ -41,6 +41,7 @@ typedef BOOL(WINAPI *imp_Wow64DisableWow64FsRedirection)(PVOID OldValue);
 
 typedef BOOL(WINAPI *imp_CreateHardLinkW)(LPCWSTR lpFileName, LPCWSTR lpExistingFileName, LPSECURITY_ATTRIBUTES lpSecurityAttributes);
 typedef DWORD(WINAPI *imp_GetLongPathNameW)(LPCWSTR lpszShortPath, LPWSTR lpszLongPath, DWORD cchBuffer);
+typedef BOOL(WINAPI *imp_TzSpecificLocalTimeToSystemTime)(const TIME_ZONE_INFORMATION *lpTimeZoneInformation, const SYSTEMTIME *lpLocalTime, LPSYSTEMTIME lpUniversalTime);
 
 typedef HANDLE(WINAPI *imp_CreateToolhelp32Snapshot)(DWORD dwFlags, DWORD th32ProcessID);
 typedef BOOL(WINAPI *imp_Process32FirstW)(HANDLE hSnapshot, LPPROCESSENTRY32W lppe);
