@@ -41,6 +41,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 - Winpthreads: git-b025331
 - zlib-ng: 2.2.4
 - LLVM 13.0.1
+- UnRAR: 7.1.6
 
 ## Getting sources
 
