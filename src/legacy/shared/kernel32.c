@@ -24,6 +24,23 @@
 
 #include "legacy.h"
 
+ // Static variables to hold the baseline values.
+ // They are initialized on the first call.
+static LARGE_INTEGER qpcBase = { 0 };      // Baseline performance counter value.
+static FILETIME ftBase = { 0 };            // Baseline system time corresponding to qpcBase.
+static LARGE_INTEGER qpcFrequency = { 0 }; // Performance counter frequency.
+
+INITIALIZER(init)
+{
+    // Set the baseline.
+    // Retrieve the performance counter frequency.
+    QueryPerformanceFrequency(&qpcFrequency);
+    // Record the current performance counter value.
+    QueryPerformanceCounter(&qpcBase);
+    // Retrieve the system time as a FILETIME.
+    GetSystemTimeAsFileTime(&ftBase);
+}
+
 int WINAPI CompareStringOrdinal(
     LPCWCH lpString1,
     int cchCount1,
@@ -176,27 +193,6 @@ HANDLE WINAPI ReOpenFile(
 
     SetLastError(0);
     return FileHandle;
-}
-
-// Static variables to hold the baseline values.
-// They are initialized on the first call.
-static LARGE_INTEGER qpcBase = { 0 };      // Baseline performance counter value.
-static FILETIME ftBase = { 0 };            // Baseline system time corresponding to qpcBase.
-static LARGE_INTEGER qpcFrequency = { 0 }; // Performance counter frequency.
-
-#if defined(__GNUC__) || defined(__clang__)
-__attribute__((constructor))
-#endif
-static void
-init()
-{
-    // Set the baseline.
-    // Retrieve the performance counter frequency.
-    QueryPerformanceFrequency(&qpcFrequency);
-    // Record the current performance counter value.
-    QueryPerformanceCounter(&qpcBase);
-    // Retrieve the system time as a FILETIME.
-    GetSystemTimeAsFileTime(&ftBase);
 }
 
 VOID WINAPI GetSystemTimePreciseAsFileTime(LPFILETIME lpSystemTimeAsFileTime)

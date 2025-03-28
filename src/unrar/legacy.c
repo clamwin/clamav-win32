@@ -33,11 +33,7 @@ extern BOOL WINAPI TzSpecificLocalTimeToSystemTime_compat(
 imp_GetLongPathNameW pGetLongPathNameW = GetLongPathNameW;
 imp_TzSpecificLocalTimeToSystemTime pTzSpecificLocalTimeToSystemTime = TzSpecificLocalTimeToSystemTime_compat;
 
-#if defined(__GNUC__) || defined(__clang__)
-__attribute__((constructor))
-#endif
-static void
-init()
+INITIALIZER(init)
 {
     HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
     if (!kernel32) // meh

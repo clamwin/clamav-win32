@@ -32,11 +32,7 @@ imp_Process32NextW pProcess32NextW = NULL;
 imp_Module32FirstW pModule32FirstW = NULL;
 imp_Module32NextW pModule32NextW = NULL;
 
-#if defined(__GNUC__) || defined(__clang__)
-__attribute__((constructor))
-#endif
-static void
-init()
+INITIALIZER(init)
 {
     HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
     if (!kernel32) // meh
