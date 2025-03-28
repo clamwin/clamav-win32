@@ -107,9 +107,7 @@ static BOOL BasepGetFileNameInformation(HANDLE Handle, FILE_INFORMATION_CLASS Fi
     SIZE_T Length = fileName->FileNameLength;
     TRACE("Name=%.*ls\n", (int)(Length / sizeof(wchar_t)), fileName->FileName);
 
-    // TODO check
-    // memmove(fileName, fileName->FileName, Length);
-    memmove(fileName, &fileName->FileName, Length);
+    memmove(fileName, fileName->FileName, Length);
     *lpName = (wchar_t *)fileName;
     (*lpName)[(Length / sizeof(wchar_t))] = L'\0';
     return TRUE;
