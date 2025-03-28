@@ -134,7 +134,7 @@ WINBOOL WINAPI InitOnceComplete(PINIT_ONCE pInitOnce, DWORD dwFlags, LPVOID lpCo
         }
     }
     else
-        lpContext = (LPVOID)((ULONG_PTR)lpContext | 2);
+        lpContext = (LPVOID)((ULONG_PTR)lpContext | INIT_DONE);
 
     for (;;)
     {
