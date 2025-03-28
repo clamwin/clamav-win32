@@ -24,13 +24,13 @@
 
 #include "legacy.h"
 
-typedef enum _INIT_ONCE_STATE
+typedef enum _RTLP_RUN_ONCE_STATE
 {
-    INIT = 0,
-    INPROGRESS = 1,
-    INIT_DONE = 2,
-    INPROGRESS_ASYNC = 3
-} INIT_ONCE_STATE;
+    RTLP_RUN_ONCE_INITIALIZING = 0,
+    RTLP_RUN_ONCE_PROGRESS = 1,
+    RTLP_RUN_ONCE_COMPLETE = 2,
+    RTLP_RUN_ONCE_ASYNC = 3
+} RTLP_RUN_ONCE_STATE;
 
 #define INIT_ONCE_MASK 3
 
@@ -52,7 +52,7 @@ WINBOOL WINAPI InitOnceBeginInitialize(PINIT_ONCE pInitOnce, DWORD dwFlags, PBOO
 
         ULONG_PTR val = (ULONG_PTR)pInitOnce->Ptr;
 
-        if ((val & INIT_ONCE_MASK) != INIT_DONE)
+        if ((val & INIT_ONCE_MASK) != RTLP_RUN_ONCE_COMPLETE)
         {
             RtlNtStatusToDosError(STATUS_UNSUCCESSFUL);
             return FALSE;
@@ -71,8 +71,8 @@ WINBOOL WINAPI InitOnceBeginInitialize(PINIT_ONCE pInitOnce, DWORD dwFlags, PBOO
 
         switch (val & INIT_ONCE_MASK)
         {
-        case INIT:
-            LPVOID newval = (dwFlags & RTL_RUN_ONCE_ASYNC) ? (LPVOID)INPROGRESS_ASYNC : (LPVOID)INPROGRESS;
+        case RTLP_RUN_ONCE_INITIALIZING:
+            LPVOID newval = (dwFlags & RTL_RUN_ONCE_ASYNC) ? (LPVOID)RTLP_RUN_ONCE_ASYNC : (LPVOID)RTLP_RUN_ONCE_PROGRESS;
             if (!InterlockedCompareExchangePointer(&pInitOnce->Ptr, newval, 0))
             {
                 *lpPending = TRUE;
@@ -80,7 +80,7 @@ WINBOOL WINAPI InitOnceBeginInitialize(PINIT_ONCE pInitOnce, DWORD dwFlags, PBOO
             }
             break;
 
-        case INPROGRESS:
+        case RTLP_RUN_ONCE_PROGRESS:
             if (dwFlags & RTL_RUN_ONCE_ASYNC)
             {
                 SetLastError(ERROR_INVALID_PARAMETER);
@@ -89,7 +89,7 @@ WINBOOL WINAPI InitOnceBeginInitialize(PINIT_ONCE pInitOnce, DWORD dwFlags, PBOO
 
             next = val & ~INIT_ONCE_MASK;
 
-            if (InterlockedCompareExchangePointer(&pInitOnce->Ptr, (LPVOID)((ULONG_PTR)&next | INPROGRESS),
+            if (InterlockedCompareExchangePointer(&pInitOnce->Ptr, (LPVOID)((ULONG_PTR)&next | RTLP_RUN_ONCE_PROGRESS),
                                                   (LPVOID)val) == (LPVOID)val)
             {
                 Sleep(0);
@@ -97,13 +97,13 @@ WINBOOL WINAPI InitOnceBeginInitialize(PINIT_ONCE pInitOnce, DWORD dwFlags, PBOO
             }
             break;
 
-        case INIT_DONE:
+        case RTLP_RUN_ONCE_COMPLETE:
             *lpPending = FALSE;
             if (lpContext)
                 *lpContext = (LPVOID)(val & ~INIT_ONCE_MASK);
             return TRUE;
 
-        case INPROGRESS_ASYNC:
+        case RTLP_RUN_ONCE_ASYNC:
             if (!(dwFlags & RTL_RUN_ONCE_ASYNC))
             {
                 SetLastError(ERROR_INVALID_PARAMETER);
@@ -134,7 +134,7 @@ WINBOOL WINAPI InitOnceComplete(PINIT_ONCE pInitOnce, DWORD dwFlags, LPVOID lpCo
         }
     }
     else
-        lpContext = (LPVOID)((ULONG_PTR)lpContext | INIT_DONE);
+        lpContext = (LPVOID)((ULONG_PTR)lpContext | RTLP_RUN_ONCE_COMPLETE);
 
     for (;;)
     {
@@ -142,7 +142,7 @@ WINBOOL WINAPI InitOnceComplete(PINIT_ONCE pInitOnce, DWORD dwFlags, LPVOID lpCo
 
         switch (val & INIT_ONCE_MASK)
         {
-        case INPROGRESS:
+        case RTLP_RUN_ONCE_PROGRESS:
             if (InterlockedCompareExchangePointer(&pInitOnce->Ptr,
                                                   lpContext, (LPVOID)val) != (LPVOID)val)
                 break;
@@ -157,7 +157,7 @@ WINBOOL WINAPI InitOnceComplete(PINIT_ONCE pInitOnce, DWORD dwFlags, LPVOID lpCo
             }
 
             return TRUE;
-        case INPROGRESS_ASYNC:
+        case RTLP_RUN_ONCE_ASYNC:
             if (!(dwFlags & RTL_RUN_ONCE_ASYNC))
             {
                 SetLastError(ERROR_INVALID_PARAMETER);
