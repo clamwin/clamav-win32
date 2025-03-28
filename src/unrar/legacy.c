@@ -25,7 +25,7 @@
 #include <windows.h>
 #include "dynload.h"
 
-extern WINBOOL WINAPI TzSpecificLocalTimeToSystemTime_compat(
+extern BOOL WINAPI TzSpecificLocalTimeToSystemTime_compat(
     const TIME_ZONE_INFORMATION *lpTimeZoneInformation,
     const SYSTEMTIME *lpLocalTime,
     LPSYSTEMTIME lpUniversalTime);
