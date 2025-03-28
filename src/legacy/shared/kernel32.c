@@ -178,29 +178,30 @@ HANDLE WINAPI ReOpenFile(
     return FileHandle;
 }
 
+// Static variables to hold the baseline values.
+// They are initialized on the first call.
+static LARGE_INTEGER qpcBase = { 0 };      // Baseline performance counter value.
+static FILETIME ftBase = { 0 };            // Baseline system time corresponding to qpcBase.
+static LARGE_INTEGER qpcFrequency = { 0 }; // Performance counter frequency.
+
+#ifdef __GNUC__
+__attribute__((constructor))
+#endif
+static void
+init()
+{
+    // Set the baseline.
+    // Retrieve the performance counter frequency.
+    QueryPerformanceFrequency(&qpcFrequency);
+    // Record the current performance counter value.
+    QueryPerformanceCounter(&qpcBase);
+    // Retrieve the system time as a FILETIME.
+    GetSystemTimeAsFileTime(&ftBase);
+}
+
 VOID WINAPI GetSystemTimePreciseAsFileTime(LPFILETIME lpSystemTimeAsFileTime)
 {
-    // Static variables to hold the baseline values.
-    // They are initialized on the first call.
-    static volatile LONG initialized = 0;
-    static LARGE_INTEGER qpcBase = {0};      // Baseline performance counter value.
-    static FILETIME ftBase = {0};            // Baseline system time corresponding to qpcBase.
-    static LARGE_INTEGER qpcFrequency = {0}; // Performance counter frequency.
-
     TRACE("GetSystemTimePreciseAsFileTime(0x%p)\n", lpSystemTimeAsFileTime);
-
-    // If not yet initialized, set the baseline.
-    if (initialized == 0)
-    {
-        // Retrieve the performance counter frequency.
-        QueryPerformanceFrequency(&qpcFrequency);
-        // Record the current performance counter value.
-        QueryPerformanceCounter(&qpcBase);
-        // Retrieve the system time as a FILETIME.
-        GetSystemTimeAsFileTime(&ftBase);
-        // Mark as initialized.
-        InterlockedExchange(&initialized, 1);
-    }
 
     // Get the current performance counter value.
     LARGE_INTEGER qpcNow = {0};
@@ -250,7 +251,6 @@ HANDLE WINAPI CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LP
     HANDLE hTimer = CreateWaitableTimerA(lpTimerAttributes, bManualReset, lpTimerNameA);
     if (lpTimerNameA)
         RtlFreeHeap(GetProcessHeap(), 0, lpTimerNameA);
-
 #endif
     // If the timer was created successfully but HIGH_RESOLUTION was requested,
     if ((hTimer != NULL) && (dwFlags & CREATE_WAITABLE_TIMER_HIGH_RESOLUTION))
