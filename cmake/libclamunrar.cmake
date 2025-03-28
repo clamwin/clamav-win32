@@ -43,6 +43,10 @@ set_target_properties(libclamunrar PROPERTIES DEFINE_SYMBOL "" PREFIX "" OUTPUT_
 target_include_directories(libclamunrar PRIVATE ${UNRAR_INCLUDES} ${CLAMWIN_DIR}/include)
 target_compile_definitions(libclamunrar PRIVATE ${UNRAR_DEFINES})
 
+if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
+    target_link_options(libclamunrar PRIVATE $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
+endif()
+
 # libclamunrar_iface
 add_library(libclamunrar_iface SHARED
     ${CLAMAV_DIR}/libclamunrar_iface/unrar_iface.cpp
