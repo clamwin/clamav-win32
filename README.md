@@ -35,7 +35,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 - bzip2: 1.0.8
 - curl: 8.12.1
 - json-c: 0.18-20240915
-- libxml2: 2.13.6
+- libxml2: 2.14.0
 - pcre2: 10.45
 - PDCurses: git-6ba6df38
 - Winpthreads: git-b025331
