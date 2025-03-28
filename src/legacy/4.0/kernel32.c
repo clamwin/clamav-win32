@@ -25,6 +25,9 @@
 #include "legacy.h"
 #include "dynload.h"
 
+#include <assert.h>
+#include <process.h>
+
 imp_CreateHardLinkW pCreateHardLinkW = NULL;
 imp_CreateToolhelp32Snapshot pCreateToolhelp32Snapshot = NULL;
 imp_Process32FirstW pProcess32FirstW = NULL;
@@ -62,12 +65,18 @@ typedef struct _WAIT_CONTEXT
     HANDLE hThread;
 } WAIT_CONTEXT, *PWAIT_CONTEXT;
 
-DWORD WINAPI WaitThreadProc(LPVOID lpParameter)
+static unsigned int __stdcall WaitThreadProc(void *pArg)
 {
-    PWAIT_CONTEXT ctx = (PWAIT_CONTEXT)lpParameter;
+    PWAIT_CONTEXT ctx = pArg;
     HANDLE handles[2] = {ctx->hObject, ctx->hCancelEvent};
 
-    TRACE("WaitThreadProc: Thread %p starting\n", GetCurrentThread());
+    TRACE("WaitThreadProc: waiting on handles: hObject=0x%p, hCancelEvent=0x%p, timeout=%lu\n",
+        ctx->hObject, ctx->hCancelEvent, ctx->dwMilliseconds);
+
+    DWORD state = WaitForSingleObject(ctx->hObject, 0);
+    TRACE("WaitThreadProc: Pre-wait state of hObject=0x%p is %ld (expected WAIT_TIMEOUT=%ld)\n",
+          ctx->hObject, state, WAIT_TIMEOUT);
+
     DWORD dwResult = WaitForMultipleObjects(2, handles, FALSE, ctx->dwMilliseconds);
 
     if (dwResult == WAIT_OBJECT_0)
@@ -76,6 +85,7 @@ DWORD WINAPI WaitThreadProc(LPVOID lpParameter)
         ctx->Callback(ctx->Context, TRUE);
 
     TRACE("WaitThreadProc: done (result=%ld)\n", dwResult);
+    _endthreadex(0);
     return 0;
 }
 
@@ -86,7 +96,7 @@ BOOL WINAPI RegisterWaitForSingleObject_compat(PHANDLE phNewWaitObject,
                                                ULONG dwMilliseconds,
                                                ULONG dwFlags)
 {
-    TRACE("RegisterWaitForSingleObject\n");
+    // TRACE("RegisterWaitForSingleObject\n");
 
     if (!hObject || hObject == NtCurrentProcess() || hObject == NtCurrentThread() || !Callback)
     {
@@ -101,7 +111,7 @@ BOOL WINAPI RegisterWaitForSingleObject_compat(PHANDLE phNewWaitObject,
         return FALSE;
     }
 
-    PWAIT_CONTEXT ctx = HeapAlloc(GetProcessHeap(), 0, sizeof(WAIT_CONTEXT));
+    PWAIT_CONTEXT ctx = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(WAIT_CONTEXT));
     if (!ctx)
     {
         SetLastError(ERROR_OUTOFMEMORY);
@@ -114,13 +124,15 @@ BOOL WINAPI RegisterWaitForSingleObject_compat(PHANDLE phNewWaitObject,
         return FALSE;
     }
 
+    TRACE("RegisterWaitForSingleObject: Created hCancelEvent=0x%p, hObject=0x%p\n", ctx->hCancelEvent, hObject);
+
     ctx->hObject = hObject;
     ctx->Callback = Callback;
     ctx->Context = Context;
     ctx->dwMilliseconds = dwMilliseconds;
 
-    DWORD dwThreadId;
-    if (!(ctx->hThread = CreateThread(NULL, 0, WaitThreadProc, ctx, 0, &dwThreadId)))
+    unsigned int threadId;
+    if (!(ctx->hThread = (HANDLE)_beginthreadex(NULL, 0, WaitThreadProc, ctx, 0, &threadId)))
     {
         TRACE("RegisterWaitForSingleObject: CreateThread() failed with %ld\n", GetLastError());
         CloseHandle(ctx->hCancelEvent);
@@ -136,6 +148,7 @@ BOOL WINAPI RegisterWaitForSingleObject_compat(PHANDLE phNewWaitObject,
 
 BOOL WINAPI UnregisterWaitEx_compat(HANDLE hWaitObject, HANDLE hCompletionEvent)
 {
+    TRACE("UnregisterWaitEx: Caller Thread ID %ld\n", GetCurrentThreadId());
     TRACE("UnregisterWaitEx(0x%p, 0x%p)\n", hWaitObject, hCompletionEvent);
 
     if (!hWaitObject)
@@ -151,15 +164,24 @@ BOOL WINAPI UnregisterWaitEx_compat(HANDLE hWaitObject, HANDLE hCompletionEvent)
     }
 
     PWAIT_CONTEXT ctx = hWaitObject;
-    SetEvent(ctx->hCancelEvent);
+    assert(ctx->hCancelEvent);
 
-    WaitForSingleObject(ctx->hThread, INFINITE);
+    TRACE("UnregisterWaitEx: About to signal cancel event 0x%p\n", ctx->hCancelEvent);
+    if (!SetEvent(ctx->hCancelEvent))
+        TRACE("UnregisterWaitEx: SetEvent failed with error %ld\n", GetLastError());
+
+    TRACE("UnregisterWaitEx: Waiting for thread 0x%p\n", ctx->hThread);
+    DWORD waitRes = WaitForSingleObject(ctx->hThread, INFINITE);
+    TRACE("UnregisterWaitEx: WaitForSingleObject returned %ld\n", waitRes);
 
     CloseHandle(ctx->hCancelEvent);
     CloseHandle(ctx->hThread);
 
     if (hCompletionEvent)
+    {
+        TRACE("UnregisterWaitEx: SetEvent(%p)\n", hCompletionEvent);
         SetEvent(hCompletionEvent);
+    }
 
     HeapFree(GetProcessHeap(), 0, ctx);
     return TRUE;
