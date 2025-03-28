@@ -30,6 +30,8 @@
 .global __imp_InitOnceExecuteOnce
 .global __imp__InitOnceExecuteOnce@16
 
+.global __imp__wassert
+
 .section .rdata,"dr"
 
 #ifdef _WIN64
@@ -45,6 +47,8 @@ __imp_ProcessPrng:
     .quad ProcessPrng
 __imp_InitOnceExecuteOnce:
     .quad InitOnceExecuteOnce
+__imp__wassert:
+    .quad emu__wassert
 #else
 .align 4
 
