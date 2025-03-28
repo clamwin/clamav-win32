@@ -188,9 +188,6 @@ WINBOOL WINAPI SystemTimeToTzSpecificLocalTime_compat(
     int effectiveBias;
     BOOL isDST = FALSE;
 
-    if (!lpUniversalTime || !lpLocalTime)
-        return FALSE;
-
     // Convert the provided UTC SYSTEMTIME into FILETIME.
     if (!SystemTimeToFileTime(lpUniversalTime, &ftUniversal))
         return FALSE;
