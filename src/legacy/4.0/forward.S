@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+#ifndef _WIN64
 .section .rdata,"dr"
 
 missing_getaddrinfo:
@@ -78,3 +79,4 @@ DEF_STUB _Module32NextW@8, _pModule32NextW, missing_module32next
 
 DEF_STUB _getaddrinfo@16, p_getaddrinfo, missing_getaddrinfo
 DEF_STUB _freeaddrinfo@4, p_freeaddrinfo, missing_freeaddrinfo
+#endif // _WIN64

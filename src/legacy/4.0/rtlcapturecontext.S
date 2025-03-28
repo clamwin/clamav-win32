@@ -19,6 +19,7 @@
  *
  */
 
+#ifndef _WIN64
 .equ CONTEXT_CONTEXTFLAGS, 0x00
 .equ CONTEXT_SEGGS, 0x8c
 .equ CONTEXT_SEGFS, 0x90
@@ -84,3 +85,4 @@ _RtlCaptureContext@4:
     # Function epilogue
     popl %ebx
     ret $4
+#endif // _WIN64
