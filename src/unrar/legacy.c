@@ -40,6 +40,8 @@ static void
 init()
 {
     HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
+    if (!kernel32) // meh
+        return;
     IMPORT_FUNCTION(kernel32, GetLongPathNameW);
     IMPORT_FUNCTION(kernel32, TzSpecificLocalTimeToSystemTime);
 }
