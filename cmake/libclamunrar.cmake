@@ -7,7 +7,10 @@ set(UNRAR_INCLUDES ${UNRAR_DIR} ${CLAMWIN_DIR}/resources)
 file(GLOB libclamunrar_headers ${UNRAR_DIR}/*.hpp)
 file(GLOB libclamunrar_win32_sources ${CLAMWIN_DIR}/src/unrar/*.cpp)
 if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
-    list(APPEND libclamunrar_win32_sources ${CLAMWIN_DIR}/src/unrar/forward.S)
+    list(APPEND libclamunrar_win32_sources
+        ${CLAMWIN_DIR}/src/unrar/forward.S
+        ${CLAMWIN_DIR}/src/unrar/legacy.c
+    )
 endif()
 
 set(libclamunrar_sources

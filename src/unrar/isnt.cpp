@@ -42,20 +42,3 @@ bool IsWindows11OrGreater()
     return false;
 #endif
 }
-
-#if _WIN32_WINNT < _WIN32_WINNT_WINXP
-#include "dynload.h"
-imp_GetLongPathNameW pGetLongPathNameW = GetLongPathNameW;
-imp_TzSpecificLocalTimeToSystemTime pTzSpecificLocalTimeToSystemTime = NULL;
-
-#ifdef __GNUC__
-__attribute__((constructor))
-#endif
-static void
-init()
-{
-    HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
-    IMPORT_FUNCTION(kernel32, GetLongPathNameW);
-    IMPORT_FUNCTION(kernel32, TzSpecificLocalTimeToSystemTime);
-}
-#endif
