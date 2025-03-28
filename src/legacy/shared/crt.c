@@ -4,6 +4,7 @@
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 
+#ifdef __GNUC__
 #include <assert.h>
 #include <stdlib.h>
 
@@ -29,3 +30,4 @@ void __cdecl emu__wassert(const wchar_t *_Message, const wchar_t *_File, unsigne
     _assert(message, file, _Line);
     abort();
 }
+#endif // __GNUC__
