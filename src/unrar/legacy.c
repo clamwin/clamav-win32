@@ -34,7 +34,7 @@ extern BOOL WINAPI TzSpecificLocalTimeToSystemTime_compat(
 imp_GetLongPathNameW pGetLongPathNameW = GetLongPathNameW;
 imp_TzSpecificLocalTimeToSystemTime pTzSpecificLocalTimeToSystemTime = TzSpecificLocalTimeToSystemTime_compat;
 
-INITIALIZER(init)
+INITIALIZER(init_unrar)
 {
     HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
     if (!kernel32) // meh

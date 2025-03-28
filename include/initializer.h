@@ -2,16 +2,18 @@
 #define _INITIALIZER_H_
 
 #if defined(_MSC_VER) && !defined(__clang__)
+#if defined _M_IX86
+#define _CRT_LINKER_SYMBOL_PREFIX(f) "_"
+#elif defined _M_X64 || defined _M_ARM || defined _M_ARM64
+#define _CRT_LINKER_SYMBOL_PREFIX ""
+#else
+#error Unsupported architecture
+#endif
 #pragma section(".CRT$XCU", read)
-#define INITIALIZER2_(f, p)                                  \
+#define INITIALIZER(f)                                       \
     static void f(void);                                     \
     __declspec(allocate(".CRT$XCU")) void (*f##_)(void) = f; \
-    __pragma(comment(linker, "/include:" p #f "_")) static void f(void)
-#ifdef _WIN64
-#define INITIALIZER(f) INITIALIZER2_(f, "")
-#else
-#define INITIALIZER(f) INITIALIZER2_(f, "_")
-#endif
+    __pragma(comment(linker, "/include:" _CRT_LINKER_SYMBOL_PREFIX #f "_")) static void f(void)
 #else
 #define INITIALIZER(f)                                \
     static void f(void) __attribute__((constructor)); \

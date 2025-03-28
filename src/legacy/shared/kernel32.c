@@ -31,8 +31,10 @@ static LARGE_INTEGER qpcBase = { 0 };      // Baseline performance counter value
 static FILETIME ftBase = { 0 };            // Baseline system time corresponding to qpcBase.
 static LARGE_INTEGER qpcFrequency = { 0 }; // Performance counter frequency.
 
-INITIALIZER(init)
+INITIALIZER(init_kernel32_4_0)
 {
+    TRACE("Init @ " __FILE__ "\n");
+
     // Set the baseline.
     // Retrieve the performance counter frequency.
     QueryPerformanceFrequency(&qpcFrequency);

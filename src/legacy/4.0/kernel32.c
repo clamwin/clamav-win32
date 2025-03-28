@@ -36,8 +36,9 @@ imp_Process32NextW pProcess32NextW = NULL;
 imp_Module32FirstW pModule32FirstW = NULL;
 imp_Module32NextW pModule32NextW = NULL;
 
-INITIALIZER(init)
+INITIALIZER(init_kernel32_shared)
 {
+    TRACE("Init @ " __FILE__ "\n");
     HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
     if (!kernel32) // meh
         return;
