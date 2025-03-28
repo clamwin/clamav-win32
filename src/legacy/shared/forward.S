@@ -27,6 +27,9 @@
 .global __imp_WakeByAddressSingle
 .global __imp_ProcessPrng
 
+.global __imp_InitOnceExecuteOnce
+.global __imp__InitOnceExecuteOnce@16
+
 .section .rdata,"dr"
 
 #ifdef _WIN64
@@ -40,7 +43,8 @@ __imp_WakeByAddressSingle:
     .quad WakeByAddressSingle
 __imp_ProcessPrng:
     .quad ProcessPrng
-
+__imp_InitOnceExecuteOnce:
+    .quad InitOnceExecuteOnce
 #else
 .align 4
 
@@ -52,4 +56,6 @@ __imp_WakeByAddressSingle:
     .long _WakeByAddressSingle@4
 __imp_ProcessPrng:
     .long _ProcessPrng@8
+__imp__InitOnceExecuteOnce@16:
+    .long _InitOnceExecuteOnce@16
 #endif
