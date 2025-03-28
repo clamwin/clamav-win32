@@ -32,7 +32,7 @@ imp_Process32NextW pProcess32NextW = NULL;
 imp_Module32FirstW pModule32FirstW = NULL;
 imp_Module32NextW pModule32NextW = NULL;
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || defined(__clang__)
 __attribute__((constructor))
 #endif
 static void

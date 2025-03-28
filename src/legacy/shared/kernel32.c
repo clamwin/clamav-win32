@@ -184,7 +184,7 @@ static LARGE_INTEGER qpcBase = { 0 };      // Baseline performance counter value
 static FILETIME ftBase = { 0 };            // Baseline system time corresponding to qpcBase.
 static LARGE_INTEGER qpcFrequency = { 0 }; // Performance counter frequency.
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || defined(__clang__)
 __attribute__((constructor))
 #endif
 static void
