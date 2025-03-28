@@ -24,6 +24,7 @@
 
 #include "legacy.h"
 #include "dynload.h"
+#include "initializer.h"
 
 #include <assert.h>
 #include <process.h>

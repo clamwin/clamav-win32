@@ -23,6 +23,7 @@
  */
 
 #include "legacy.h"
+#include "initializer.h"
 
  // Static variables to hold the baseline values.
  // They are initialized on the first call.
