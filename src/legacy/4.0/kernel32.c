@@ -22,55 +22,13 @@
  * SOFTWARE.
  */
 
+#ifndef _WIN64
 #include "legacy.h"
 #include "dynload.h"
 #include "initializer.h"
 
 #include <assert.h>
 #include <process.h>
-
-imp_CreateHardLinkW pCreateHardLinkW = NULL;
-imp_CreateToolhelp32Snapshot pCreateToolhelp32Snapshot = NULL;
-imp_Process32FirstW pProcess32FirstW = NULL;
-imp_Process32NextW pProcess32NextW = NULL;
-imp_Module32FirstW pModule32FirstW = NULL;
-imp_Module32NextW pModule32NextW = NULL;
-
-#ifndef _UNICODE
-// windows 98 does not like MB_ERR_INVALID_CHARS and loops rust message function
-imp_MultiByteToWideChar pMultiByteToWideChar = NULL;
-
-int WINAPI MultiByteToWideChar_legacy(UINT CodePage, DWORD dwFlags, LPCCH lpMultiByteStr, int cbMultiByte, LPWSTR lpWideCharStr, int cchWideChar)
-{
-    return pMultiByteToWideChar(CodePage, dwFlags & ~MB_ERR_INVALID_CHARS, lpMultiByteStr, cbMultiByte, lpWideCharStr, cchWideChar);
-}
-#endif
-
-INITIALIZER(init_kernel32_4_0)
-{
-    TRACE("Init @ " __FILE__ "\n");
-    HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
-    if (!kernel32) // meh
-        return;
-
-#ifndef _UNICODE
-    IMPORT_FUNCTION(kernel32, MultiByteToWideChar);
-#endif
-
-    IMPORT_FUNCTION(kernel32, CreateHardLinkW);
-    IMPORT_FUNCTION(kernel32, CreateToolhelp32Snapshot);
-    IMPORT_FUNCTION(kernel32, Process32FirstW);
-    IMPORT_FUNCTION(kernel32, Process32NextW);
-    IMPORT_FUNCTION(kernel32, Module32FirstW);
-    IMPORT_FUNCTION(kernel32, Module32NextW);
-}
-
-PVOID WINAPI AddVectoredExceptionHandler(ULONG First, PVECTORED_EXCEPTION_HANDLER Handler)
-{
-    TRACE("AddVectoredExceptionHandler: not supported\n");
-    fprintf(stderr, "SetFileInformationByHandle is not supported!\n");
-    return NULL;
-}
 
 typedef struct _WAIT_CONTEXT
 {
@@ -339,4 +297,45 @@ NTSTATUS NTAPI NtWriteFile(
 
     return IoStatusBlock->Status;
 }
-#endif /* _UNICODE */
+#endif // _UNICODE
+
+imp_MultiByteToWideChar pMultiByteToWideChar = NULL;
+imp_RegisterWaitForSingleObject pRegisterWaitForSingleObject = RegisterWaitForSingleObject_compat;
+imp_UnregisterWait pUnregisterWait = UnregisterWait_compat;
+imp_UnregisterWaitEx pUnregisterWaitEx = UnregisterWaitEx_compat;
+
+imp_CreateHardLinkW pCreateHardLinkW = NULL;
+imp_CreateToolhelp32Snapshot pCreateToolhelp32Snapshot = NULL;
+imp_Process32FirstW pProcess32FirstW = NULL;
+imp_Process32NextW pProcess32NextW = NULL;
+imp_Module32FirstW pModule32FirstW = NULL;
+imp_Module32NextW pModule32NextW = NULL;
+imp_AddVectoredExceptionHandler pAddVectoredExceptionHandler = NULL;
+
+// windows 98/nt do not like MB_ERR_INVALID_CHARS and loop rust message function
+int WINAPI MultiByteToWideChar_wrapper(UINT CodePage, DWORD dwFlags, LPCCH lpMultiByteStr, int cbMultiByte, LPWSTR lpWideCharStr, int cchWideChar)
+{
+    return pMultiByteToWideChar(CodePage, dwFlags & ~MB_ERR_INVALID_CHARS, lpMultiByteStr, cbMultiByte, lpWideCharStr, cchWideChar);
+}
+
+INITIALIZER(init_kernel32_4_0)
+{
+    TRACE("Init @ " __FILE__ "\n");
+    HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
+    if (!kernel32) // meh
+        return;
+
+    IMPORT_FUNCTION(kernel32, MultiByteToWideChar);
+    IMPORT_FUNCTION(kernel32, RegisterWaitForSingleObject);
+    IMPORT_FUNCTION(kernel32, UnregisterWait);
+    IMPORT_FUNCTION(kernel32, UnregisterWaitEx);
+
+    IMPORT_FUNCTION(kernel32, AddVectoredExceptionHandler);
+    IMPORT_FUNCTION(kernel32, CreateHardLinkW);
+    IMPORT_FUNCTION(kernel32, CreateToolhelp32Snapshot);
+    IMPORT_FUNCTION(kernel32, Process32FirstW);
+    IMPORT_FUNCTION(kernel32, Process32NextW);
+    IMPORT_FUNCTION(kernel32, Module32FirstW);
+    IMPORT_FUNCTION(kernel32, Module32NextW);
+}
+#endif /* _WIN64 */

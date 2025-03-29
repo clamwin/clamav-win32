@@ -30,6 +30,8 @@ missing_getaddrinfo:
 missing_freeaddrinfo:
     .asciz "freeaddrinfo is not supported, aborting.\n"
 
+missing_addveh:
+    .asciz "AddVectoredExceptionHandler is not supported, aborting.\n"
 missing_createhardlink:
     .asciz "CreateHardLinkW is not supported, aborting.\n"
 missing_th32snap:
@@ -43,19 +45,35 @@ missing_module32first:
 missing_module32next:
     .asciz "Module32NextW is not supported, aborting.\n"
 
-#ifndef _UNICODE
+.global __imp__RegisterWaitForSingleObject@24
+.global __imp__UnregisterWait@4
+.global __imp__UnregisterWaitEx@8
+
 .global __imp__MultiByteToWideChar@24
 .global _MultiByteToWideChar@24
 
+__imp__RegisterWaitForSingleObject@24:
+    .long thunk_pRegisterWaitForSingleObject@24
+__imp__UnregisterWait@4:
+    .long thunk_pUnregisterWait@4
+__imp__UnregisterWaitEx@8:
+    .long thunk_pUnregisterWaitEx@8
+
 __imp__MultiByteToWideChar@24:
-    .long _MultiByteToWideChar_legacy@24
+    .long _MultiByteToWideChar_wrapper@24
 
 .section .text
 .align 4
 
 _MultiByteToWideChar@24:
-    jmp _MultiByteToWideChar_legacy@24
-#endif
+    jmp _MultiByteToWideChar_wrapper@24
+
+thunk_pRegisterWaitForSingleObject@24:
+    jmp *_pRegisterWaitForSingleObject
+thunk_pUnregisterWait@4:
+    jmp *_pUnregisterWait
+thunk_pUnregisterWaitEx@8:
+    jmp *_pUnregisterWaitEx
 
 .section .data
 
@@ -83,6 +101,7 @@ jump_\name:
     jmp     *%eax                   # Jump to the function implementation via the pointer
 .endm
 
+DEF_STUB _AddVectoredExceptionHandler@8, _pAddVectoredExceptionHandler, missing_addveh
 DEF_STUB _CreateHardLinkW@12, _pCreateHardLinkW, missing_createhardlink
 DEF_STUB _CreateToolhelp32Snapshot@8, _pCreateToolhelp32Snapshot, missing_th32snap
 DEF_STUB _Process32FirstW@8, _pProcess32FirstW, missing_proc32first

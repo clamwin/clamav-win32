@@ -13,7 +13,7 @@ set(UNRAR_INCLUDES ${UNRAR_DIR} ${CLAMWIN_DIR}/resources)
 
 file(GLOB libclamunrar_headers ${UNRAR_DIR}/*.hpp)
 file(GLOB libclamunrar_win32_sources ${CLAMWIN_DIR}/src/unrar/*.cpp)
-if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
+if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
     list(APPEND libclamunrar_win32_sources
         ${CLAMWIN_DIR}/src/unrar/forward.S
         ${CLAMWIN_DIR}/src/unrar/legacy.c
@@ -50,7 +50,7 @@ set_target_properties(libclamunrar PROPERTIES DEFINE_SYMBOL "" PREFIX "" OUTPUT_
 target_include_directories(libclamunrar PRIVATE ${UNRAR_INCLUDES} ${CLAMWIN_DIR}/include)
 target_compile_definitions(libclamunrar PRIVATE ${UNRAR_DEFINES})
 
-if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
+if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
     target_link_options(libclamunrar PRIVATE $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 endif()
 

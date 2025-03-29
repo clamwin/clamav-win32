@@ -36,7 +36,7 @@ if(CLAMWIN_UNICODE_BUILD)
     set(ENABLE_UNICODE ON)
 endif()
 
-if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
+if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
     set(USE_WIN32_IDN OFF)
     set(ENABLE_IPV6 OFF)
     set(ENABLE_THREADED_RESOLVER OFF)
@@ -55,7 +55,7 @@ endif()
 add_subdirectory(${CURL_DIR} EXCLUDE_FROM_ALL)
 target_include_directories(libcurl_object PRIVATE ${OPENSSL_INCLUDE_DIR})
 
-if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
+if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
     set_source_files_properties(
         ${CURL_DIR}/lib/version_win32.c
         DIRECTORY ${CURL_DIR}/lib

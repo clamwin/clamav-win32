@@ -29,9 +29,12 @@
 .section .text
 .align 4
 
-trunk_pGetLongPathNameW@12:
+#ifdef _UNICODE
+thunk_pGetLongPathNameW@12:
     jmp *_pGetLongPathNameW
-trunk_pTzSpecificLocalTimeToSystemTime@12:
+#endif
+
+thunk_pTzSpecificLocalTimeToSystemTime@12:
     jmp *_pTzSpecificLocalTimeToSystemTime
 
 .section .rdata,"dr"
@@ -39,8 +42,9 @@ trunk_pTzSpecificLocalTimeToSystemTime@12:
 
 #ifdef _UNICODE
 __imp__GetLongPathNameW@12:
-    .long trunk_pGetLongPathNameW@12
+    .long thunk_pGetLongPathNameW@12
 #endif
+
 __imp__TzSpecificLocalTimeToSystemTime@12:
-    .long trunk_pTzSpecificLocalTimeToSystemTime@12
+    .long thunk_pTzSpecificLocalTimeToSystemTime@12
 #endif

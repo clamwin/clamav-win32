@@ -24,7 +24,7 @@ DWORD WinNT()
 
 bool IsWindows11OrGreater()
 {
-#if _WIN32_WINNT >= _WIN32_WINNT_WINXP
+#if _WIN32_WINNT > _WIN32_WINNT_WINXP
     OSVERSIONINFOEXW vi = {0};
     vi.dwOSVersionInfoSize = sizeof(vi);
     vi.dwMajorVersion = 10;

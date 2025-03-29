@@ -16,7 +16,7 @@ file(GLOB clamav_compat_sources
     ${CLAMWIN_DIR}/src/legacy/shared/forward.S
 )
 
-if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
+if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501 AND CLAMAV_ARCH STREQUAL "x86")
     list(APPEND clamav_compat_sources
         ${CLAMWIN_DIR}/src/legacy/4.0/forward.S
         ${CLAMWIN_DIR}/src/legacy/4.0/rtlcapturecontext.S
@@ -73,7 +73,7 @@ if(NOT CLAMWIN_UNICODE_BUILD)
     target_link_libraries(libclamunrar PRIVATE ${UNICOWS_LIBRARY})
 endif()
 
-if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
+if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
     # userenv
     get_target_property(CLAMV_RUST_LIBS clamav_rust INTERFACE_LINK_LIBRARIES)
     list(REMOVE_ITEM CLAMV_RUST_LIBS -luserenv userenv)
@@ -87,7 +87,7 @@ target_link_libraries(libfreshclam PRIVATE clamav_compat)
 target_link_libraries(clambc PRIVATE clamav_compat)
 target_link_libraries(sigtool PRIVATE clamav_compat)
 
-if(CLAMWIN_WINDOWS_VERSION LESS 0x0501)
+if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501 AND CLAMAV_ARCH STREQUAL "x86")
     target_link_libraries(clamd PRIVATE clamav_compat)
     target_link_libraries(clamscan PRIVATE clamav_compat)
     target_link_libraries(clamdscan PRIVATE clamav_compat)

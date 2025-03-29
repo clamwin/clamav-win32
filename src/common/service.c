@@ -21,6 +21,8 @@
 
 #include <stdio.h>
 
+#include "dynload.h"
+
 #include "service.h"
 #include "output.h"
 
@@ -121,9 +123,18 @@ bool svc_install(const TCHAR *name, const TCHAR *dname, TCHAR *desc)
         return false;
     }
 
-#if _WIN32_WINNT >= _WIN32_WINNT_WINXP
-    if (!ChangeServiceConfig2(svc, SERVICE_CONFIG_DESCRIPTION, &sdesc))
-        _ftprintf(stderr, TEXT("Unable to set description for Service %s (%ld)\n"), name, GetLastError());
+#ifdef _UNICODE
+    imp_ChangeServiceConfig2W pChangeServiceConfig2W = NULL;
+    HMODULE advapi32 = GetModuleHandle(TEXT("advapi32"));
+    if (!advapi32)
+        abort();
+
+    IMPORT_FUNCTION(advapi32, ChangeServiceConfig2W);
+    if (pChangeServiceConfig2W)
+    {
+        if (!pChangeServiceConfig2W(svc, SERVICE_CONFIG_DESCRIPTION, &sdesc))
+            _ftprintf(stderr, L"Unable to set description for Service %s (%ld)\n", name, GetLastError());
+    }
 #endif
 
     CloseServiceHandle(svc);

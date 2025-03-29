@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+#ifndef _WIN64
 #include <windows.h>
 #include "dynload.h"
 #include "initializer.h"
@@ -42,3 +43,4 @@ INITIALIZER(init_unrar)
     IMPORT_FUNCTION(kernel32, GetLongPathNameW);
     IMPORT_FUNCTION(kernel32, TzSpecificLocalTimeToSystemTime);
 }
+#endif

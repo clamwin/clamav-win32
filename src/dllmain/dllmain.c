@@ -19,14 +19,15 @@
  */
 
 #include "platform.h"
+#include "dynload.h"
 
 #include <windows.h>
 #include <winsock2.h>
 #include <stdio.h>
 
-#ifndef _WIN64
-#include "dynload.h"
+static imp_HeapSetInformation pHeapSetInformation = NULL;
 
+#ifndef _WIN64
 BOOL bIsWow64 = FALSE;
 
 static imp_IsWow64Process pIsWow64Process = NULL;
@@ -43,11 +44,11 @@ LIBCLAMAV_EXPORT BOOL disablefsredir(void)
 
 /* avoid bombing in stupid msvcrt checks - msvcrt8 only */
 #ifdef _MSC_VER
-void clamavInvalidParameterHandler(const wchar_t* expression,
-    const wchar_t* function,
-    const wchar_t* file,
-    unsigned int line,
-    uintptr_t pReserved)
+void clamavInvalidParameterHandler(const wchar_t *expression,
+                                   const wchar_t *function,
+                                   const wchar_t *file,
+                                   unsigned int line,
+                                   uintptr_t pReserved)
 {
     fprintf(stderr, "\nW00ps!! you have something strange with this file\n(maybe crt versions mismatch)\n");
 
@@ -65,10 +66,11 @@ static void processattach(void)
     ULONG HeapFragValue = 2;
     WSADATA wsaData;
 
-#ifndef _WIN64
     HMODULE kernel32 = GetModuleHandleW(L"kernel32");
     if (kernel32) // meh
     {
+        IMPORT_FUNCTION(kernel32, HeapSetInformation);
+#ifndef _WIN64
         IMPORT_FUNCTION(kernel32, IsWow64Process);
 
         if (pIsWow64Process)
@@ -78,13 +80,12 @@ static void processattach(void)
             else if (bIsWow64)
                 IMPORT_FUNCTION(kernel32, Wow64DisableWow64FsRedirection);
         }
-    }
 #endif
+    }
 
-#if _WIN32_WINNT >= _WIN32_WINNT_WINXP
     if (!IsDebuggerPresent())
     {
-        if (!HeapSetInformation(GetProcessHeap(), HeapCompatibilityInformation, &HeapFragValue, sizeof(HeapFragValue)))
+        if (pHeapSetInformation && !pHeapSetInformation(GetProcessHeap(), HeapCompatibilityInformation, &HeapFragValue, sizeof(HeapFragValue)))
         {
             DWORD le = GetLastError();
             /* ERROR_GEN_FAILURE on wine */
@@ -92,8 +93,8 @@ static void processattach(void)
                 fprintf(stderr, "[DllMain] Error setting up low-fragmentation heap: le=%ld\n", le);
         }
     }
-#endif
-    if (WSAStartup(MAKEWORD(2,2), &wsaData) != NO_ERROR)
+
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != NO_ERROR)
         fprintf(stderr, "[DllMain] Error at WSAStartup(): %d\n", WSAGetLastError());
 
 #ifndef _WIN64

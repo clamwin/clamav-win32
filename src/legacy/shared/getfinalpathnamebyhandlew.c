@@ -23,10 +23,22 @@
  */
 
 #include "legacy.h"
+#include "initializer.h"
 
 // https://github.com/zeroclear/xpext/blob/master/xpext_ver4/k32_file.cpp#L445
 // https://stackoverflow.com/questions/65170/how-to-get-name-associated-with-open-handle/5286888#5286888
+
 #ifdef _UNICODE
+static OSVERSIONINFOW osvi = {0};
+
+INITIALIZER(init_gfpn)
+{
+    osvi.dwOSVersionInfoSize = sizeof(osvi);
+    if (!GetVersionExW(&osvi))
+        fprintf(stderr, "[legacy] GetVersionEx() failed with %ld\n", GetLastError());
+    TRACE("Windows Version is %d.%d\n", osvi.dwMajorVersion, osvi.dwMinorVersion);
+}
+
 static BOOL BasepGetObjectNTName(HANDLE Handle, wchar_t **lpName)
 {
     NTSTATUS status;
@@ -117,6 +129,12 @@ static BOOL BasepGetFileNameInformation(HANDLE Handle, FILE_INFORMATION_CLASS Fi
 static BOOL BasepGetVolumeGUIDFromNTName(const wchar_t *Src, wchar_t **VolumeName)
 {
     TRACE("BasepGetVolumeGUIDFromNTName [%ls]\n", Src);
+
+    if (osvi.dwMajorVersion < 5)
+    {
+        SetLastError(ERROR_NOT_SUPPORTED);
+        return FALSE;
+    }
 
     HANDLE hDevice = CreateFile(
         MOUNTMGR_DOS_DEVICE_NAME,
@@ -349,6 +367,12 @@ static BOOL BasepGetVolumeDosLetterNameFromNTName(const wchar_t *Src, wchar_t **
 
     if (wcsnicmp(Src, L"\\Device\\Mup", 11) == 0)
         return UncPath(VolumeName);
+
+    if (osvi.dwMajorVersion < 5)
+    {
+        SetLastError(ERROR_NOT_SUPPORTED);
+        return FALSE;
+    }
 
     HANDLE hDevice = CreateFile(
         MOUNTMGR_DOS_DEVICE_NAME,

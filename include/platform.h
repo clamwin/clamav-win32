@@ -63,17 +63,15 @@ typedef struct pollfd
 } WSAPOLLFD, *PWSAPOLLFD, *LPWSAPOLLFD;
 #endif
 
-#if _WIN32_WINNT < _WIN32_WINNT_WINXP
+#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
+#ifndef _WIN64
 #include <wspiapi.h>
 
 #ifndef IPPROTO_IPV6
 #define IPPROTO_IPV6 41
 #endif
+#endif
 
-BOOL WINAPI RegisterWaitForSingleObject_compat(PHANDLE phNewWaitObject, HANDLE hObject, WAITORTIMERCALLBACK Callback, PVOID Context, ULONG dwMilliseconds, ULONG dwFlags);
-#define RegisterWaitForSingleObject RegisterWaitForSingleObject_compat
-BOOL WINAPI UnregisterWaitEx_compat(HANDLE WaitHandle, HANDLE CompletionEvent);
-#define UnregisterWaitEx UnregisterWaitEx_compat
 #define MAX_PATH 260
 #else
 #define MAX_PATH 32767

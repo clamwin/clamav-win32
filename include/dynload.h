@@ -49,5 +49,12 @@ typedef BOOL(WINAPI *imp_Process32NextW)(HANDLE hSnapshot, LPPROCESSENTRY32 lppe
 typedef BOOL(WINAPI *imp_Module32FirstW)(HANDLE hSnapshot, LPMODULEENTRY32W lpme);
 typedef BOOL(WINAPI *imp_Module32NextW)(HANDLE hSnapshot, LPMODULEENTRY32W lpme);
 
+typedef BOOL(WINAPI *imp_ChangeServiceConfig2W)(SC_HANDLE hService, DWORD dwInfoLevel, LPVOID lpInfo);
+
+typedef PVOID(WINAPI *imp_AddVectoredExceptionHandler)(ULONG First, PVECTORED_EXCEPTION_HANDLER Handler);
+typedef BOOL(WINAPI *imp_RegisterWaitForSingleObject)(PHANDLE phNewWaitObject, HANDLE hObject, WAITORTIMERCALLBACK Callback, PVOID Context, ULONG dwMilliseconds, ULONG dwFlags);
+typedef BOOL(WINAPI *imp_UnregisterWait)(HANDLE WaitHandle);
+typedef BOOL(WINAPI *imp_UnregisterWaitEx)(HANDLE WaitHandle, HANDLE CompletionEvent);
+typedef BOOL(WINAPI *imp_HeapSetInformation)(HANDLE HeapHandle, HEAP_INFORMATION_CLASS HeapInformationClass, PVOID HeapInformation, SIZE_T HeapInformationLength);
 typedef int(WINAPI *imp_MultiByteToWideChar)(UINT CodePage, DWORD dwFlags, LPCCH lpMultiByteStr, int cbMultiByte, LPWSTR lpWideCharStr, int cchWideChar);
 #endif /* _DYNLOAD_H_ */

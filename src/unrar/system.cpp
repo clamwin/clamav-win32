@@ -64,6 +64,8 @@ clock_t MonoClock()
   return clock();
 }
 
+typedef EXECUTION_STATE(WINAPI *imp_SetThreadExecutionState)(EXECUTION_STATE esFlags);
+
 void Wait()
 {
   if (ErrHandler.UserBreak)
@@ -83,9 +85,13 @@ void Wait()
     }
 
     // Reset system sleep timer to prevent system going sleep.
-#if _WIN32_WINNT > _WIN32_WINNT_NT4
-    SetThreadExecutionState(ES_SYSTEM_REQUIRED);
-#endif
+    HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
+    if (kernel32)
+    {
+      imp_SetThreadExecutionState pSetThreadExecutionState = (imp_SetThreadExecutionState)GetProcAddress(kernel32, "SetThreadExecutionState");
+      if (pSetThreadExecutionState)
+        pSetThreadExecutionState(ES_SYSTEM_REQUIRED);
+    }
   }
 }
 

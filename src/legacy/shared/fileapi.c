@@ -275,6 +275,7 @@ WINBOOL WINAPI SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLAS
             if (win32RenameInfo->ReplaceIfExists)
                 moveFlags |= MOVEFILE_REPLACE_EXISTING;
 
+            CloseHandle(hFile);
             return MoveFileExW(sourcePath, win32RenameInfo->FileName, moveFlags);
         }
     }
