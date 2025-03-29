@@ -49,4 +49,5 @@ typedef BOOL(WINAPI *imp_Process32NextW)(HANDLE hSnapshot, LPPROCESSENTRY32 lppe
 typedef BOOL(WINAPI *imp_Module32FirstW)(HANDLE hSnapshot, LPMODULEENTRY32W lpme);
 typedef BOOL(WINAPI *imp_Module32NextW)(HANDLE hSnapshot, LPMODULEENTRY32W lpme);
 
+typedef int(WINAPI *imp_MultiByteToWideChar)(UINT CodePage, DWORD dwFlags, LPCCH lpMultiByteStr, int cbMultiByte, LPWSTR lpWideCharStr, int cchWideChar);
 #endif /* _DYNLOAD_H_ */

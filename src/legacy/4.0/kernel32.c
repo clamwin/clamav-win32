@@ -36,12 +36,27 @@ imp_Process32NextW pProcess32NextW = NULL;
 imp_Module32FirstW pModule32FirstW = NULL;
 imp_Module32NextW pModule32NextW = NULL;
 
+#ifndef _UNICODE
+// windows 98 does not like MB_ERR_INVALID_CHARS and loops rust message function
+imp_MultiByteToWideChar pMultiByteToWideChar = NULL;
+
+int WINAPI MultiByteToWideChar_legacy(UINT CodePage, DWORD dwFlags, LPCCH lpMultiByteStr, int cbMultiByte, LPWSTR lpWideCharStr, int cchWideChar)
+{
+    return pMultiByteToWideChar(CodePage, dwFlags & ~MB_ERR_INVALID_CHARS, lpMultiByteStr, cbMultiByte, lpWideCharStr, cchWideChar);
+}
+#endif
+
 INITIALIZER(init_kernel32_4_0)
 {
     TRACE("Init @ " __FILE__ "\n");
     HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
     if (!kernel32) // meh
         return;
+
+#ifndef _UNICODE
+    IMPORT_FUNCTION(kernel32, MultiByteToWideChar);
+#endif
+
     IMPORT_FUNCTION(kernel32, CreateHardLinkW);
     IMPORT_FUNCTION(kernel32, CreateToolhelp32Snapshot);
     IMPORT_FUNCTION(kernel32, Process32FirstW);
@@ -73,7 +88,7 @@ static unsigned int __stdcall WaitThreadProc(void *pArg)
     HANDLE handles[2] = {ctx->hObject, ctx->hCancelEvent};
 
     TRACE("WaitThreadProc: waiting on handles: hObject=0x%p, hCancelEvent=0x%p, timeout=%lu\n",
-        ctx->hObject, ctx->hCancelEvent, ctx->dwMilliseconds);
+          ctx->hObject, ctx->hCancelEvent, ctx->dwMilliseconds);
 
     DWORD state = WaitForSingleObject(ctx->hObject, 0);
     TRACE("WaitThreadProc: Pre-wait state of hObject=0x%p is %ld (expected WAIT_TIMEOUT=%ld)\n",

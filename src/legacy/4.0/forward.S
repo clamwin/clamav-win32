@@ -43,13 +43,26 @@ missing_module32first:
 missing_module32next:
     .asciz "Module32NextW is not supported, aborting.\n"
 
+#ifndef _UNICODE
+.global __imp__MultiByteToWideChar@24
+.global _MultiByteToWideChar@24
+
+__imp__MultiByteToWideChar@24:
+    .long _MultiByteToWideChar_legacy@24
+
+.section .text
+.align 4
+
+_MultiByteToWideChar@24:
+    jmp _MultiByteToWideChar_legacy@24
+#endif
+
 .section .data
 
 p_getaddrinfo:
     .long 0
 p_freeaddrinfo:
     .long 0
-
 
 .section .text
 .align 4
