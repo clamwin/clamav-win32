@@ -20,6 +20,9 @@
             <supportedOS Id="{35138b9a-5d96-4fbd-8e2d-a2440225f93a}" />
             <!-- Windows Vista -->
             <supportedOS Id="{e2011457-1546-43c5-a5fe-008deee3d3f0}" />
+            <windowsSettings xmlns:ws2="http://schemas.microsoft.com/SMI/2016/WindowsSettings">
+                <ws2:longPathAware>true</ws2:longPathAware>
+            </windowsSettings>
         </application>
     </compatibility>
     <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
