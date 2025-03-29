@@ -65,7 +65,11 @@ typedef struct pollfd
 
 #if _WIN32_WINNT <= _WIN32_WINNT_WINXP
 #ifndef _WIN64
+#ifdef _MSC_VER
+#include <ws2tcpip.h>
+#else
 #include <wspiapi.h>
+#endif
 
 #ifndef IPPROTO_IPV6
 #define IPPROTO_IPV6 41

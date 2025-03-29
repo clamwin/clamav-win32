@@ -3,7 +3,7 @@
 
 #if defined(_MSC_VER) && !defined(__clang__)
 #if defined _M_IX86
-#define _CRT_LINKER_SYMBOL_PREFIX(f) "_"
+#define _CRT_LINKER_SYMBOL_PREFIX "_"
 #elif defined _M_X64 || defined _M_ARM || defined _M_ARM64
 #define _CRT_LINKER_SYMBOL_PREFIX ""
 #else
