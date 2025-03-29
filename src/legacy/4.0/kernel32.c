@@ -48,10 +48,6 @@ static unsigned int __stdcall WaitThreadProc(void *pArg)
     TRACE("WaitThreadProc: waiting on handles: hObject=0x%p, hCancelEvent=0x%p, timeout=%lu\n",
           ctx->hObject, ctx->hCancelEvent, ctx->dwMilliseconds);
 
-    DWORD state = WaitForSingleObject(ctx->hObject, 0);
-    TRACE("WaitThreadProc: Pre-wait state of hObject=0x%p is %ld (expected WAIT_TIMEOUT=%ld)\n",
-          ctx->hObject, state, WAIT_TIMEOUT);
-
     DWORD dwResult = WaitForMultipleObjects(2, handles, FALSE, ctx->dwMilliseconds);
 
     if (dwResult == WAIT_OBJECT_0)
@@ -109,7 +105,7 @@ BOOL WINAPI RegisterWaitForSingleObject_compat(PHANDLE phNewWaitObject,
     unsigned int threadId;
     if (!(ctx->hThread = (HANDLE)_beginthreadex(NULL, 0, WaitThreadProc, ctx, 0, &threadId)))
     {
-        TRACE("RegisterWaitForSingleObject: CreateThread() failed with %ld\n", GetLastError());
+        fprintf(stderr, "RegisterWaitForSingleObject: CreateThread() failed with %ld\n", GetLastError());
         CloseHandle(ctx->hCancelEvent);
         HeapFree(GetProcessHeap(), 0, ctx);
         return FALSE;
@@ -123,7 +119,6 @@ BOOL WINAPI RegisterWaitForSingleObject_compat(PHANDLE phNewWaitObject,
 
 BOOL WINAPI UnregisterWaitEx_compat(HANDLE hWaitObject, HANDLE hCompletionEvent)
 {
-    TRACE("UnregisterWaitEx: Caller Thread ID %ld\n", GetCurrentThreadId());
     TRACE("UnregisterWaitEx(0x%p, 0x%p)\n", hWaitObject, hCompletionEvent);
 
     if (!hWaitObject)
@@ -143,10 +138,13 @@ BOOL WINAPI UnregisterWaitEx_compat(HANDLE hWaitObject, HANDLE hCompletionEvent)
 
     TRACE("UnregisterWaitEx: About to signal cancel event 0x%p\n", ctx->hCancelEvent);
     if (!SetEvent(ctx->hCancelEvent))
-        TRACE("UnregisterWaitEx: SetEvent failed with error %ld\n", GetLastError());
+        fprintf(stderr, "UnregisterWaitEx: SetEvent failed with error %ld\n", GetLastError());
 
     TRACE("UnregisterWaitEx: Waiting for thread 0x%p\n", ctx->hThread);
-    DWORD waitRes = WaitForSingleObject(ctx->hThread, INFINITE);
+#ifdef LEGACY_TRACE
+    DWORD waitRes =
+#endif
+        WaitForSingleObject(ctx->hThread, INFINITE);
     TRACE("UnregisterWaitEx: WaitForSingleObject returned %ld\n", waitRes);
 
     CloseHandle(ctx->hCancelEvent);
