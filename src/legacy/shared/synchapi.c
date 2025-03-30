@@ -80,7 +80,7 @@ static BOOL compare_addr(const void *addr, const void *cmp, SIZE_T size)
  *
  * @param Address - Pointer to the memory address to wake a waiter on
  */
-void WINAPI WakeByAddressSingle(void *Address)
+void WINAPI WRAP(WakeByAddressSingle)(void *Address)
 {
     TRACE("WakeByAddressSingle(0x%p)\n", Address);
 
@@ -128,7 +128,7 @@ void WINAPI WakeByAddressSingle(void *Address)
  *
  * @return TRUE if the wait succeeded, FALSE if timeout or error
  */
-BOOL WINAPI WaitOnAddress(volatile void *Address, void *CompareAddress, SIZE_T AddressSize, DWORD dwMilliseconds)
+BOOL WINAPI WRAP(WaitOnAddress)(volatile void *Address, void *CompareAddress, SIZE_T AddressSize, DWORD dwMilliseconds)
 {
     TRACE("WaitOnAddress(0x%p, 0x%p, %d, %ld)\n", Address, CompareAddress, (unsigned int)AddressSize, dwMilliseconds);
 
@@ -187,7 +187,7 @@ BOOL WINAPI WaitOnAddress(volatile void *Address, void *CompareAddress, SIZE_T A
  *
  * @param Address - Pointer to the memory address to wake waiters on
  */
-void WINAPI WakeByAddressAll(void *Address)
+void WINAPI WRAP(WakeByAddressAll)(void *Address)
 {
     TRACE("WakeByAddressAll(0x%p)\n", Address);
 
