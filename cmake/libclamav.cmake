@@ -59,10 +59,13 @@ add_library(libclamav SHARED
     ${libclamav_win32_sources}
 )
 
-target_link_options(libclamav PRIVATE
-    "/DELAYLOAD:bcryptprimitives.dll"
-    "/DELAYLOAD:api-ms-win-core-synch-l1-2-0.dll"
-)
+if(MSVC)
+    target_link_options(libclamav PRIVATE
+        "/DELAYLOAD:bcryptprimitives.dll"
+        "/DELAYLOAD:api-ms-win-core-synch-l1-2-0.dll"
+    )
+endif()
+
 add_library(ClamAV::libclamav ALIAS libclamav)
 
 set_target_properties(libclamav PROPERTIES DEFINE_SYMBOL THIS_IS_LIBCLAMAV PREFIX "" OUTPUT_NAME libclamav)
