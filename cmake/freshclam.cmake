@@ -9,15 +9,10 @@ set(libfreshclam_sources
 )
 
 set(libfreshclam_win32_sources
+    ${CLAMWIN_DIR}/src/helpers/resolver.c
     ${CLAMWIN_DIR}/resources/libfreshclam.rc
     ${CLAMWIN_DIR}/libfreshclam.def
 )
-
-if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
-    list(APPEND libfreshclam_win32_sources ${CLAMWIN_DIR}/src/legacy/4.0/resolv.c)
-else()
-    list(APPEND libfreshclam_win32_sources ${CLAMAV_DIR}/win32/compat/resolv.c)
-endif()
 
 file(GLOB libfreshclam_common_sources
     ${CLAMAV_DIR}/common/cert_util.c
@@ -43,11 +38,8 @@ target_link_libraries(libfreshclam PRIVATE
     libclamav
     crypt32
     ws2_32
-    iphlpapi)
-
-if(CLAMWIN_WINDOWS_VERSION GREATER 0x0501)
-    target_link_libraries(libfreshclam PRIVATE dnsapi)
-endif()
+    iphlpapi
+    dnsapi)
 
 # freshclam
 file(GLOB freshclam_headers ${CLAMAV_DIR}/freshclam/*.h)
