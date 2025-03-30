@@ -61,4 +61,6 @@ typedef int(WINAPI *imp_MultiByteToWideChar)(UINT CodePage, DWORD dwFlags, LPCCH
 
 typedef DNS_STATUS(WINAPI *imp_DnsQuery_A)(PCSTR pszName, WORD wType, DWORD Options, PIP4_ARRAY aipServers, PDNS_RECORD *ppQueryResults, PVOID *pReserved);
 typedef VOID(WINAPI *imp_DnsRecordListFree)(PDNS_RECORD pRecordList, DNS_FREE_TYPE FreeType);
+
+typedef BOOLEAN(WINAPI *imp_SystemFunction036)(PVOID RandomBuffer, ULONG RandomBufferLength);
 #endif /* _DYNLOAD_H_ */

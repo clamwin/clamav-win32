@@ -23,13 +23,28 @@
  */
 
 #include "legacy.h"
+#include "dynload.h"
+#include "initializer.h"
+
+static imp_SystemFunction036 pSystemFunction036 = NULL;
+
+INITIALIZER(init_bcryptprimitives)
+{
+    HMODULE advapi32 = LoadLibrary(TEXT("advapi32"));
+    if (advapi32)
+        IMPORT_FUNCTION(advapi32, SystemFunction036);
+}
 
 BOOL WINAPI ProcessPrng(void *buffer, size_t size)
 {
-    HCRYPTPROV hProv = 0;
-    BOOL result;
+    TRACE("ProcessPrng(0x%p, %zu) RtlGenRandom = 0x%p\n", buffer, size, pSystemFunction036);
 
-    TRACE("ProcessPrng(0x%p, %zu)\n", buffer, size);
+    // use RtlGenRandom if available
+    if (pSystemFunction036)
+        return pSystemFunction036(buffer, (ULONG)size);
+
+    HCRYPTPROV hProv;
+    BOOL result;
 
     // Acquire a cryptographic context. The CRYPT_VERIFYCONTEXT flag indicates that
     // no persistent key container is needed (suitable for generating random data).
