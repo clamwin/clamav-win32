@@ -21,12 +21,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 ## Features
 
 - [**clamav**] small footprint
-- [**clamav**] native msvc win64 port, legacy mingw 32bit/64bit build for WinXP+
-- [**clamav**] support for unc paths, exotic/long file names
+- [**clamav**] modern MSVC 64bit port for Windows 7+, legacy 32bit down to NT4, legacy 64bit for WinXP+
+- [**clamav**] support for UNC paths, exotic/long file names
 - [**clamav**] nice icons ;)
 - [**clamscan**] memory scanner (in memory loaded modules are scanned on-disk)
-- [**llvm**] msvc build Only
-- [**clamdtop**] curses ui to connect to a running clamd service
+- [**clamdtop**] curses UI to connect to a running clamd service
 - [**clamd/freshclam**] as Windows Service
 
 ## 3rdparty libraries and versions
@@ -40,7 +39,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 - PDCurses: git-6ba6df38
 - Winpthreads: git-b025331
 - zlib-ng: 2.2.4
-- LLVM 13.0.1
 - UnRAR: 7.1.6
 
 ## Getting sources
