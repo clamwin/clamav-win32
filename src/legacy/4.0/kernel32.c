@@ -297,7 +297,13 @@ NTSTATUS NTAPI NtWriteFile(
 }
 #endif // _UNICODE
 
+static BOOL WINAPI ChangeServiceConfig2A_dummy(SC_HANDLE hService, DWORD dwInfoLevel, LPVOID lpInfo)
+{
+    return TRUE;
+}
+
 imp_MultiByteToWideChar pMultiByteToWideChar = NULL;
+imp_ChangeServiceConfig2A pChangeServiceConfig2A = ChangeServiceConfig2A_dummy;
 imp_RegisterWaitForSingleObject pRegisterWaitForSingleObject = RegisterWaitForSingleObject_compat;
 imp_UnregisterWait pUnregisterWait = UnregisterWait_compat;
 imp_UnregisterWaitEx pUnregisterWaitEx = UnregisterWaitEx_compat;
@@ -340,6 +346,7 @@ INITIALIZER(init_kernel32_4_0)
 #endif
 
     IMPORT_FUNCTION(kernel32, MultiByteToWideChar);
+    IMPORT_FUNCTION(kernel32, ChangeServiceConfig2A);
     IMPORT_FUNCTION(kernel32, RegisterWaitForSingleObject);
     IMPORT_FUNCTION(kernel32, UnregisterWait);
     IMPORT_FUNCTION(kernel32, UnregisterWaitEx);

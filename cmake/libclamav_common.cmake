@@ -12,6 +12,7 @@ set(libclamav_common_sources
     ${CLAMAV_DIR}/common/misc.c
     ${CLAMAV_DIR}/common/optparser.c
     ${CLAMAV_DIR}/common/output.c
+    ${CLAMAV_DIR}/common/service.c
     ${CLAMAV_DIR}/common/tar.c
     ${CLAMAV_DIR}/win32/compat/glob.c
 )

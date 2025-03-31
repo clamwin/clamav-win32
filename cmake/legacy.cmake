@@ -88,6 +88,7 @@ target_link_libraries(clambc PRIVATE clamav_compat)
 target_link_libraries(sigtool PRIVATE clamav_compat)
 
 if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501 AND CLAMAV_ARCH STREQUAL "x86")
+    target_link_libraries(freshclam PRIVATE clamav_compat)
     target_link_libraries(clamd PRIVATE clamav_compat)
     target_link_libraries(clamscan PRIVATE clamav_compat)
     target_link_libraries(clamdscan PRIVATE clamav_compat)
