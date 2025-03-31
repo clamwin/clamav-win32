@@ -37,7 +37,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 - libxml2: 2.14.0
 - pcre2: 10.45
 - PDCurses: git-6ba6df38
-- Winpthreads: git-b025331
+- Winpthreads: from MinGW-W64 git-90da6c6
 - zlib-ng: 2.2.4
 - UnRAR: 7.1.6
 
