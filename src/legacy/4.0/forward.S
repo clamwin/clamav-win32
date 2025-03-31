@@ -52,6 +52,9 @@ missing_module32next:
 .global __imp__MultiByteToWideChar@24
 .global _MultiByteToWideChar@24
 
+.global __imp__CreateThread@24
+.global _CreateThread@24
+
 __imp__RegisterWaitForSingleObject@24:
     .long thunk_pRegisterWaitForSingleObject@24
 __imp__UnregisterWait@4:
@@ -62,11 +65,21 @@ __imp__UnregisterWaitEx@8:
 __imp__MultiByteToWideChar@24:
     .long _MultiByteToWideChar_wrapper@24
 
+#ifndef _UNICODE
+__imp__CreateThread@24:
+    .long _MultiByteToWideChar_wrapper@24
+#endif
+
 .section .text
 .align 4
 
 _MultiByteToWideChar@24:
     jmp _MultiByteToWideChar_wrapper@24
+
+#ifndef _UNICODE
+_CreateThread@24:
+    jmp _CreateThread_wrapper@24
+#endif
 
 thunk_pRegisterWaitForSingleObject@24:
     jmp *_pRegisterWaitForSingleObject

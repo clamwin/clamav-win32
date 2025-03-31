@@ -316,12 +316,28 @@ int WINAPI MultiByteToWideChar_wrapper(UINT CodePage, DWORD dwFlags, LPCCH lpMul
     return pMultiByteToWideChar(CodePage, dwFlags & ~MB_ERR_INVALID_CHARS, lpMultiByteStr, cbMultiByte, lpWideCharStr, cchWideChar);
 }
 
+#ifndef _UNICODE
+imp_CreateThread pCreateThread = NULL;
+// windows 98 does not like CreateThread with NULL lpThreadId
+HANDLE WINAPI CreateThread_wrapper(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize, LPTHREAD_START_ROUTINE lpStartAddress, LPVOID lpParameter, DWORD dwCreationFlags, LPDWORD lpThreadId)
+{
+    DWORD ThreadId;
+    if (!lpThreadId)
+        lpThreadId = &ThreadId;
+    return pCreateThread(lpThreadAttributes, dwStackSize, lpStartAddress, lpParameter, dwCreationFlags, lpThreadId);
+}
+#endif
+
 INITIALIZER(init_kernel32_4_0)
 {
     TRACE("Init @ " __FILE__ "\n");
     HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
     if (!kernel32) // meh
         return;
+
+#ifndef _UNICODE
+    IMPORT_FUNCTION(kernel32, CreateThread);
+#endif
 
     IMPORT_FUNCTION(kernel32, MultiByteToWideChar);
     IMPORT_FUNCTION(kernel32, RegisterWaitForSingleObject);
