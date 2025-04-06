@@ -2,6 +2,7 @@ enable_language(C ASM)
 
 list(APPEND LEGACY_DEFINES ${CLAMWIN_WINNT_VERSION} ${UNICODE_DEFINES})
 option(LEGACY_TRACE "Enable Compatibility Layer TRACE" OFF)
+option(LEGACY_TOOLS "Enable Compatibility Test Tools" OFF)
 
 if(LEGACY_TRACE)
     list(APPEND LEGACY_DEFINES LEGACY_TRACE)
@@ -54,7 +55,7 @@ function(add_legacy_executable TARGET SOURCES LINK_LIBRARY)
 endfunction()
 
 # test tools
-if(CLAMWIN_UNICODE_BUILD)
+if(LEGACY_TOOLS AND CLAMWIN_UNICODE_BUILD)
     add_legacy_executable(gfpn ${CLAMWIN_DIR}/src/legacy/tests/gfpn.c clamav_compat)
     add_legacy_executable(gfpn-native ${CLAMWIN_DIR}/src/legacy/tests/gfpn.c ntdll)
     add_legacy_executable(glpn ${CLAMWIN_DIR}/src/legacy/tests/glpn.c clamav_compat)
