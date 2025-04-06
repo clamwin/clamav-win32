@@ -32,12 +32,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 - OpenSSL: 3.4.1
 - bzip2: 1.0.8
-- curl: 8.12.1
+- curl: 8.13.0
 - json-c: 0.18-20240915
-- libxml2: 2.14.0
+- libxml2: 2.14.1
 - pcre2: 10.45
 - PDCurses: git-6ba6df38
-- Winpthreads: from MinGW-W64 git-90da6c6
+- Winpthreads: from MinGW-W64 git-2f7aff6
 - zlib-ng: 2.2.4
 - UnRAR: 7.1.6
 
