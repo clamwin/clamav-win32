@@ -40,6 +40,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 - Winpthreads: from MinGW-W64 git-2f7aff6
 - zlib-ng: 2.2.4
 - UnRAR: 7.1.6
+- Opencow (custom build) on Win9x
 
 ## Getting sources
 

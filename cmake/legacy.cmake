@@ -65,14 +65,31 @@ if(LEGACY_TOOLS AND CLAMWIN_UNICODE_BUILD)
 endif()
 
 if(NOT CLAMWIN_UNICODE_BUILD)
-    # link unicows
-    find_library(UNICOWS_LIBRARY
-        NAMES libunicows.a unicows libunicows
-        HINTS ${3RDPARTY_DIR}/libunicows
-        REQUIRED
-        NO_DEFAULT_PATH)
-    target_link_libraries(libclamav PRIVATE ${UNICOWS_LIBRARY})
-    target_link_libraries(libclamunrar PRIVATE ${UNICOWS_LIBRARY})
+    # melt in opencow
+    file(GLOB opencow_headers ${CLAMWIN_DIR}/src/legacy/opencow/*.h)
+    file(GLOB opencow_sources
+        ${CLAMWIN_DIR}/src/legacy/opencow/*.c
+        ${CLAMWIN_DIR}/src/legacy/opencow/*.cpp
+        ${CLAMWIN_DIR}/src/legacy/opencow/forward.S
+    )
+    add_library(opencow STATIC ${opencow_headers} ${opencow_sources})
+    target_include_directories(opencow PRIVATE ${LEGACY_INCLUDES})
+    target_compile_options(opencow PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall -Wno-attributes>)
+    target_link_options(opencow PRIVATE $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
+
+    target_link_libraries(libclamav PRIVATE opencow)
+    target_link_libraries(libfreshclam PRIVATE opencow)
+    target_link_libraries(libclamunrar PRIVATE opencow)
+    target_link_libraries(libclamunrar_iface PRIVATE opencow)
+
+    target_link_libraries(clamscan PRIVATE opencow)
+    target_link_libraries(sigtool PRIVATE opencow)
+    target_link_libraries(freshclam PRIVATE opencow)
+    target_link_libraries(clamd PRIVATE opencow)
+    target_link_libraries(clamdscan PRIVATE opencow)
+    target_link_libraries(clamdtop PRIVATE opencow)
+
+    install(FILES ${CLAMWIN_DIR}/src/legacy/opencow/LICENCE.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME opencow.txt)
 endif()
 
 if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501 AND CLAMAV_ARCH STREQUAL "x86")
@@ -82,6 +99,8 @@ if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501 AND CLAMAV_ARCH STREQUAL "x86")
     set_target_properties(clamav_rust PROPERTIES INTERFACE_LINK_LIBRARIES "${CLAMV_RUST_LIBS}")
     target_sources(clamav_compat PRIVATE ${CLAMWIN_DIR}/src/legacy/4.0/userenv.c)
 endif()
+
+install(FILES ${CLAMWIN_DIR}/src/legacy/LICENSE.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME legacy.txt)
 
 # "taint" needy executables
 target_link_libraries(libclamav PRIVATE clamav_compat)
