@@ -28,9 +28,11 @@ set(CURL_ZSTD OFF)
 
 set(_ssl_enabled ON)
 set(USE_OPENSSL ON)
-set(CURL_USE_OPENSSL ON)
 set(HAVE_SSL_SET0_WBIO 1)
 set(HAVE_OPENSSL_SRP 0)
+
+# must be OFF or libfreshclam will get openssl direct dependency, we export symbols in libclamav
+set(CURL_USE_OPENSSL OFF)
 
 if(CLAMWIN_UNICODE_BUILD)
     set(ENABLE_UNICODE ON)
@@ -59,7 +61,7 @@ if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
     set_source_files_properties(
         ${CURL_DIR}/lib/version_win32.c
         DIRECTORY ${CURL_DIR}/lib
-        PROPERTIES COMPILE_DEFINITIONS "_WIN32_WINNT=0x0400"
+        PROPERTIES COMPILE_DEFINITIONS "CURL_WINDOWS_UWP"
     )
     set_source_files_properties(
         ${CURL_DIR}/lib/asyn-thread.c

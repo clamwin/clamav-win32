@@ -182,6 +182,7 @@ SSL_get0_verified_chain
 SSL_get1_peer_certificate
 SSL_get_certificate
 SSL_get_current_cipher
+SSL_get_early_data_status
 SSL_get_error
 SSL_get_ex_data
 SSL_get_peer_cert_chain
@@ -194,9 +195,11 @@ SSL_new
 SSL_pending
 SSL_read
 SSL_SESSION_free
+SSL_SESSION_get_max_early_data
 SSL_SESSION_get_timeout
 SSL_set0_rbio
 SSL_set0_wbio
+SSL_set_alpn_protos
 SSL_set_bio
 SSL_set_connect_state
 SSL_set_ex_data
@@ -205,6 +208,7 @@ SSL_set_session
 SSL_shutdown
 SSL_version
 SSL_write
+SSL_write_early_data
 TLS_client_method
 TLS_method
 UI_create_method
