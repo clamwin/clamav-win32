@@ -14,6 +14,8 @@ option(ENABLE_LLVM "Enable JIT using LLVM Engine" OFF)
 set(ENABLE_LEGACY "OFF" CACHE STRING "Enable support for legacy Windows Versions")
 set_property(CACHE ENABLE_LEGACY PROPERTY STRINGS OFF unicode ansi)
 
+option(ENABLE_TEST_TOOLS "Enable Test Tools" OFF)
+
 if(ENABLE_LEGACY STREQUAL "unicode")
     set(CLAMWIN_UNICODE_BUILD ON)
     set(CLAMWIN_WINDOWS_VERSION 0x0501)
@@ -28,7 +30,7 @@ elseif(ENABLE_LEGACY STREQUAL "OFF")
     set(CLAMWIN_WINNT_VERSION _WIN32_WINNT=_WIN32_WINNT_VISTA)
 endif()
 
-if (CLAMWIN_UNICODE_BUILD)
+if(CLAMWIN_UNICODE_BUILD)
     set(UNICODE_DEFINES UNICODE _UNICODE)
 endif()
 
@@ -140,15 +142,21 @@ include(cmake/libclammspack.cmake)
 include(cmake/libclamav.cmake)
 include(cmake/libclamav_common.cmake)
 include(cmake/clambc.cmake)
-include(cmake/clamd.cmake)
-include(cmake/clamdscan.cmake)
 include(cmake/clamscan.cmake)
 include(cmake/freshclam.cmake)
 include(cmake/sigtool.cmake)
 include(cmake/libclamunrar.cmake)
-include(cmake/pdcurses.cmake)
-include(cmake/clamdtop.cmake)
-include(cmake/tools.cmake)
+
+if(CLAMWIN_UNICODE_BUILD)
+    include(cmake/clamd.cmake)
+    include(cmake/clamdscan.cmake)
+    include(cmake/pdcurses.cmake)
+    include(cmake/clamdtop.cmake)
+endif()
+
+if(ENABLE_TEST_TOOLS)
+    include(cmake/tools.cmake)
+endif()
 
 set_source_files_properties(${CLAMWIN_DIR}/src/helpers/cw_main.c
     PROPERTIES COMPILE_DEFINITIONS "${UNICODE_DEFINES}"
@@ -159,9 +167,11 @@ add_subdirectory(${CLAMAV_DIR}/libclamav_rust EXCLUDE_FROM_ALL)
 
 if(NOT ENABLE_LEGACY STREQUAL "OFF")
     message(STATUS "Legacy support enabled for: ${ENABLE_LEGACY}")
+
     if(MSVC)
         message(WARNING "Compatibility layer makes only sense on MinGW")
     endif()
+
     include(cmake/legacy.cmake)
 endif()
 
@@ -173,7 +183,11 @@ install(TARGETS ${CLAMAV_INSTALL_TARGETS}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}
 )
 
-set(DIST_FILES README.md clamd.conf freshclam.conf clamav.reg)
+set(DIST_FILES README.md freshclam.conf clamav.reg)
+
+if(CLAMWIN_UNICODE_BUILD)
+    list(APPEND DIST_FILES clamd.conf)
+endif()
 
 file(GLOB COPYRIGHT_FILES ${CLAMAV}/COPYING*)
 install(FILES ${COPYRIGHT_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright)

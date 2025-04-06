@@ -2,7 +2,6 @@ enable_language(C ASM)
 
 list(APPEND LEGACY_DEFINES ${CLAMWIN_WINNT_VERSION} ${UNICODE_DEFINES})
 option(LEGACY_TRACE "Enable Compatibility Layer TRACE" OFF)
-option(LEGACY_TOOLS "Enable Compatibility Test Tools" OFF)
 
 if(LEGACY_TRACE)
     list(APPEND LEGACY_DEFINES LEGACY_TRACE)
@@ -55,7 +54,7 @@ function(add_legacy_executable TARGET SOURCES LINK_LIBRARY)
 endfunction()
 
 # test tools
-if(LEGACY_TOOLS AND CLAMWIN_UNICODE_BUILD)
+if(CLAMWIN_UNICODE_BUILD AND ENABLE_TEST_TOOLS)
     add_legacy_executable(gfpn ${CLAMWIN_DIR}/src/legacy/tests/gfpn.c clamav_compat)
     add_legacy_executable(gfpn-native ${CLAMWIN_DIR}/src/legacy/tests/gfpn.c ntdll)
     add_legacy_executable(glpn ${CLAMWIN_DIR}/src/legacy/tests/glpn.c clamav_compat)
@@ -85,10 +84,6 @@ if(NOT CLAMWIN_UNICODE_BUILD)
     target_link_libraries(clamscan PRIVATE opencow)
     target_link_libraries(sigtool PRIVATE opencow)
     target_link_libraries(freshclam PRIVATE opencow)
-    target_link_libraries(clamd PRIVATE opencow)
-    target_link_libraries(clamdscan PRIVATE opencow)
-    target_link_libraries(clamdtop PRIVATE opencow)
-
     install(FILES ${CLAMWIN_DIR}/src/legacy/opencow/LICENCE.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME opencow.txt)
 endif()
 
@@ -110,11 +105,14 @@ target_link_libraries(sigtool PRIVATE clamav_compat)
 
 if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501 AND CLAMAV_ARCH STREQUAL "x86")
     target_link_libraries(freshclam PRIVATE clamav_compat)
-    target_link_libraries(clamd PRIVATE clamav_compat)
     target_link_libraries(clamscan PRIVATE clamav_compat)
-    target_link_libraries(clamdscan PRIVATE clamav_compat)
-    target_link_libraries(clamdtop PRIVATE clamav_compat)
     target_link_libraries(libclamunrar PRIVATE clamav_compat)
+
+    if(CLAMWIN_UNICODE_BUILD)
+        target_link_libraries(clamd PRIVATE clamav_compat)
+        target_link_libraries(clamdscan PRIVATE clamav_compat)
+        target_link_libraries(clamdtop PRIVATE clamav_compat)
+    endif()
 endif()
 
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
