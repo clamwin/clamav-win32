@@ -56,7 +56,7 @@ Source: "{#DistDir}\clambc.exe"; DestDir: "{app}"; Components: extra
 ; clamdtop
 Source: "{#DistDir}\clamdtop.exe"; DestDir: "{app}"; Components: extra
 ; copyright files
-Source: "{#DistDir}\copyright\*";  DestDir: "{app}/copyrights"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#DistDir}\copyright\*";  DestDir: "{app}/copyright"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Dirs]
 Name: {app}\db; Permissions: authusers-full
