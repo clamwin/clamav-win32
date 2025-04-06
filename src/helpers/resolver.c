@@ -58,8 +58,13 @@ IPHLPAPI_DLL_LINKAGE DWORD WINAPI GetNetworkParams(PFIXED_INFO pFixedInfo, PULON
 static imp_DnsQuery_A pDnsQuery_A = NULL;
 static imp_DnsRecordListFree pDnsRecordListFree = NULL;
 
+static OSVERSIONINFOW g_osvi = {0};
+
 INITIALIZER(init_resolver)
 {
+    g_osvi.dwOSVersionInfoSize = sizeof(g_osvi);
+    GetVersionExW(&g_osvi);
+
     HMODULE dnsapi = LoadLibrary(TEXT("dnsapi"));
     if (dnsapi)
     {
@@ -426,11 +431,18 @@ static int res_query_dnsapi(const char *dname, int class, int type, unsigned cha
     if (anslen <= sizeof(HEADER))
         return -1;
 
-    s = pDnsQuery_A(dname, (WORD)type,
-                    DNS_QUERY_BYPASS_CACHE | DNS_QUERY_NO_HOSTS_FILE | DNS_QUERY_DONT_RESET_TTL_VALUES,
-                    NULL, &rrs, NULL);
+    DWORD dwOptions = DNS_QUERY_BYPASS_CACHE | DNS_QUERY_DONT_RESET_TTL_VALUES;
+
+    // DNS_QUERY_NO_HOSTS_FILE is not supported under Windows 2000
+    if ((g_osvi.dwMajorVersion > 6) || ((g_osvi.dwMajorVersion == 5) && (g_osvi.dwMinorVersion > 0)))
+        dwOptions += DNS_QUERY_NO_HOSTS_FILE;
+
+    s = pDnsQuery_A(dname, (WORD)type, dwOptions, NULL, &rrs, NULL);
     if (s)
+    {
+        logg(LOGG_ERROR, "DnsQuery_A failed with %ld\n", s);
         return -1;
+    }
 
     h->id = 1;
     h->qr = 1; /* Reply */
