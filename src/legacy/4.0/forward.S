@@ -53,6 +53,8 @@ missing_module32next:
 .global __imp__MultiByteToWideChar@24
 .global _MultiByteToWideChar@24
 
+.global _GetUserProfileDirectoryW@12
+
 .global __imp__CreateThread@24
 .global _CreateThread@24
 
@@ -78,6 +80,9 @@ __imp__CreateThread@24:
 
 _MultiByteToWideChar@24:
     jmp _MultiByteToWideChar_wrapper@24
+
+_GetUserProfileDirectoryW@12:
+    jmp *_pGetUserProfileDirectoryW
 
 #ifndef _UNICODE
 _CreateThread@24:

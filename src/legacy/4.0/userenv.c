@@ -22,9 +22,12 @@
  * SOFTWARE.
  */
 
+#ifndef _WIN64
 #include "legacy.h"
+#include "dynload.h"
+#include "initializer.h"
 
-BOOL WINAPI GetUserProfileDirectoryA(HANDLE hToken, LPSTR lpProfileDir, LPDWORD lpcchSize)
+BOOL WINAPI GetUserProfileDirectoryA_compat(HANDLE hToken, LPSTR lpProfileDir, LPDWORD lpcchSize)
 {
     char szPath[MAX_PATH];
     DWORD dwSize;
@@ -53,7 +56,7 @@ BOOL WINAPI GetUserProfileDirectoryA(HANDLE hToken, LPSTR lpProfileDir, LPDWORD 
     return TRUE;
 }
 
-BOOL WINAPI GetUserProfileDirectoryW(HANDLE hToken, LPWSTR lpProfileDir, LPDWORD lpcchSize)
+BOOL WINAPI GetUserProfileDirectoryW_compat(HANDLE hToken, LPWSTR lpProfileDir, LPDWORD lpcchSize)
 {
     char szPath[MAX_PATH + 1];
 
@@ -63,7 +66,7 @@ BOOL WINAPI GetUserProfileDirectoryW(HANDLE hToken, LPWSTR lpProfileDir, LPDWORD
         return FALSE;
     }
 
-    if (!GetUserProfileDirectoryA(NULL, szPath, lpcchSize))
+    if (!GetUserProfileDirectoryA_compat(NULL, szPath, lpcchSize))
         return FALSE;
 
     if (!MultiByteToWideChar(CP_ACP, 0, szPath, *lpcchSize, lpProfileDir, *lpcchSize))
@@ -71,3 +74,15 @@ BOOL WINAPI GetUserProfileDirectoryW(HANDLE hToken, LPWSTR lpProfileDir, LPDWORD
 
     return TRUE;
 }
+
+imp_GetUserProfileDirectoryW pGetUserProfileDirectoryW = GetUserProfileDirectoryW_compat;
+
+INITIALIZER(init_userenv_4_0)
+{
+    TRACE("Init @ " __FILE__ "\n");
+    HMODULE userenv = LoadLibrary(TEXT("userenv"));
+    if (userenv)
+        IMPORT_FUNCTION(userenv, GetUserProfileDirectoryW);
+}
+
+#endif // _WIN64

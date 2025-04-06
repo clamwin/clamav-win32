@@ -75,7 +75,7 @@ if(NOT CLAMWIN_UNICODE_BUILD)
     target_link_libraries(libclamunrar PRIVATE ${UNICOWS_LIBRARY})
 endif()
 
-if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
+if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501 AND CLAMAV_ARCH STREQUAL "x86")
     # userenv
     get_target_property(CLAMV_RUST_LIBS clamav_rust INTERFACE_LINK_LIBRARIES)
     list(REMOVE_ITEM CLAMV_RUST_LIBS -luserenv userenv)
