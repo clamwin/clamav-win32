@@ -176,7 +176,7 @@ void svc_register(TCHAR *name)
     svc_getcpvalue(name);
 
     evStart = CreateEvent(NULL, TRUE, FALSE, NULL);
-    DispatcherThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)StartServiceCtrlDispatcherA, (LPVOID)DT, 0, &tid);
+    DispatcherThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)StartServiceCtrlDispatcher, (LPVOID)DT, 0, &tid);
 }
 
 void svc_ready(void)
