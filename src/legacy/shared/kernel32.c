@@ -23,26 +23,6 @@
  */
 
 #include "legacy.h"
-#include "initializer.h"
-
- // Static variables to hold the baseline values.
- // They are initialized on the first call.
-static LARGE_INTEGER qpcBase = { 0 };      // Baseline performance counter value.
-static FILETIME ftBase = { 0 };            // Baseline system time corresponding to qpcBase.
-static LARGE_INTEGER qpcFrequency = { 0 }; // Performance counter frequency.
-
-INITIALIZER(init_kernel32_shared)
-{
-    TRACE("Init @ " __FILE__ "\n");
-
-    // Set the baseline.
-    // Retrieve the performance counter frequency.
-    QueryPerformanceFrequency(&qpcFrequency);
-    // Record the current performance counter value.
-    QueryPerformanceCounter(&qpcBase);
-    // Retrieve the system time as a FILETIME.
-    GetSystemTimeAsFileTime(&ftBase);
-}
 
 int WINAPI CompareStringOrdinal(
     LPCWCH lpString1,
@@ -196,30 +176,6 @@ HANDLE WINAPI ReOpenFile(
 
     SetLastError(0);
     return FileHandle;
-}
-
-VOID WINAPI GetSystemTimePreciseAsFileTime(LPFILETIME lpSystemTimeAsFileTime)
-{
-    TRACE("GetSystemTimePreciseAsFileTime(0x%p)\n", lpSystemTimeAsFileTime);
-
-    // Get the current performance counter value.
-    LARGE_INTEGER qpcNow = {0};
-    QueryPerformanceCounter(&qpcNow);
-
-    // Calculate the difference in counter ticks.
-    LONGLONG ticksElapsed = qpcNow.QuadPart - qpcBase.QuadPart;
-    // Convert the tick difference to 100-nanosecond intervals.
-    // 1 second = 10,000,000 (10^7) 100-ns intervals.
-    ULONGLONG timeOffset = (ULONGLONG)((ticksElapsed * 10000000ULL) / qpcFrequency.QuadPart);
-
-    // Convert the baseline FILETIME to a 64-bit integer.
-    ULONGLONG baseTime = (((ULONGLONG)ftBase.dwHighDateTime) << 32) | ftBase.dwLowDateTime;
-    // Compute the high-resolution time.
-    ULONGLONG preciseTime = baseTime + timeOffset;
-
-    // Store the result back into the FILETIME structure.
-    lpSystemTimeAsFileTime->dwLowDateTime = (DWORD)(preciseTime & 0xFFFFFFFF);
-    lpSystemTimeAsFileTime->dwHighDateTime = (DWORD)(preciseTime >> 32);
 }
 
 #ifndef CREATE_WAITABLE_TIMER_HIGH_RESOLUTION

@@ -1,4 +1,4 @@
-enable_language(C CXX ASM)
+enable_language(C CXX ASM ASM_MASM)
 
 file(GLOB libclamav_sources
     ${CLAMAV_DIR}/libclamav/*.c
@@ -34,6 +34,10 @@ list(APPEND libclamav_win32_sources
     ${CLAMAV_DIR}/win32/compat/utf8_util.c
 )
 
+if(MSVC)
+    list(APPEND libclamav_win32_sources ${CLAMWIN_DIR}/src/dllmain/forward.asm)
+endif()
+
 if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501 AND CLAMAV_ARCH STREQUAL "x86")
     list(APPEND CLAMWIN_DEFINES C_WINDOWS)
 endif()
@@ -64,6 +68,9 @@ if(MSVC)
         "/DELAYLOAD:bcryptprimitives.dll"
         "/DELAYLOAD:api-ms-win-core-synch-l1-2-0.dll"
     )
+    if(CLAMAV_ARCH STREQUAL "x86")
+        target_link_options(libclamav PRIVATE "/SAFESEH:NO")
+    endif()
 endif()
 
 add_library(ClamAV::libclamav ALIAS libclamav)
@@ -73,7 +80,6 @@ target_include_directories(libclamav PRIVATE ${CLAMWIN_INCLUDES} ${CLAMAV_DIR}/w
 target_compile_definitions(libclamav PRIVATE ${CLAMWIN_DEFINES})
 target_compile_options(libclamav PRIVATE
     $<$<AND:$<CXX_COMPILER_ID:GNU>,$<COMPILE_LANGUAGE:CXX>>:-Wno-missing-template-keyword -Wno-init-list-lifetime>
-    $<$<C_COMPILER_ID:MSVC>:/wd4267 /wd4333 /wd4334>
 )
 
 target_link_libraries(libclamav PRIVATE

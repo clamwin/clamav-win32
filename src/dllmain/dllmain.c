@@ -25,6 +25,9 @@
 #include <winsock2.h>
 #include <stdio.h>
 
+extern imp_GetSystemTimePreciseAsFileTime pGetSystemTimePreciseAsFileTime;
+extern void init_sysinfoapi(void);
+
 static imp_HeapSetInformation pHeapSetInformation = NULL;
 
 #ifndef _WIN64
@@ -70,6 +73,10 @@ static void processattach(void)
     if (kernel32) // meh
     {
         IMPORT_FUNCTION(kernel32, HeapSetInformation);
+        IMPORT_FUNCTION(kernel32, GetSystemTimePreciseAsFileTime);
+        if (!pGetSystemTimePreciseAsFileTime)
+            init_sysinfoapi();
+
 #ifndef _WIN64
         IMPORT_FUNCTION(kernel32, IsWow64Process);
 

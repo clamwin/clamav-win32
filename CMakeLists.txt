@@ -121,7 +121,14 @@ elseif(MSVC)
     set(CMAKE_BUILD_TYPE "RelWithDebInfo")
     set(CMAKE_DEBUG_POSTFIX d)
     add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
-    add_compile_options(/wd4996 /wd4005 /wd4820)
+    add_compile_options(
+        $<$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>:/wd4005>
+        $<$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>:/wd4267>
+        $<$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>:/wd4333>
+        $<$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>:/wd4334>
+        $<$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>:/wd4820>
+        $<$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>:/wd4996>
+    )
     add_link_options(/ignore:4099)
 endif()
 

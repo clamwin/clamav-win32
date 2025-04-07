@@ -39,6 +39,7 @@
 
 typedef BOOL(WINAPI *imp_IsWow64Process)(HANDLE hProcess, PBOOL Wow64Process);
 typedef BOOL(WINAPI *imp_Wow64DisableWow64FsRedirection)(PVOID OldValue);
+typedef VOID(WINAPI *imp_GetSystemTimePreciseAsFileTime)(LPFILETIME lpSystemTimeAsFileTime);
 
 typedef BOOL(WINAPI *imp_CreateHardLinkW)(LPCWSTR lpFileName, LPCWSTR lpExistingFileName, LPSECURITY_ATTRIBUTES lpSecurityAttributes);
 typedef DWORD(WINAPI *imp_GetLongPathNameW)(LPCWSTR lpszShortPath, LPWSTR lpszLongPath, DWORD cchBuffer);
