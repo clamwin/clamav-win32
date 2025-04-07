@@ -38,10 +38,138 @@ static HANDLE evStart;
 static HANDLE DispatcherThread;
 static int checkpoint_every = 5000;
 
+#if defined(_UNICODE) && _WIN32_WINNT > _WIN32_WINNT_WINXP
+#include <shellapi.h>
+
+bool IsProcessElevated()
+{
+    HANDLE hToken;
+    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
+        return false;
+
+    TOKEN_ELEVATION elevation;
+    DWORD dwSize;
+
+    bool isElevated = false;
+    if (GetTokenInformation(hToken, TokenElevation, &elevation, sizeof(elevation), &dwSize))
+        isElevated = (elevation.TokenIsElevated != 0);
+
+    CloseHandle(hToken);
+    return isElevated;
+}
+
+static void AttachParentConsole(void)
+{
+    DWORD dwProcessList[1];
+    if (GetConsoleProcessList(dwProcessList, 1) != 1)
+        return;
+
+    FreeConsole();
+
+    if (!AttachConsole(ATTACH_PARENT_PROCESS))
+    {
+        wchar_t text[1024];
+        wsprintf(text, L"Failed with error %ld", GetLastError());
+        MessageBox(NULL, text, L"AttachConsole", MB_OK);
+        AllocConsole();
+    }
+
+    fflush(stdout);
+    fflush(stderr);
+
+    (void)freopen("CONOUT$", "w", stdout);
+    (void)freopen("CONOUT$", "w", stderr);
+    (void)freopen("CONIN$", "r", stdin);
+}
+
+static bool EnsureElevated()
+{
+    if (IsProcessElevated())
+    {
+        AttachParentConsole();
+        return true;
+    }
+
+    wchar_t szExePath[MAX_PATH];
+    if (!GetModuleFileName(NULL, szExePath, MAX_PATH - 1))
+    {
+        fprintf(stderr, "GetModuleFileName() failed with %ld\n", GetLastError());
+        return false;
+    }
+
+    int argc;
+    LPWSTR cmdLine = GetCommandLineW();
+    LPWSTR *argv = CommandLineToArgvW(cmdLine, &argc);
+
+    if (!argv)
+    {
+        fprintf(stderr, "CommandLineToArgvW() failed with %ld\n", GetLastError());
+        return false;
+    }
+
+    size_t totalLength = 0;
+    for (int i = 1; i < argc; i++)
+        totalLength += wcslen(argv[i]) + 1;
+
+    wchar_t *params = malloc((totalLength + 1) * sizeof(wchar_t));
+
+    if (!params)
+    {
+        LocalFree(argv);
+        fprintf(stderr, "Out of memory\n");
+        return false;
+    }
+
+    params[0] = L'\0';
+    for (int i = 1; i < argc; i++)
+    {
+        wcscat(params, argv[i]);
+        if (i < argc - 1)
+            wcscat(params, L" ");
+    }
+
+    LocalFree(argv);
+
+    SHELLEXECUTEINFOW sei = {0};
+    sei.cbSize = sizeof(sei);
+    sei.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_NO_CONSOLE;
+    sei.hwnd = NULL;
+    sei.lpVerb = L"runas";
+    sei.lpFile = szExePath;
+    sei.lpParameters = params;
+    sei.nShow = SW_HIDE;
+
+    if (!ShellExecuteExW(&sei))
+    {
+        DWORD le = GetLastError();
+        if (le == ERROR_CANCELLED)
+            printf("No action\n");
+        else
+            fprintf(stderr, "ShellExecuteExW() failed with %ld\n", le);
+    }
+
+    if (sei.hProcess)
+    {
+        DWORD code;
+        WaitForSingleObject(sei.hProcess, INFINITE);
+        GetExitCodeProcess(sei.hProcess, &code);
+        CloseHandle(sei.hProcess);
+    }
+
+    free(params);
+    return false;
+}
+#else
+#define EnsureElevated() (true)
+#endif
+
 bool svc_uninstall(const TCHAR *name, bool verbose)
 {
     SC_HANDLE sm, svc;
     bool ret = false;
+
+    if (!EnsureElevated())
+        return true;
 
     if (!(sm = OpenSCManager(NULL, NULL, DELETE)))
     {
@@ -88,6 +216,9 @@ bool svc_install(const TCHAR *name, const TCHAR *dname, TCHAR *desc)
     TCHAR modulepath[MAX_PATH];
     TCHAR binpath[MAX_PATH];
     SERVICE_DESCRIPTION sdesc = {desc};
+
+    if (!EnsureElevated())
+        return true;
 
     if (!GetModuleFileName(NULL, modulepath, MAX_PATH - 1))
     {
