@@ -182,11 +182,11 @@ bool svc_uninstall(const TCHAR *name, bool verbose)
         if (DeleteService(svc))
         {
             if (verbose)
-                _tprintf(TEXT("Service %s successfully removed\n"), name);
+                _tprintf(TEXT("Service %S successfully removed\n"), name);
         }
         else
         {
-            _ftprintf(stderr, TEXT("Unable to Open Service %s (%ld)\n"), name, GetLastError());
+            _ftprintf(stderr, TEXT("Unable to Open Service %S (%ld)\n"), name, GetLastError());
             ret = false;
         }
     }
@@ -195,11 +195,11 @@ bool svc_uninstall(const TCHAR *name, bool verbose)
         if (GetLastError() == ERROR_SERVICE_DOES_NOT_EXIST)
         {
             if (verbose)
-                _tprintf(TEXT("Service %s does not exist\n"), name);
+                _tprintf(TEXT("Service %S does not exist\n"), name);
         }
         else
         {
-            _ftprintf(stderr, TEXT("Unable to Open Service %s (%ld)\n"), name, GetLastError());
+            _ftprintf(stderr, TEXT("Unable to Open Service %S (%ld)\n"), name, GetLastError());
             ret = false;
         }
     }
@@ -253,7 +253,7 @@ bool svc_install(const TCHAR *name, const TCHAR *dname, TCHAR *desc)
 
     if (!svc)
     {
-        _ftprintf(stderr, TEXT("Unable to Create Service %s (%ld)\n"), name, GetLastError());
+        _ftprintf(stderr, TEXT("Unable to Create Service %S (%ld)\n"), name, GetLastError());
         CloseServiceHandle(sm);
         return false;
     }
@@ -267,7 +267,7 @@ bool svc_install(const TCHAR *name, const TCHAR *dname, TCHAR *desc)
         if (pChangeServiceConfig2W)
         {
             if (!pChangeServiceConfig2W(svc, SERVICE_CONFIG_DESCRIPTION, &sdesc))
-                _ftprintf(stderr, L"Unable to set description for Service %s (%ld)\n", name, GetLastError());
+                _ftprintf(stderr, L"Unable to set description for Service %S (%ld)\n", name, GetLastError());
         }
     }
 #endif
@@ -275,8 +275,8 @@ bool svc_install(const TCHAR *name, const TCHAR *dname, TCHAR *desc)
     CloseServiceHandle(svc);
     CloseServiceHandle(sm);
 
-    _tprintf(TEXT("Service %s successfully created.\n"), name);
-    _tprintf(TEXT("Use 'net start %s' and 'net stop %s' to start/stop the service.\n"), name, name);
+    _tprintf(TEXT("Service %S successfully created.\n"), name);
+    _tprintf(TEXT("Use 'net start %S' and 'net stop %S' to start/stop the service.\n"), name, name);
     return true;
 }
 
