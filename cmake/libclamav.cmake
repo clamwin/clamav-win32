@@ -36,6 +36,8 @@ list(APPEND libclamav_win32_sources
 
 if(MSVC)
     list(APPEND libclamav_win32_sources ${CLAMWIN_DIR}/src/dllmain/forward.asm)
+else()
+    list(APPEND libclamav_win32_sources ${CLAMWIN_DIR}/src/dllmain/forward.S)
 endif()
 
 if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501 AND CLAMAV_ARCH STREQUAL "x86")
