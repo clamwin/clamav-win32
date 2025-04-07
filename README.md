@@ -57,6 +57,11 @@ Clone repository using:
   [Baltimore CyberTrust Root](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt)
   (double click on .crt file and follow the wizard)
 
+  On legacy versions a crt bundle is used instead, if you get a message like:
+  `ERROR: Failed to convert system certificate to x509.`
+  it's probabily and old bogus cert you can safely remove from windows cert manager,
+  on my system `Japan Certification Services, Inc. SecureSign RootCA1, RootCA2 and RootCA3`
+
 ## Running Clamd and FreshClam as services
 
 - import `clamav.reg` file
