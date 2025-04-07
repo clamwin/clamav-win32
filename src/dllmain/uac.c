@@ -18,11 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <windows.h>
+
 #ifdef _UNICODE
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <windows.h>
 #include <shellapi.h>
 
 #include "dynload.h"
@@ -160,6 +161,6 @@ BOOL EnsureElevated()
 #else
 BOOL EnsureElevated()
 {
-    return TRUE
+    return TRUE;
 }
 #endif // _UNICODE
