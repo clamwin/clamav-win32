@@ -22,18 +22,20 @@
 #ifndef _SERVICE_H_
 #define _SERVICE_H_
 
-#include <windows.h>
 #include <stdbool.h>
-#include <tchar.h>
 
-bool svc_uninstall(const TCHAR *name, bool verbose);
-bool svc_install(const TCHAR *name, const TCHAR *dname, TCHAR *desc);
-void svc_register(TCHAR *name);
+#ifdef _UNICODE
+bool svc_uninstall(const wchar_t *name, bool verbose);
+bool svc_install(const wchar_t *name, const wchar_t *dname, wchar_t *desc);
+void svc_register(wchar_t *name);
 void svc_ready(void);
 int svc_checkpoint(const char *type, const char *name, unsigned int custom, void *context);
 
-#define svc_install(name, dname, desc) svc_install(TEXT(name), TEXT(dname), TEXT(desc))
-#define svc_uninstall(name, verbose) svc_uninstall(TEXT(name), verbose)
-#define svc_register(name) svc_register(TEXT(name))
-
+#define _QUOTE(quote) L##quote
+#define svc_install(name, dname, desc) svc_install(_QUOTE(name), _QUOTE(dname), _QUOTE(desc))
+#define svc_uninstall(name, verbose) svc_uninstall(_QUOTE(name), verbose)
+#define svc_register(name) svc_register(_QUOTE(name))
+#else
+// TODO
+#endif
 #endif // _SERVICE_H_

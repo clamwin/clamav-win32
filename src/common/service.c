@@ -19,26 +19,26 @@
  *  MA 02110-1301, USA.
  */
 
+#ifdef _UNICODE
 #include <stdio.h>
 #include <stdbool.h>
 #include <windows.h>
 #include <winsvc.h>
-#include <tchar.h>
 
 #include "dynload.h"
 #include "output.h"
 
-void WINAPI ServiceMain(DWORD dwArgc, LPTSTR *lpszArgv);
+void WINAPI ServiceMain(DWORD dwArgc, LPWSTR *lpszArgv);
 
 static SERVICE_STATUS svc;
 static SERVICE_STATUS_HANDLE svc_handle;
-static SERVICE_TABLE_ENTRY DT[] = {{TEXT("Service"), ServiceMain}, {NULL, NULL}};
+static SERVICE_TABLE_ENTRY DT[] = {{L"Service", ServiceMain}, {NULL, NULL}};
 
 static HANDLE evStart;
 static HANDLE DispatcherThread;
 static int checkpoint_every = 5000;
 
-#if defined(_UNICODE) && _WIN32_WINNT > _WIN32_WINNT_WINXP
+#if _WIN32_WINNT > _WIN32_WINNT_WINXP
 #include <shellapi.h>
 
 bool IsProcessElevated()
@@ -130,7 +130,7 @@ static bool EnsureElevated()
 
     LocalFree(argv);
 
-    SHELLEXECUTEINFOW sei = {0};
+    SHELLEXECUTEINFO sei = {0};
     sei.cbSize = sizeof(sei);
     sei.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_NO_CONSOLE;
     sei.hwnd = NULL;
@@ -139,13 +139,13 @@ static bool EnsureElevated()
     sei.lpParameters = params;
     sei.nShow = SW_HIDE;
 
-    if (!ShellExecuteExW(&sei))
+    if (!ShellExecuteEx(&sei))
     {
         DWORD le = GetLastError();
         if (le == ERROR_CANCELLED)
             printf("No action\n");
         else
-            fprintf(stderr, "ShellExecuteExW() failed with %ld\n", le);
+            fprintf(stderr, "ShellExecuteEx() failed with %ld\n", le);
     }
 
     if (sei.hProcess)
@@ -161,9 +161,9 @@ static bool EnsureElevated()
 }
 #else
 #define EnsureElevated() (true)
-#endif
+#endif // _WIN32_WINNT > _WIN32_WINNT_WINXP
 
-bool svc_uninstall(const TCHAR *name, bool verbose)
+bool svc_uninstall(const wchar_t *name, bool verbose)
 {
     SC_HANDLE sm, svc;
     bool ret = false;
@@ -173,7 +173,7 @@ bool svc_uninstall(const TCHAR *name, bool verbose)
 
     if (!(sm = OpenSCManager(NULL, NULL, DELETE)))
     {
-        _ftprintf(stderr, TEXT("Unable to Open SCManager (%ld)\n"), GetLastError());
+        fwprintf(stderr, L"Unable to Open SCManager (%ld)\n", GetLastError());
         return false;
     }
 
@@ -182,11 +182,11 @@ bool svc_uninstall(const TCHAR *name, bool verbose)
         if (DeleteService(svc))
         {
             if (verbose)
-                _tprintf(TEXT("Service %S successfully removed\n"), name);
+                wprintf(L"Service %ls successfully removed\n", name);
         }
         else
         {
-            _ftprintf(stderr, TEXT("Unable to Open Service %S (%ld)\n"), name, GetLastError());
+            fwprintf(stderr, L"Unable to Open Service %ls (%ld)\n", name, GetLastError());
             ret = false;
         }
     }
@@ -195,11 +195,11 @@ bool svc_uninstall(const TCHAR *name, bool verbose)
         if (GetLastError() == ERROR_SERVICE_DOES_NOT_EXIST)
         {
             if (verbose)
-                _tprintf(TEXT("Service %S does not exist\n"), name);
+                wprintf(L"Service %ls does not exist\n", name);
         }
         else
         {
-            _ftprintf(stderr, TEXT("Unable to Open Service %S (%ld)\n"), name, GetLastError());
+            fwprintf(stderr, L"Unable to Open Service %ls (%ld)\n", name, GetLastError());
             ret = false;
         }
     }
@@ -210,11 +210,11 @@ bool svc_uninstall(const TCHAR *name, bool verbose)
     return ret;
 }
 
-bool svc_install(const TCHAR *name, const TCHAR *dname, TCHAR *desc)
+bool svc_install(const wchar_t *name, const wchar_t *dname, wchar_t *desc)
 {
     SC_HANDLE sm, svc;
-    TCHAR modulepath[MAX_PATH];
-    TCHAR binpath[MAX_PATH];
+    wchar_t modulepath[MAX_PATH];
+    wchar_t binpath[MAX_PATH];
     SERVICE_DESCRIPTION sdesc = {desc};
 
     if (!EnsureElevated())
@@ -222,7 +222,7 @@ bool svc_install(const TCHAR *name, const TCHAR *dname, TCHAR *desc)
 
     if (!GetModuleFileName(NULL, modulepath, MAX_PATH - 1))
     {
-        _ftprintf(stderr, TEXT("Unable to get the executable name (%ld)\n"), GetLastError());
+        fprintf(stderr, "Unable to get the executable name (%ld)\n", GetLastError());
         return false;
     }
 
@@ -230,14 +230,14 @@ bool svc_install(const TCHAR *name, const TCHAR *dname, TCHAR *desc)
 
     if (!(sm = OpenSCManager(NULL, NULL, SC_MANAGER_CREATE_SERVICE | DELETE)))
     {
-        _ftprintf(stderr, TEXT("Unable to Open SCManager (%ld)\n"), GetLastError());
+        fprintf(stderr, "Unable to Open SCManager (%ld)\n", GetLastError());
         return false;
     }
 
-    if (_tcschr(modulepath, TEXT(' ')))
-        _sntprintf(binpath, MAX_PATH - 1, TEXT("\"%s\" --daemon --service-mode"), modulepath);
+    if (wcschr(modulepath, L' '))
+        _snwprintf(binpath, MAX_PATH - 1, L"\"%ls\" --daemon --service-mode", modulepath);
     else
-        _sntprintf(binpath, MAX_PATH - 1, TEXT("%s --daemon --service-mode"), modulepath);
+        _snwprintf(binpath, MAX_PATH - 1, L"%ls --daemon --service-mode", modulepath);
     binpath[MAX_PATH - 1] = L'\0';
 
     svc = CreateService(sm, name, dname, SERVICE_CHANGE_CONFIG,
@@ -249,58 +249,56 @@ bool svc_install(const TCHAR *name, const TCHAR *dname, TCHAR *desc)
                         NULL, /* Tag Id */
                         NULL, /* Dependencies */
                         NULL, /* User -> Local System */
-                        TEXT(""));
+                        L"");
 
     if (!svc)
     {
-        _ftprintf(stderr, TEXT("Unable to Create Service %S (%ld)\n"), name, GetLastError());
+        fwprintf(stderr, L"Unable to Create Service %ls (%ld)\n", name, GetLastError());
         CloseServiceHandle(sm);
         return false;
     }
 
-#ifdef _UNICODE
     imp_ChangeServiceConfig2W pChangeServiceConfig2W = NULL;
-    HMODULE advapi32 = GetModuleHandle(TEXT("advapi32"));
+    HMODULE advapi32 = GetModuleHandle(L"advapi32");
     if (advapi32)
     {
         IMPORT_FUNCTION(advapi32, ChangeServiceConfig2W);
         if (pChangeServiceConfig2W)
         {
             if (!pChangeServiceConfig2W(svc, SERVICE_CONFIG_DESCRIPTION, &sdesc))
-                _ftprintf(stderr, L"Unable to set description for Service %S (%ld)\n", name, GetLastError());
+                fwprintf(stderr, L"Unable to set description for Service %ls (%ld)\n", name, GetLastError());
         }
     }
-#endif
 
     CloseServiceHandle(svc);
     CloseServiceHandle(sm);
 
-    _tprintf(TEXT("Service %S successfully created.\n"), name);
-    _tprintf(TEXT("Use 'net start %S' and 'net stop %S' to start/stop the service.\n"), name, name);
+    wprintf(L"Service %ls successfully created.\n", name);
+    wprintf(L"Use 'net start %ls' and 'net stop %ls' to start/stop the service.\n", name, name);
     return true;
 }
 
-static void svc_getcpvalue(const TCHAR *name)
+static void svc_getcpvalue(const wchar_t *name)
 {
     HKEY hKey;
     DWORD dwType;
     DWORD value = checkpoint_every, vlen = sizeof(DWORD);
-    TCHAR subkey[MAX_PATH];
+    wchar_t subkey[MAX_PATH];
 
-    _sntprintf(subkey, MAX_PATH - 1, TEXT("SYSTEM\\CurrentControlSet\\Services\\%s"), name);
-    subkey[MAX_PATH - 1] = 0;
+    _snwprintf(subkey, MAX_PATH - 1, L"SYSTEM\\CurrentControlSet\\Services\\%ls", name);
+    subkey[MAX_PATH - 1] = L'\0';
 
     if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS)
         return;
 
-    if ((RegQueryValueEx(hKey, TEXT("Checkpoint"), NULL, &dwType, (LPBYTE)&value, &vlen) == ERROR_SUCCESS) &&
+    if ((RegQueryValueEx(hKey, L"Checkpoint", NULL, &dwType, (LPBYTE)&value, &vlen) == ERROR_SUCCESS) &&
         (vlen == sizeof(DWORD) && (dwType == REG_DWORD)))
         checkpoint_every = value;
 
     RegCloseKey(hKey);
 }
 
-void svc_register(TCHAR *name)
+void svc_register(wchar_t *name)
 {
     DWORD tid;
     DT->lpServiceName = name;
@@ -364,7 +362,7 @@ BOOL WINAPI cw_stop_ctrl_handler(DWORD CtrlType)
     return TRUE;
 }
 
-void WINAPI ServiceMain(DWORD dwArgc, LPTSTR *lpszArgv)
+void WINAPI ServiceMain(DWORD dwArgc, LPWSTR *lpszArgv)
 {
     svc.dwServiceType = SERVICE_WIN32;
     svc.dwCurrentState = SERVICE_START_PENDING;
@@ -390,3 +388,4 @@ void WINAPI ServiceMain(DWORD dwArgc, LPTSTR *lpszArgv)
     WaitForSingleObject(DispatcherThread, INFINITE);
     cw_stop_ctrl_handler(CTRL_C_EVENT);
 }
+#endif // _UNICODE
