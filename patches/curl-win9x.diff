@@ -1,0 +1,13 @@
+diff --git a/lib/cf-socket.c b/lib/cf-socket.c
+index a6f98886c..46cb9bca3 100644
+--- a/lib/cf-socket.c
++++ b/lib/cf-socket.c
+@@ -1217,7 +1217,7 @@ static CURLcode cf_socket_open(struct Curl_cfilter *cf,
+   }
+ #endif
+ 
+-#ifndef SOCK_NONBLOCK
++#if 0 //ndef SOCK_NONBLOCK
+   /* Set socket non-blocking, must be a non-blocking socket for
+    * a non-blocking connect. */
+   error = curlx_nonblock(ctx->sock, TRUE);
