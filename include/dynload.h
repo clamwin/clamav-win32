@@ -51,7 +51,7 @@ typedef BOOL(WINAPI *imp_Process32NextW)(HANDLE hSnapshot, LPPROCESSENTRY32 lppe
 typedef BOOL(WINAPI *imp_Module32FirstW)(HANDLE hSnapshot, LPMODULEENTRY32W lpme);
 typedef BOOL(WINAPI *imp_Module32NextW)(HANDLE hSnapshot, LPMODULEENTRY32W lpme);
 
-typedef BOOL(WINAPI *imp_ChangeServiceConfig2A)(SC_HANDLE hService, DWORD dwInfoLevel, LPVOID lpInfo);
+typedef BOOL(WINAPI *imp_ChangeServiceConfig2W)(SC_HANDLE hService, DWORD dwInfoLevel, LPVOID lpInfo);
 
 typedef PVOID(WINAPI *imp_AddVectoredExceptionHandler)(ULONG First, PVECTORED_EXCEPTION_HANDLER Handler);
 typedef BOOL(WINAPI *imp_RegisterWaitForSingleObject)(PHANDLE phNewWaitObject, HANDLE hObject, WAITORTIMERCALLBACK Callback, PVOID Context, ULONG dwMilliseconds, ULONG dwFlags);

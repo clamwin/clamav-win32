@@ -59,6 +59,11 @@ add_executable(freshclam
     ${freshclam_win32_sources}
 )
 
+set_source_files_properties(
+    ${CLAMAV_DIR}/freshclam/freshclam.c
+    PROPERTIES COMPILE_DEFINITIONS "${UNICODE_DEFINES}"
+)
+
 target_include_directories(freshclam PRIVATE ${CLAMWIN_INCLUDES} ${CLAMAV_DIR}/libfreshclam)
 target_compile_definitions(freshclam PRIVATE ${CLAMWIN_DEFINES})
 target_link_libraries(freshclam PRIVATE libfreshclam libclamav_common libclamav ws2_32)

@@ -20,7 +20,6 @@ if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501 AND CLAMAV_ARCH STREQUAL "x86")
     list(APPEND clamav_compat_sources
         ${CLAMWIN_DIR}/src/legacy/4.0/forward.S
         ${CLAMWIN_DIR}/src/legacy/4.0/rtlcapturecontext.S
-        ${CLAMWIN_DIR}/src/legacy/4.0/advapi32.c
         ${CLAMWIN_DIR}/src/legacy/4.0/kernel32.c
     )
 endif()

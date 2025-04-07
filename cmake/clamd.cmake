@@ -17,6 +17,11 @@ add_executable(clamd
     ${clamd_win32_sources}
 )
 
+set_source_files_properties(
+    ${CLAMAV_DIR}/clamd/clamd.c
+    PROPERTIES COMPILE_DEFINITIONS "${UNICODE_DEFINES}"
+)
+
 if(MSVC)
     target_sources(clamd PRIVATE ${CLAMWIN_DIR}/resources/compatibility.manifest)
 elseif(MINGW)

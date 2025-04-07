@@ -45,7 +45,6 @@ missing_module32first:
 missing_module32next:
     .asciz "Module32NextW is not supported, aborting.\n"
 
-.global __imp__ChangeServiceConfig2A@12
 .global __imp__RegisterWaitForSingleObject@24
 .global __imp__UnregisterWait@4
 .global __imp__UnregisterWaitEx@8
@@ -58,8 +57,6 @@ missing_module32next:
 .global __imp__CreateThread@24
 .global _CreateThread@24
 
-__imp__ChangeServiceConfig2A@12:
-    .long thunk_ChangeServiceConfig2A@12
 __imp__RegisterWaitForSingleObject@24:
     .long thunk_pRegisterWaitForSingleObject@24
 __imp__UnregisterWait@4:
@@ -89,8 +86,6 @@ _CreateThread@24:
     jmp _CreateThread_wrapper@24
 #endif
 
-thunk_ChangeServiceConfig2A@12:
-    jmp *_pChangeServiceConfig2A
 thunk_pRegisterWaitForSingleObject@24:
     jmp *_pRegisterWaitForSingleObject
 thunk_pUnregisterWait@4:
