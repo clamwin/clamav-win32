@@ -193,6 +193,7 @@ lsig_sub_matched
 cw_perror
 cw_strerror
 cw_sigcheck
+EnsureElevated
 
 ; zlib
 gzclose                                    @1118 NONAME

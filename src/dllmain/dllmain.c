@@ -28,6 +28,9 @@
 extern imp_GetSystemTimePreciseAsFileTime pGetSystemTimePreciseAsFileTime;
 extern void init_sysinfoapi(void);
 
+extern imp_AttachConsole pAttachConsole;
+extern imp_GetConsoleProcessList pGetConsoleProcessList;
+
 static imp_HeapSetInformation pHeapSetInformation = NULL;
 
 #ifndef _WIN64
@@ -76,6 +79,9 @@ static void processattach(void)
         IMPORT_FUNCTION(kernel32, GetSystemTimePreciseAsFileTime);
         if (!pGetSystemTimePreciseAsFileTime)
             init_sysinfoapi();
+
+        IMPORT_FUNCTION(kernel32, AttachConsole);
+        IMPORT_FUNCTION(kernel32, GetConsoleProcessList);
 
 #ifndef _WIN64
         IMPORT_FUNCTION(kernel32, IsWow64Process);
