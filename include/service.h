@@ -22,6 +22,7 @@
 #ifndef _SERVICE_H_
 #define _SERVICE_H_
 
+#include <windows.h>
 #include <stdbool.h>
 
 #ifdef _UNICODE
@@ -36,6 +37,11 @@ int svc_checkpoint(const char *type, const char *name, unsigned int custom, void
 #define svc_uninstall(name, verbose) svc_uninstall(_QUOTE(name), verbose)
 #define svc_register(name) svc_register(_QUOTE(name))
 #else
-// TODO
+#define svc_install(...) \
+    fprintf(stderr, "Service is not supported on this build\n")
+#define svc_uninstall(...) \
+    fprintf(stderr, "Service is not supported on this build\n")
+#define svc_register(name)
+#define svc_ready()
 #endif
 #endif // _SERVICE_H_
