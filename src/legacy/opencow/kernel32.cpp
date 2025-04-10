@@ -545,7 +545,7 @@ FindResourceW(
     return ::FindResourceA(hModule, lpTypeA, lpNameA);
 }
 
-DWORD FormatMessageW(
+DWORD WINAPI FormatMessageW(
     IN DWORD   dwFlags,
     IN LPCVOID lpSource,
     IN DWORD   dwMessageId,
