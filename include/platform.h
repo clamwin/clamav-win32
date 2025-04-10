@@ -78,7 +78,7 @@ typedef struct pollfd
 
 #define MAX_PATH 260
 #else
-#define MAX_PATH 32767
+#define MAX_PATH 4096
 #define stat(path, buf) w32_stat(path, buf)
 #endif
 
