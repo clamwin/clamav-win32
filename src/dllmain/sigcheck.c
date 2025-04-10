@@ -40,7 +40,7 @@
 static bool isIssuerTrusted(wchar_t *filename)
 {
     bool fResult = false;
-    DWORD dwSize;
+    DWORD dwSize = 0;
     DWORD lErr;
     CERT_INFO CertInfo;
     wchar_t *szName = NULL;

@@ -70,6 +70,10 @@ static inline void insert_cache(filelist_t **list, const TCHAR *filename, int re
         prev->next = current = malloc(sizeof(filelist_t));
     }
 
+    /* OOM */
+    if (!current)
+        return;
+
     current->next = NULL;
     current->res = res;
     current->filename[0] = 0;
@@ -169,16 +173,13 @@ int walkmodules(proc_callback callback, void *data, struct mem_info *info)
 
         for (j = 0; j < (mneeded / sizeof(HMODULE)); j++)
         {
-            if (!GetModuleBaseName(hProc, mods[j], me32.szModule,
-                                   MAX_PATH - 1))
+            if (!GetModuleBaseName(hProc, mods[j], me32.szModule, ARRAYSIZE(me32.szModule) - 1))
                 continue;
 
-            if (!GetModuleFileNameEx(hProc, mods[j], me32.szExePath,
-                                     MAX_PATH - 1))
+            if (!GetModuleFileNameEx(hProc, mods[j], me32.szExePath, ARRAYSIZE(me32.szExePath) - 1))
                 continue;
 
-            if (!GetModuleInformation(hProc, mods[j], &mi,
-                                      sizeof(mi)))
+            if (!GetModuleInformation(hProc, mods[j], &mi, sizeof(mi)))
                 continue;
 
             me32.hModule = mods[j];
@@ -407,7 +408,9 @@ int dump_pe(const char *filename, PROCESSENTRY32 ProcStruct,
     if (!(hProc = OpenProcess(PROCESS_VM_READ, FALSE, ProcStruct.th32ProcessID)))
         return -1;
 
-    buffer = malloc((size_t)me32.modBaseSize);
+    if (!(buffer = malloc((size_t)me32.modBaseSize)))
+        return -1;
+
     if (!ReadProcessMemory(hProc, me32.modBaseAddr, buffer,
                            (size_t)me32.modBaseSize, &bytesread))
     {
