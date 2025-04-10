@@ -98,7 +98,7 @@ static bool isIssuerTrusted(wchar_t *filename)
     return fResult;
 }
 
-long _sigcheck(HCATADMIN hCatAdmin, int fd, const char *virname, bool warnfp)
+static long _sigcheck(HCATADMIN hCatAdmin, int fd, const char *virname, bool warnfp)
 {
     BOOL TrustIssuer = FALSE;
     LONG lstatus, lsigned = TRUST_E_NOSIGNATURE;
@@ -120,7 +120,7 @@ long _sigcheck(HCATADMIN hCatAdmin, int fd, const char *virname, bool warnfp)
     if (!CryptCATAdminCalcHashFromFileHandle(hFile, &cbHash, bHash, 0))
         FAILED_HRESULT("CryptCATAdminCalcHashFromFileHandle");
 
-    if (!GetFinalPathNameByHandleW(hFile, filename, sizeof(filename) - 1, VOLUME_NAME_DOS))
+    if (!GetFinalPathNameByHandleW(hFile, filename, MAX_PATH - 1, VOLUME_NAME_DOS))
         FAILED_HRESULT("GetFinalPathNameByHandleW");
 
     for (i = 0; i < sizeof(bHash); i++)
