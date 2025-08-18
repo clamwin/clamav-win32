@@ -181,6 +181,25 @@ BOOL WINAPI SetFilePointerEx(HANDLE hFile, LARGE_INTEGER liDistanceToMove, PLARG
     return TRUE;
 }
 
+/* ditto */
+BOOL WINAPI GetFileSizeEx(HANDLE hFile, PLARGE_INTEGER lpFileSize)
+{
+    DWORD high = 0;
+    DWORD low = GetFileSize(hFile, &high);
+
+    if (low == INVALID_FILE_SIZE)
+    {
+        if (GetLastError() != NO_ERROR)
+            return FALSE;
+
+        // else: legitimate size == 0xFFFFFFFF with lpHigh provided
+    }
+
+    lpFileSize->LowPart = low;
+    lpFileSize->HighPart = (LONG)high;
+    return TRUE;
+}
+
 #ifdef _UNICODE
 DWORD WINAPI GetProcessId(HANDLE Process)
 {
@@ -294,6 +313,26 @@ NTSTATUS NTAPI NtWriteFile(
     }
 
     return IoStatusBlock->Status;
+}
+
+NTSTATUS NTAPI NtCreateNamedPipeFile(
+    PHANDLE FileHandle,
+    ULONG DesiredAccess,
+    POBJECT_ATTRIBUTES ObjectAttributes,
+    PIO_STATUS_BLOCK IoStatusBlock,
+    ULONG ShareAccess,
+    ULONG CreateDisposition,
+    ULONG CreateOptions,
+    ULONG NamedPipeType,
+    ULONG ReadMode,
+    ULONG CompletionMode,
+    ULONG MaximumInstances,
+    ULONG InboundQuota,
+    ULONG OutboundQuota,
+    PLARGE_INTEGER DefaultTimeout)
+{
+    fprintf(stderr, "NtCreateNamedPipeFile() is unsupported\n");
+    return STATUS_NOT_SUPPORTED;
 }
 #endif // _UNICODE
 
