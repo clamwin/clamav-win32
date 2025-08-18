@@ -9,7 +9,12 @@ def main():
     lines = []
 
     for def_file in defs_dir.iterdir():
-        _, name = def_file.stem.split('_', 1)
+        try:
+            _, name = def_file.stem.split('_', 1)
+        except ValueError:
+            print(def_file)
+            raise
+
         if 'noname' in name:
             name, _ = name.split('_noname')
             noname = True
