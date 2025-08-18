@@ -1,12 +1,497 @@
+; AUTOMATIC GENERATED - DO NOT EDIT
 EXPORTS
-fc_strerror
-fc_initialize
+
+; zlib
+gzclose                                    @1000 NONAME
+gzopen                                     @1001 NONAME
+gzwrite                                    @1002 NONAME
+
+; public
+cl_always_gen_section_hash                  @1
+cl_countsigs
+cl_cvdfree
+cl_cvdgetage
+cl_cvdhead
+cl_cvdparse
+cl_cvdunpack
+cl_cvdverify
+cl_debug
+cl_engine_addref
+cl_engine_compile
+cl_engine_free
+cl_engine_get_num
+cl_engine_get_str
+cl_engine_new
+cl_engine_set_clcb_engine_compile_progress
+cl_engine_set_clcb_file_props
+cl_engine_set_clcb_hash
+cl_engine_set_clcb_meta
+cl_engine_set_clcb_post_scan
+cl_engine_set_clcb_pre_cache
+cl_engine_set_clcb_pre_scan
+cl_engine_set_clcb_scan_progress
+cl_engine_set_clcb_sigload
+cl_engine_set_clcb_sigload_progress
+cl_engine_set_clcb_stats_add_sample
+cl_engine_set_clcb_stats_decrement_count
+cl_engine_set_clcb_stats_flush
+cl_engine_set_clcb_stats_get_hostid
+cl_engine_set_clcb_stats_get_num
+cl_engine_set_clcb_stats_get_size
+cl_engine_set_clcb_stats_remove_sample
+cl_engine_set_clcb_stats_submit
+cl_engine_set_clcb_vba
+cl_engine_set_clcb_virus_found
+cl_engine_set_num
+cl_engine_set_stats_set_cbdata
+cl_engine_set_str
+cl_engine_settings_apply
+cl_engine_settings_copy
+cl_engine_settings_free
+cl_engine_stats_enable
+cl_finish_hash
+cl_fmap_close
+cl_fmap_open_handle
+cl_fmap_open_memory
+cl_hash_data
+cl_hash_destroy
+cl_hash_init
+cl_init
+cl_initialize_crypto
+cl_load
+cl_retdbdir
+cl_retflevel
+cl_retver
+cl_scandesc
+cl_scandesc_callback
+cl_scanfile
+cl_scanfile_callback
+cl_scanmap_callback
+cl_set_clcb_msg
+cl_statchkdir
+cl_statfree
+cl_statinidir
+cl_strerror
+cl_update_hash
+lsig_increment_subsig_match
+lsig_sub_matched
+
+; public freshclam
 fc_cleanup
-fc_prune_database_directory
-fc_test_database
 fc_dns_query_update_info
-fc_download_url_database
 fc_download_url_databases
-fc_update_database
-fc_update_databases
+fc_initialize
+fc_prune_database_directory
 fc_set_fccb_download_complete
+fc_strerror
+fc_test_database
+fc_update_databases
+
+; cw
+cw_perror
+cw_strerror
+cw_sigcheck
+EnsureElevated
+
+; openssl
+ASN1_STRING_get0_data                      @1003 NONAME
+ASN1_STRING_length                         @1004 NONAME
+ASN1_STRING_print                          @1005 NONAME
+ASN1_STRING_to_UTF8                        @1006 NONAME
+ASN1_STRING_type                           @1007 NONAME
+ASN1_TIME_print                            @1008 NONAME
+BIO_clear_flags                            @1009 NONAME
+BIO_ctrl                                   @1010 NONAME
+BIO_free                                   @1011 NONAME
+BIO_free_all                               @1012 NONAME
+BIO_f_ssl                                  @1013 NONAME
+BIO_get_data                               @1014 NONAME
+BIO_get_shutdown                           @1015 NONAME
+BIO_meth_free                              @1016 NONAME
+BIO_meth_new                               @1017 NONAME
+BIO_meth_set_create                        @1018 NONAME
+BIO_meth_set_ctrl                          @1019 NONAME
+BIO_meth_set_destroy                       @1020 NONAME
+BIO_meth_set_read                          @1021 NONAME
+BIO_meth_set_write                         @1022 NONAME
+BIO_new                                    @1023 NONAME
+BIO_new_mem_buf                            @1024 NONAME
+BIO_printf                                 @1025 NONAME
+BIO_puts                                   @1026 NONAME
+BIO_set_data                               @1027 NONAME
+BIO_set_flags                              @1028 NONAME
+BIO_set_init                               @1029 NONAME
+BIO_set_shutdown                           @1030 NONAME
+BIO_s_file                                 @1031 NONAME
+BIO_s_mem                                  @1032 NONAME
+BIO_up_ref                                 @1033 NONAME
+BN_clear_free                              @1034 NONAME
+BN_num_bits                                @1035 NONAME
+BN_print                                   @1036 NONAME
+CONF_modules_load_file                     @1037 NONAME
+CRYPTO_free                                @1038 NONAME
+CRYPTO_get_ex_new_index                    @1039 NONAME
+CRYPTO_malloc                              @1040 NONAME
+d2i_OCSP_RESPONSE                          @1041 NONAME
+d2i_PKCS12_bio                             @1042 NONAME
+d2i_PrivateKey_bio                         @1043 NONAME
+d2i_SSL_SESSION                            @1044 NONAME
+d2i_X509                                   @1045 NONAME
+d2i_X509_bio                               @1046 NONAME
+DES_ecb_encrypt                            @1047 NONAME
+DES_set_key                                @1048 NONAME
+DES_set_key_unchecked                      @1049 NONAME
+DES_set_odd_parity                         @1050 NONAME
+DH_get0_key                                @1051 NONAME
+DH_get0_pqg                                @1052 NONAME
+DSA_get0_key                               @1053 NONAME
+DSA_get0_pqg                               @1054 NONAME
+ERR_clear_error                            @1055 NONAME
+ERR_error_string                           @1056 NONAME
+ERR_error_string_n                         @1057 NONAME
+ERR_get_error                              @1058 NONAME
+ERR_peek_error                             @1059 NONAME
+ERR_peek_last_error                        @1060 NONAME
+EVP_DigestFinal_ex                         @1061 NONAME
+EVP_DigestInit                             @1062 NONAME
+EVP_DigestInit_ex                          @1063 NONAME
+EVP_DigestUpdate                           @1064 NONAME
+EVP_get_digestbyname                       @1065 NONAME
+EVP_md5                                    @1066 NONAME
+EVP_MD_CTX_free                            @1067 NONAME
+EVP_MD_CTX_new                             @1068 NONAME
+EVP_PKEY_copy_parameters                   @1069 NONAME
+EVP_PKEY_free                              @1070 NONAME
+EVP_PKEY_get0_DH                           @1071 NONAME
+EVP_PKEY_get0_DSA                          @1072 NONAME
+EVP_PKEY_get0_RSA                          @1073 NONAME
+EVP_PKEY_get0_type_name                    @1074 NONAME
+EVP_PKEY_get1_RSA                          @1075 NONAME
+EVP_PKEY_get_bits                          @1076 NONAME
+EVP_PKEY_get_bn_param                      @1077 NONAME
+EVP_PKEY_get_group_name                    @1078 NONAME
+EVP_PKEY_get_id                            @1079 NONAME
+EVP_PKEY_get_security_bits                 @1080 NONAME
+EVP_sha1                                   @1081 NONAME
+EVP_sha256                                 @1082 NONAME
+EVP_sha512_256                             @1083 NONAME
+GENERAL_NAMES_free                         @1084 NONAME
+i2a_ASN1_OBJECT                            @1085 NONAME
+i2d_SSL_SESSION                            @1086 NONAME
+i2d_X509_PUBKEY                            @1087 NONAME
+i2t_ASN1_OBJECT                            @1088 NONAME
+MD4_Final                                  @1089 NONAME
+MD4_Init                                   @1090 NONAME
+MD4_Update                                 @1091 NONAME
+MD5_Final                                  @1092 NONAME
+MD5_Init                                   @1093 NONAME
+MD5_Update                                 @1094 NONAME
+OBJ_find_sigid_algs                        @1095 NONAME
+OBJ_nid2sn                                 @1096 NONAME
+OBJ_obj2txt                                @1097 NONAME
+OCSP_BASICRESP_free                        @1098 NONAME
+OCSP_basic_verify                          @1099 NONAME
+OCSP_CERTID_free                           @1100 NONAME
+OCSP_cert_status_str                       @1101 NONAME
+OCSP_cert_to_id                            @1102 NONAME
+OCSP_check_validity                        @1103 NONAME
+OCSP_crl_reason_str                        @1104 NONAME
+OCSP_resp_count                            @1105 NONAME
+OCSP_resp_find_status                      @1106 NONAME
+OCSP_resp_get0                             @1107 NONAME
+OCSP_RESPONSE_free                         @1108 NONAME
+OCSP_response_get1_basic                   @1109 NONAME
+OCSP_response_status                       @1110 NONAME
+OCSP_response_status_str                   @1111 NONAME
+OCSP_single_get0_status                    @1112 NONAME
+OPENSSL_init_ssl                           @1113 NONAME
+OPENSSL_load_builtin_modules               @1114 NONAME
+OPENSSL_sk_num                             @1115 NONAME
+OPENSSL_sk_pop                             @1116 NONAME
+OPENSSL_sk_pop_free                        @1117 NONAME
+OPENSSL_sk_value                           @1118 NONAME
+OpenSSL_version                            @1119 NONAME
+OpenSSL_version_num                        @1120 NONAME
+;OSSL_LIB_CTX_free                          @1121 NONAME
+;OSSL_LIB_CTX_load_config                   @1122 NONAME
+;OSSL_LIB_CTX_new                           @1123 NONAME
+OSSL_PROVIDER_available                    @1124 NONAME
+OSSL_PROVIDER_try_load                     @1125 NONAME
+;OSSL_PROVIDER_unload                       @1126 NONAME
+OSSL_STORE_close                           @1127 NONAME
+OSSL_STORE_expect                          @1128 NONAME
+OSSL_STORE_INFO_free                       @1129 NONAME
+OSSL_STORE_INFO_get1_CERT                  @1130 NONAME
+OSSL_STORE_INFO_get1_PKEY                  @1131 NONAME
+OSSL_STORE_INFO_get_type                   @1132 NONAME
+OSSL_STORE_load                            @1133 NONAME
+OSSL_STORE_open                            @1134 NONAME
+OSSL_STORE_open_ex                         @1135 NONAME
+PEM_read_bio_PrivateKey                    @1136 NONAME
+PEM_read_bio_X509                          @1137 NONAME
+PEM_read_bio_X509_AUX                      @1138 NONAME
+PEM_write_bio_X509                         @1139 NONAME
+PEM_X509_INFO_read_bio                     @1140 NONAME
+PKCS12_free                                @1141 NONAME
+PKCS12_parse                               @1142 NONAME
+PKCS12_PBE_add                             @1143 NONAME
+RAND_add                                   @1144 NONAME
+RAND_bytes                                 @1145 NONAME
+RAND_file_name                             @1146 NONAME
+RAND_load_file                             @1147 NONAME
+RAND_status                                @1148 NONAME
+RSA_flags                                  @1149 NONAME
+RSA_free                                   @1150 NONAME
+RSA_get0_key                               @1151 NONAME
+SHA256_Final                               @1152 NONAME
+SHA256_Init                                @1153 NONAME
+SHA256_Update                              @1154 NONAME
+SSL_alert_desc_string_long                 @1155 NONAME
+SSL_CIPHER_get_name                        @1156 NONAME
+SSL_connect                                @1157 NONAME
+SSL_ctrl                                   @1158 NONAME
+SSL_CTX_add_client_CA                      @1159 NONAME
+SSL_CTX_check_private_key                  @1160 NONAME
+SSL_CTX_ctrl                               @1161 NONAME
+SSL_CTX_free                               @1162 NONAME
+SSL_CTX_get_cert_store                     @1163 NONAME
+SSL_CTX_load_verify_locations              @1164 NONAME
+SSL_CTX_new                                @1165 NONAME
+;SSL_CTX_new_ex                             @1166 NONAME
+SSL_CTX_sess_set_new_cb                    @1167 NONAME
+SSL_CTX_set_alpn_protos                    @1168 NONAME
+SSL_CTX_set_cert_store                     @1169 NONAME
+SSL_CTX_set_cipher_list                    @1170 NONAME
+SSL_CTX_set_ciphersuites                   @1171 NONAME
+SSL_CTX_set_default_passwd_cb              @1172 NONAME
+SSL_CTX_set_default_passwd_cb_userdata     @1173 NONAME
+;SSL_CTX_set_default_read_buffer_len        @1174 NONAME
+SSL_CTX_set_keylog_callback                @1175 NONAME
+SSL_CTX_set_msg_callback                   @1176 NONAME
+SSL_CTX_set_next_proto_select_cb           @1177 NONAME
+SSL_CTX_set_options                        @1178 NONAME
+SSL_CTX_set_post_handshake_auth            @1179 NONAME
+SSL_CTX_set_verify                         @1180 NONAME
+SSL_CTX_use_certificate                    @1181 NONAME
+SSL_CTX_use_certificate_chain_file         @1182 NONAME
+SSL_CTX_use_certificate_file               @1183 NONAME
+SSL_CTX_use_PrivateKey                     @1184 NONAME
+SSL_CTX_use_PrivateKey_file                @1185 NONAME
+SSL_free                                   @1186 NONAME
+SSL_get0_alpn_selected                     @1187 NONAME
+SSL_get0_group_name                        @1188 NONAME
+SSL_get0_verified_chain                    @1189 NONAME
+SSL_get1_peer_certificate                  @1190 NONAME
+SSL_get_certificate                        @1191 NONAME
+SSL_get_current_cipher                     @1192 NONAME
+SSL_get_early_data_status                  @1193 NONAME
+SSL_get_error                              @1194 NONAME
+SSL_get_ex_data                            @1195 NONAME
+SSL_get_peer_cert_chain                    @1196 NONAME
+SSL_get_peer_signature_type_nid            @1197 NONAME
+SSL_get_privatekey                         @1198 NONAME
+SSL_get_shutdown                           @1199 NONAME
+SSL_get_verify_result                      @1200 NONAME
+SSL_get_version                            @1201 NONAME
+SSL_new                                    @1202 NONAME
+SSL_pending                                @1203 NONAME
+SSL_read                                   @1204 NONAME
+SSL_SESSION_free                           @1205 NONAME
+SSL_SESSION_get_max_early_data             @1206 NONAME
+SSL_SESSION_get_timeout                    @1207 NONAME
+SSL_set0_rbio                              @1208 NONAME
+SSL_set0_wbio                              @1209 NONAME
+SSL_set_alpn_protos                        @1210 NONAME
+SSL_set_bio                                @1211 NONAME
+SSL_set_connect_state                      @1212 NONAME
+SSL_set_ex_data                            @1213 NONAME
+SSL_set_fd                                 @1214 NONAME
+SSL_set_session                            @1215 NONAME
+SSL_shutdown                               @1216 NONAME
+SSL_version                                @1217 NONAME
+SSL_write                                  @1218 NONAME
+SSL_write_early_data                       @1219 NONAME
+TLS_client_method                          @1220 NONAME
+TLS_method                                 @1221 NONAME
+UI_create_method                           @1222 NONAME
+UI_destroy_method                          @1223 NONAME
+UI_get0_user_data                          @1224 NONAME
+UI_get_input_flags                         @1225 NONAME
+UI_get_string_type                         @1226 NONAME
+UI_method_get_closer                       @1227 NONAME
+UI_method_get_opener                       @1228 NONAME
+UI_method_get_reader                       @1229 NONAME
+UI_method_get_writer                       @1230 NONAME
+UI_method_set_closer                       @1231 NONAME
+UI_method_set_opener                       @1232 NONAME
+UI_method_set_reader                       @1233 NONAME
+UI_method_set_writer                       @1234 NONAME
+UI_OpenSSL                                 @1235 NONAME
+UI_set_result                              @1236 NONAME
+X509_ALGOR_get0                            @1237 NONAME
+X509_check_issued                          @1238 NONAME
+X509_cmp                                   @1239 NONAME
+X509_digest                                @1240 NONAME
+X509_dup                                   @1241 NONAME
+X509_EXTENSION_get_data                    @1242 NONAME
+X509_EXTENSION_get_object                  @1243 NONAME
+X509_free                                  @1244 NONAME
+X509_get0_extensions                       @1245 NONAME
+X509_get0_notAfter                         @1246 NONAME
+X509_get0_notBefore                        @1247 NONAME
+X509_get0_pubkey                           @1248 NONAME
+X509_get0_signature                        @1249 NONAME
+X509_get_ext_d2i                           @1250 NONAME
+X509_get_issuer_name                       @1251 NONAME
+X509_get_pubkey                            @1252 NONAME
+X509_get_serialNumber                      @1253 NONAME
+X509_get_signature_nid                     @1254 NONAME
+X509_get_subject_name                      @1255 NONAME
+X509_get_version                           @1256 NONAME
+X509_get_X509_PUBKEY                       @1257 NONAME
+X509_INFO_free                             @1258 NONAME
+X509_load_crl_file                         @1259 NONAME
+X509_LOOKUP_file                           @1260 NONAME
+X509_NAME_ENTRY_get_data                   @1261 NONAME
+X509_NAME_get_entry                        @1262 NONAME
+X509_NAME_get_index_by_NID                 @1263 NONAME
+X509_NAME_print_ex                         @1264 NONAME
+X509_PUBKEY_get0_param                     @1265 NONAME
+X509_STORE_add_cert                        @1266 NONAME
+X509_STORE_add_crl                         @1267 NONAME
+X509_STORE_add_lookup                      @1268 NONAME
+X509_STORE_free                            @1269 NONAME
+X509_STORE_load_file                       @1270 NONAME
+X509_STORE_load_locations                  @1271 NONAME
+X509_STORE_load_path                       @1272 NONAME
+X509_STORE_set_flags                       @1273 NONAME
+X509_STORE_up_ref                          @1274 NONAME
+X509V3_EXT_print                           @1275 NONAME
+X509_verify_cert_error_string              @1276 NONAME
+
+; cw_internal
+cw_leerrno                                 @1277 NONAME
+cw_wseterrno                               @1278 NONAME
+basename                                   @1279 NONAME
+cli_strdup_to_utf8                         @1280 NONAME
+closedir                                   @1281 NONAME
+dirname                                    @1282 NONAME
+opendir                                    @1283 NONAME
+readdir                                    @1284 NONAME
+safe_open                                  @1285 NONAME
+strptime                                   @1286 NONAME
+tcgetattr                                  @1287 NONAME
+tcsetattr                                  @1288 NONAME
+uncpath                                    @1289 NONAME
+w32_stat                                   @1290 NONAME
+cdiff_apply                                @1291 NONAME
+clrs_log_init                              @1292 NONAME
+evidence_free                              @1293 NONAME
+evidence_new                               @1294 NONAME
+ffierror_fmt                               @1295 NONAME
+ffierror_free                              @1296 NONAME
+fuzzy_hash_calculate_image                 @1297 NONAME
+script2cdiff                               @1298 NONAME
+
+; internal
+cli_ac_chklsig                             @1299 NONAME
+cli_chomp                                  @1300 NONAME
+cli_ctime                                  @1301 NONAME
+cli_filecopy                               @1302 NONAME
+cli_determine_fmap_type                    @1303 NONAME
+cli_scan_fmap                              @1304 NONAME
+cli_ftw                                    @1305 NONAME
+cli_gentemp                                @1306 NONAME
+cli_gentempfd                              @1307 NONAME
+cli_gettmpdir                              @1308 NONAME
+cli_hashfile                               @1309 NONAME
+cli_hashset_destroy                        @1310 NONAME
+cli_hashstream                             @1311 NONAME
+cli_hex2str                                @1312 NONAME
+cli_hex2ui                                 @1313 NONAME
+cli_initroots                              @1314 NONAME
+cli_isnumber                               @1315 NONAME
+cli_ldbtokenize                            @1316 NONAME
+cli_matchregex                             @1317 NONAME
+cli_ole2_extract                           @1318 NONAME
+cli_pcre_perf_events_destroy               @1319 NONAME
+cli_pcre_perf_print                        @1320 NONAME
+cli_ppt_vba_read                           @1321 NONAME
+cli_readn                                  @1322 NONAME
+cli_regcomp                                @1323 NONAME
+cli_regexec                                @1324 NONAME
+cli_regfree                                @1325 NONAME
+cli_rmdirs                                 @1326 NONAME
+cli_rndnum                                 @1327 NONAME
+cli_scancpio_newc                          @1328 NONAME
+cli_scancpio_odc                           @1329 NONAME
+cli_scancpio_old                           @1330 NONAME
+cli_scanmacho                              @1331 NONAME
+cli_sigperf_events_destroy                 @1332 NONAME
+cli_sigperf_print                          @1333 NONAME
+cli_str2hex                                @1334 NONAME
+cli_strbcasestr                            @1335 NONAME
+cli_strerror                               @1336 NONAME
+cli_strtok                                 @1337 NONAME
+cli_strtokenize                            @1338 NONAME
+cli_utf16toascii                           @1339 NONAME
+cli_vba_inflate                            @1340 NONAME
+cli_vba_readdir                            @1341 NONAME
+cli_versig2                                @1342 NONAME
+cli_wm_decrypt_macro                       @1343 NONAME
+cli_wm_readdir                             @1344 NONAME
+cli_writen                                 @1345 NONAME
+cli_genhash_pe                             @1346 NONAME
+cli_free_vba_project                       @1347 NONAME
+cli_check_auth_header                      @1348 NONAME
+cli_gentemp_with_prefix                    @1349 NONAME
+cli_realpath                               @1350 NONAME
+cli_strntoul                               @1351 NONAME
+cli_unlink                                 @1352 NONAME
+cli_get_filepath_from_filedesc             @1353 NONAME
+cli_add_content_match_pattern              @1354 NONAME
+readdb_parse_ldb_subsignature              @1355 NONAME
+cli_basename                               @1356 NONAME
+cli_infomsg_simple                         @1357 NONAME
+cli_dbgmsg                                 @1358 NONAME
+cli_dbgmsg_no_inline                       @1359 NONAME
+cli_safer_strdup                           @1360 NONAME
+cli_safer_realloc                          @1361 NONAME
+cli_get_debug_flag                         @1362 NONAME
+cli_getdsig                                @1363 NONAME
+cli_checklimits                            @1364 NONAME
+cli_matchmeta                              @1365 NONAME
+cli_magic_scan_buff                        @1366 NONAME
+html_normalise_map                         @1367 NONAME
+text_normalize_init                        @1368 NONAME
+text_normalize_reset                       @1369 NONAME
+text_normalize_map                         @1370 NONAME
+uniq_get                                   @1371 NONAME
+fmap                                       @1372 NONAME
+openlog                                    @1373 NONAME
+closelog                                   @1374 NONAME
+syslog                                     @1375 NONAME
+mpool_getstats                             @1376 NONAME
+cli_errmsg                                 @1378 NONAME
+cli_warnmsg                                @1379 NONAME
+cli_bytecode_context_alloc                 @1396 NONAME
+cli_bytecode_context_destroy               @1397 NONAME
+cli_bytecode_context_getresult_int         @1398 NONAME
+cli_bytecode_context_set_trace             @1399 NONAME
+cli_bytecode_context_setfile               @1400 NONAME
+cli_bytecode_context_setfuncid             @1401 NONAME
+cli_bytecode_context_setparam_int          @1402 NONAME
+cli_bytecode_debug                         @1403 NONAME
+cli_bytecode_debug_printsrc                @1404 NONAME
+cli_bytecode_describe                      @1405 NONAME
+cli_bytecode_destroy                       @1406 NONAME
+cli_bytecode_done                          @1407 NONAME
+cli_bytecode_init                          @1408 NONAME
+cli_bytecode_load                          @1409 NONAME
+cli_bytecode_prepare2                      @1410 NONAME
+cli_bytecode_printversion                  @1411 NONAME
+cli_bytecode_run                           @1412 NONAME
+cli_bytefunc_describe                      @1413 NONAME
+cli_bytetype_describe                      @1414 NONAME
+cli_bytevalue_describe                     @1415 NONAME
+__cli_strndup                              @1416 NONAME

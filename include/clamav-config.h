@@ -500,7 +500,7 @@
 /* #undef LLVM_VERSION */
 
 /* Version number of package */
-#define VERSION "1.4.2"
+#define VERSION "1.4.3"
 
 /* Version suffix for package */
 #define VERSION_SUFFIX ""

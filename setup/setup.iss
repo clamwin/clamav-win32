@@ -1,5 +1,5 @@
 #define MyAppName "ClamAV Antivirus"
-#define MyAppVersion "1.4.2-r1"
+#define MyAppVersion "1.4.3-r1"
 #define MyAppPublisher "Gianluigi Tiesi <sherpya@gmail.com>"
 #define MyAppURL "https://oss.netfarm.it/clamav/"
 
