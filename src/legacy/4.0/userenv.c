@@ -25,6 +25,7 @@
 #ifndef _WIN64
 #include "legacy.h"
 #include "dynload.h"
+#include "loadlibrary.h"
 #include "initializer.h"
 
 BOOL WINAPI GetUserProfileDirectoryA_compat(HANDLE hToken, LPSTR lpProfileDir, LPDWORD lpcchSize)
@@ -79,10 +80,20 @@ imp_GetUserProfileDirectoryW pGetUserProfileDirectoryW = GetUserProfileDirectory
 
 INITIALIZER(init_userenv_4_0)
 {
+    OSVERSIONINFO osvi = {0};
     TRACE("Init @ " __FILE__ "\n");
-    HMODULE userenv = LoadLibrary(TEXT("userenv"));
+
+    osvi.dwOSVersionInfoSize = sizeof(osvi);
+    GetVersionEx(&osvi);
+
+#ifdef _UNICODE
+    if (osvi.dwMajorVersion < 5) // win2k or later
+        return;
+
+    HMODULE userenv = LoadLibraryFromWin32(TEXT("userenv.dll"));
     if (userenv)
         IMPORT_FUNCTION(userenv, GetUserProfileDirectoryW);
+#endif
 }
 
 #endif // _WIN64

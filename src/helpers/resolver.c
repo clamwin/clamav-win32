@@ -27,14 +27,15 @@
 #if _WIN32_WINNT > _WIN32_WINNT_WINXP || defined(_WIN64)
 #include "resolv.c"
 #else
-#include "dynload.h"
-#include "initializer.h"
-
 #include <iphlpapi.h>
 #include <iptypes.h>
 
 #include "resolv.h"
 #include "output.h"
+
+#include "dynload.h"
+#include "loadlibrary.h"
+#include "initializer.h"
 
 #define TCPIP_PARAMS "SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters"
 
@@ -65,7 +66,8 @@ INITIALIZER(init_resolver)
     g_osvi.dwOSVersionInfoSize = sizeof(g_osvi);
     GetVersionExW(&g_osvi);
 
-    HMODULE dnsapi = LoadLibrary(TEXT("dnsapi"));
+    // _UNICODE can't be defined here
+    HMODULE dnsapi = LoadLibraryFromWin32("dnsapi.dll");
     if (dnsapi)
     {
         IMPORT_FUNCTION(dnsapi, DnsQuery_A);

@@ -24,13 +24,24 @@
 
 #include "legacy.h"
 #include "dynload.h"
+#include "loadlibrary.h"
 #include "initializer.h"
 
 static imp_SystemFunction036 pSystemFunction036 = NULL;
 
 INITIALIZER(init_bcryptprimitives)
 {
-    HMODULE advapi32 = LoadLibrary(TEXT("advapi32"));
+    OSVERSIONINFO osvi = {0};
+    TRACE("Init @ " __FILE__ "\n");
+
+    osvi.dwOSVersionInfoSize = sizeof(osvi);
+    GetVersionEx(&osvi);
+
+    // win8 or later
+    if ((osvi.dwMajorVersion < 6) || ((osvi.dwMajorVersion == 6) && (osvi.dwMinorVersion < 2)))
+        return;
+
+    HMODULE advapi32 = LoadLibraryFromWin32(TEXT("advapi32.dll"));
     if (advapi32)
         IMPORT_FUNCTION(advapi32, SystemFunction036);
 }

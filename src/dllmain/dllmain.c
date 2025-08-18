@@ -19,11 +19,13 @@
  */
 
 #include "platform.h"
-#include "dynload.h"
 
 #include <windows.h>
 #include <winsock2.h>
 #include <stdio.h>
+
+#include "dynload.h"
+#include "loadlibrary.h"
 
 extern imp_GetSystemTimePreciseAsFileTime pGetSystemTimePreciseAsFileTime;
 extern void init_sysinfoapi(void);
@@ -116,11 +118,11 @@ static void processattach(void)
        needed ones (I hope :D) */
     if (bIsWow64)
     {
-        LoadLibraryW(L"mswsock.dll");
-        LoadLibraryW(L"winrnr.dll");
-        LoadLibraryW(L"wshtcpip.dll");
-        LoadLibraryW(L"iphlpapi.dll");
-        LoadLibraryW(L"rsaenh.dll");
+        LoadLibraryFromWin32(TEXT("mswsock.dll"));
+        LoadLibraryFromWin32(TEXT("winrnr.dll"));
+        LoadLibraryFromWin32(TEXT("wshtcpip.dll"));
+        LoadLibraryFromWin32(TEXT("iphlpapi.dll"));
+        LoadLibraryFromWin32(TEXT("rsaenh.dll"));
     }
 #endif
 }
