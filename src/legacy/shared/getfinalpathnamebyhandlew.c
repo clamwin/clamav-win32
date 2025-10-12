@@ -603,7 +603,7 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
         break;
     }
 
-    if ((dwFlags && FILE_NAME_OPENED) == 0)
+    if ((dwFlags & FILE_NAME_OPENED) == 0)
     {
         wchar_t *normalizedName = NULL, *Dest = NULL;
         if (BasepGetFileNameInformation(hFile, FileNormalizedNameInformation, &normalizedName))
