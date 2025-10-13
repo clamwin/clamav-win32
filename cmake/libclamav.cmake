@@ -109,4 +109,5 @@ endif()
 
 list(APPEND CLAMAV_INSTALL_TARGETS libclamav)
 
+install(FILES ${CLAMAV_DIR}/certs/clamav.crt DESTINATION ${CMAKE_INSTALL_PREFIX}/certs)
 install(FILES ${CLAMAV_DIR}/COPYING.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME clamav.txt)

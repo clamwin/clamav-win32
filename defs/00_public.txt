@@ -54,8 +54,10 @@ cl_retdbdir
 cl_retflevel
 cl_retver
 cl_scandesc
+cl_scandesc_ex
 cl_scandesc_callback
 cl_scanfile
+cl_scanfile_ex
 cl_scanfile_callback
 cl_scanmap_callback
 cl_set_clcb_msg
@@ -66,6 +68,19 @@ cl_strerror
 cl_update_hash
 lsig_increment_subsig_match
 lsig_sub_matched
+
+; 1.5.0
+cl_cvdunpack_ex
+cl_cvdverify_ex
+cvd_free
+cvd_get_name
+cvd_get_version
+cvd_open
+
+; rust
+codesign_sign_file
+codesign_verify_file
+ffi_cstring_free
 
 cw_perror
 cw_strerror

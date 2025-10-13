@@ -32,6 +32,10 @@
 
 .global __imp__wassert
 
+.global __imp_GetTimeZoneInformationForYear
+
+.global _FindFirstFileExW@24
+
 .section .rdata,"dr"
 
 #ifdef _WIN64
@@ -49,6 +53,9 @@ __imp_InitOnceExecuteOnce:
     .quad InitOnceExecuteOnce
 __imp__wassert:
     .quad emu__wassert
+
+__imp_GetTimeZoneInformationForYear:
+    .quad GetTimeZoneInformationForYear
 #else
 .align 4
 
@@ -62,4 +69,21 @@ __imp_ProcessPrng:
     .long _ProcessPrng@8
 __imp__InitOnceExecuteOnce@16:
     .long _InitOnceExecuteOnce@16
+
+__imp_GetTimeZoneInformationForYear:
+    .long _GetTimeZoneInformationForYear@12
+#endif
+
+.section text
+
+#ifdef _WIN64
+.align 8
+
+FindFirstFileExW:
+    jmp FindFirstFileExW_wrapper
+#else
+.align 4
+
+_FindFirstFileExW@24:
+    jmp _FindFirstFileExW_wrapper@24
 #endif

@@ -74,7 +74,7 @@ text_normalize_init
 text_normalize_reset
 text_normalize_map
 uniq_get
-fmap
+fmap_new
 
 ; win32
 openlog
@@ -130,3 +130,10 @@ cli_bytevalue_describe
 
 ; freshclam @ 0.103.12
 __cli_strndup
+
+; freshclam @ 1.5.0
+cli_cvdunpack_and_verify
+cli_cvdverify
+codesign_verifier_free
+codesign_verifier_new
+glob_rm

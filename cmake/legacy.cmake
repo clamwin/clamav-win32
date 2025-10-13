@@ -122,7 +122,7 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
         OUTPUT "${RUST_FILTERED_ARCHIVE}"
         COMMAND ${CMAKE_COMMAND} -E copy "${RUST_ARCHIVE}" "${RUST_FILTERED_ARCHIVE}"
         COMMAND ${CMAKE_AR} t "${RUST_FILTERED_ARCHIVE}" > filelist.txt
-        COMMAND ${CMAKE_COMMAND} -E env bash -c 'for f in $$$(grep -E "api-ms-win-core-synch-l1-2-0\\|bcryptprimitives" filelist.txt) \; do ${CMAKE_AR} d ${RUST_FILTERED_ARCHIVE} $$f \; done'
+        COMMAND ${CMAKE_COMMAND} -E env bash -c 'for f in $$$(grep -E "api-ms-win-core-synch-l1-2-0\\|bcryptprimitives\\|kernel32.dlls00000.o" filelist.txt) \; do ${CMAKE_AR} d ${RUST_FILTERED_ARCHIVE} $$f \; done'
         DEPENDS "${RUST_ARCHIVE}"
     )
 

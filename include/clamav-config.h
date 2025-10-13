@@ -74,8 +74,16 @@
 /* os is solaris */
 /* #undef C_SOLARIS */
 
+#ifndef _WIN32
 /* Path to virus database directory. */
 /* #undef DATADIR */
+
+/* where to look for the config file */
+/* #undef CONFDIR */
+
+/* where to look for the CA certificate file(s) */
+/* #undef CERTSDIR */
+#endif
 
 /* Have sys/fanotify.h */
 /* #undef HAVE_SYS_FANOTIFY_H */
@@ -365,9 +373,6 @@
 /* yara sources are compiled in */
 #define HAVE_YARA 1
 
-/* For internal use only - DO NOT DEFINE */
-/* #undef HAVE__INTERNAL__SHA_COLLECT */
-
 /* Define as const if the declaration of iconv() needs const. */
 /* #undef ICONV_CONST */
 
@@ -375,16 +380,16 @@
 /* #undef UNRAR_LINKED */
 
 /* "Full clamav library version number" */
-#define LIBCLAMAV_FULLVER "12.0.3"
+#define LIBCLAMAV_FULLVER "12.1.0"
 
 /* "Major clamav library version number" */
 #define LIBCLAMAV_MAJORVER 12
 
 /* "Full freshclam library version number" */
-#define LIBFRESHCLAM_FULLVER "3.0.2"
+#define LIBFRESHCLAM_FULLVER "4.0.0"
 
 /* "Major freshclam library version number" */
-#define LIBFRESHCLAM_MAJORVER 3
+#define LIBFRESHCLAM_MAJORVER 4
 
 /* The archive extension */
 #define LT_LIBEXT ".lib"
@@ -397,10 +402,11 @@
 
 /* Define to the name of the environment variable that determines the run-time
    module search path. */
-/* #undef LT_MODULE_PATH_VAR */
-
-/* Define to the sub-directory where libtool stores uninstalled libraries. */
-/* #undef LT_OBJDIR */
+#ifdef _WIN32
+#define SEARCH_LIBDIR "."
+#else
+/* #undef SEARCH_LIBDIR */
+#endif
 
 /* Define to the shared library suffix, say, ".dylib". */
 #define LT_SHARED_EXT ".dll"
@@ -500,7 +506,7 @@
 /* #undef LLVM_VERSION */
 
 /* Version number of package */
-#define VERSION "1.4.3"
+#define VERSION "1.5.0"
 
 /* Version suffix for package */
 #define VERSION_SUFFIX ""
@@ -576,6 +582,7 @@
 
 /* Define to `long int' if <sys/types.h> does not define. */
 #ifndef OFF_T_DEFINED
+   
    #define OFF_T_DEFINED
 #endif
 

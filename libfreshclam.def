@@ -467,7 +467,7 @@ text_normalize_init                        @1368 NONAME
 text_normalize_reset                       @1369 NONAME
 text_normalize_map                         @1370 NONAME
 uniq_get                                   @1371 NONAME
-fmap                                       @1372 NONAME
+fmap_new                                   @1372 NONAME
 openlog                                    @1373 NONAME
 closelog                                   @1374 NONAME
 syslog                                     @1375 NONAME

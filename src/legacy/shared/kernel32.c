@@ -23,6 +23,8 @@
  */
 
 #include "legacy.h"
+#include "dynload.h"
+#include "initializer.h"
 
 int WINAPI CompareStringOrdinal(
     LPCWCH lpString1,
@@ -215,4 +217,22 @@ HANDLE WINAPI CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LP
     }
 
     return hTimer;
+}
+
+imp_FindFirstFileExW pFindFirstFileExW = NULL;
+
+// FindFirstFileExW on Windows XP and lower does not support FindExInfoBasic
+HANDLE WINAPI FindFirstFileExW_wrapper(LPCWSTR lpFileName, FINDEX_INFO_LEVELS fInfoLevelId, LPVOID lpFindFileData, FINDEX_SEARCH_OPS fSearchOp, LPVOID lpSearchFilter, DWORD dwAdditionalFlags)
+{
+    return pFindFirstFileExW(lpFileName, FindExInfoStandard, lpFindFileData, fSearchOp, lpSearchFilter, dwAdditionalFlags);
+}
+
+INITIALIZER(init_kernel32_shared)
+{
+    TRACE("Init @ " __FILE__ "\n");
+    HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
+    if (!kernel32) // meh
+        return;
+
+    IMPORT_FUNCTION(kernel32, FindFirstFileExW);
 }

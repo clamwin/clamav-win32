@@ -1,11 +1,6 @@
 ; AUTOMATIC GENERATED - DO NOT EDIT
 EXPORTS
 
-; zlib
-gzclose                                    @1000 NONAME
-gzopen                                     @1001 NONAME
-gzwrite                                    @1002 NONAME
-
 ; public
 cl_always_gen_section_hash                  @1
 cl_countsigs
@@ -63,8 +58,10 @@ cl_retdbdir
 cl_retflevel
 cl_retver
 cl_scandesc
+cl_scandesc_ex
 cl_scandesc_callback
 cl_scanfile
+cl_scanfile_ex
 cl_scanfile_callback
 cl_scanmap_callback
 cl_set_clcb_msg
@@ -75,10 +72,24 @@ cl_strerror
 cl_update_hash
 lsig_increment_subsig_match
 lsig_sub_matched
+cl_cvdunpack_ex
+cl_cvdverify_ex
+cvd_free
+cvd_get_name
+cvd_get_version
+cvd_open
+codesign_sign_file
+codesign_verify_file
+ffi_cstring_free
 cw_perror
 cw_strerror
 cw_sigcheck
 EnsureElevated
+
+; zlib
+gzclose                                    @1000 NONAME
+gzopen                                     @1001 NONAME
+gzwrite                                    @1002 NONAME
 
 ; openssl
 ASN1_STRING_get0_data                      @1003 NONAME
@@ -380,122 +391,130 @@ ffierror_free                              @1296 NONAME
 fuzzy_hash_calculate_image                 @1297 NONAME
 script2cdiff                               @1298 NONAME
 
+; openssl_deprecated
+SSL_SESSION_get_time                       @1299 NONAME
+
 ; internal
-cli_ac_chklsig                             @1299 NONAME
-cli_chomp                                  @1300 NONAME
-cli_ctime                                  @1301 NONAME
-cli_filecopy                               @1302 NONAME
-cli_determine_fmap_type                    @1303 NONAME
-cli_scan_fmap                              @1304 NONAME
-cli_ftw                                    @1305 NONAME
-cli_gentemp                                @1306 NONAME
-cli_gentempfd                              @1307 NONAME
-cli_gettmpdir                              @1308 NONAME
-cli_hashfile                               @1309 NONAME
-cli_hashset_destroy                        @1310 NONAME
-cli_hashstream                             @1311 NONAME
-cli_hex2str                                @1312 NONAME
-cli_hex2ui                                 @1313 NONAME
-cli_initroots                              @1314 NONAME
-cli_isnumber                               @1315 NONAME
-cli_ldbtokenize                            @1316 NONAME
-cli_matchregex                             @1317 NONAME
-cli_ole2_extract                           @1318 NONAME
-cli_pcre_perf_events_destroy               @1319 NONAME
-cli_pcre_perf_print                        @1320 NONAME
-cli_ppt_vba_read                           @1321 NONAME
-cli_readn                                  @1322 NONAME
-cli_regcomp                                @1323 NONAME
-cli_regexec                                @1324 NONAME
-cli_regfree                                @1325 NONAME
-cli_rmdirs                                 @1326 NONAME
-cli_rndnum                                 @1327 NONAME
-cli_scancpio_newc                          @1328 NONAME
-cli_scancpio_odc                           @1329 NONAME
-cli_scancpio_old                           @1330 NONAME
-cli_scanmacho                              @1331 NONAME
-cli_sigperf_events_destroy                 @1332 NONAME
-cli_sigperf_print                          @1333 NONAME
-cli_str2hex                                @1334 NONAME
-cli_strbcasestr                            @1335 NONAME
-cli_strerror                               @1336 NONAME
-cli_strtok                                 @1337 NONAME
-cli_strtokenize                            @1338 NONAME
-cli_utf16toascii                           @1339 NONAME
-cli_vba_inflate                            @1340 NONAME
-cli_vba_readdir                            @1341 NONAME
-cli_versig2                                @1342 NONAME
-cli_wm_decrypt_macro                       @1343 NONAME
-cli_wm_readdir                             @1344 NONAME
-cli_writen                                 @1345 NONAME
-cli_genhash_pe                             @1346 NONAME
-cli_free_vba_project                       @1347 NONAME
-cli_check_auth_header                      @1348 NONAME
-cli_gentemp_with_prefix                    @1349 NONAME
-cli_realpath                               @1350 NONAME
-cli_strntoul                               @1351 NONAME
-cli_unlink                                 @1352 NONAME
-cli_get_filepath_from_filedesc             @1353 NONAME
-cli_add_content_match_pattern              @1354 NONAME
-readdb_parse_ldb_subsignature              @1355 NONAME
-cli_basename                               @1356 NONAME
-cli_infomsg_simple                         @1357 NONAME
-cli_dbgmsg                                 @1358 NONAME
-cli_dbgmsg_no_inline                       @1359 NONAME
-cli_safer_strdup                           @1360 NONAME
-cli_safer_realloc                          @1361 NONAME
-cli_get_debug_flag                         @1362 NONAME
-cli_getdsig                                @1363 NONAME
-cli_checklimits                            @1364 NONAME
-cli_matchmeta                              @1365 NONAME
-cli_magic_scan_buff                        @1366 NONAME
-html_normalise_map                         @1367 NONAME
-text_normalize_init                        @1368 NONAME
-text_normalize_reset                       @1369 NONAME
-text_normalize_map                         @1370 NONAME
-uniq_get                                   @1371 NONAME
-fmap                                       @1372 NONAME
-openlog                                    @1373 NONAME
-closelog                                   @1374 NONAME
-syslog                                     @1375 NONAME
-mpool_getstats                             @1376 NONAME
-cli_debug_flag                             @1377 NONAME DATA
-cli_errmsg                                 @1378 NONAME
-cli_warnmsg                                @1379 NONAME
-cli_apicall_maxapi                         @1380 NONAME DATA
-cli_apicall_maxglobal                      @1381 NONAME DATA
-cli_apicall_maxtypes                       @1382 NONAME DATA
-cli_apicall_types                          @1383 NONAME DATA
-cli_apicalls                               @1384 NONAME DATA
-cli_apicalls0                              @1385 NONAME DATA
-cli_apicalls1                              @1386 NONAME DATA
-cli_apicalls2                              @1387 NONAME DATA
-cli_apicalls3                              @1388 NONAME DATA
-cli_apicalls4                              @1389 NONAME DATA
-cli_apicalls5                              @1390 NONAME DATA
-cli_apicalls6                              @1391 NONAME DATA
-cli_apicalls7                              @1392 NONAME DATA
-cli_apicalls8                              @1393 NONAME DATA
-cli_apicalls9                              @1394 NONAME DATA
-cli_globals                                @1395 NONAME DATA
-cli_bytecode_context_alloc                 @1396 NONAME
-cli_bytecode_context_destroy               @1397 NONAME
-cli_bytecode_context_getresult_int         @1398 NONAME
-cli_bytecode_context_set_trace             @1399 NONAME
-cli_bytecode_context_setfile               @1400 NONAME
-cli_bytecode_context_setfuncid             @1401 NONAME
-cli_bytecode_context_setparam_int          @1402 NONAME
-cli_bytecode_debug                         @1403 NONAME
-cli_bytecode_debug_printsrc                @1404 NONAME
-cli_bytecode_describe                      @1405 NONAME
-cli_bytecode_destroy                       @1406 NONAME
-cli_bytecode_done                          @1407 NONAME
-cli_bytecode_init                          @1408 NONAME
-cli_bytecode_load                          @1409 NONAME
-cli_bytecode_prepare2                      @1410 NONAME
-cli_bytecode_printversion                  @1411 NONAME
-cli_bytecode_run                           @1412 NONAME
-cli_bytefunc_describe                      @1413 NONAME
-cli_bytetype_describe                      @1414 NONAME
-cli_bytevalue_describe                     @1415 NONAME
-__cli_strndup                              @1416 NONAME
+cli_ac_chklsig                             @1300 NONAME
+cli_chomp                                  @1301 NONAME
+cli_ctime                                  @1302 NONAME
+cli_filecopy                               @1303 NONAME
+cli_determine_fmap_type                    @1304 NONAME
+cli_scan_fmap                              @1305 NONAME
+cli_ftw                                    @1306 NONAME
+cli_gentemp                                @1307 NONAME
+cli_gentempfd                              @1308 NONAME
+cli_gettmpdir                              @1309 NONAME
+cli_hashfile                               @1310 NONAME
+cli_hashset_destroy                        @1311 NONAME
+cli_hashstream                             @1312 NONAME
+cli_hex2str                                @1313 NONAME
+cli_hex2ui                                 @1314 NONAME
+cli_initroots                              @1315 NONAME
+cli_isnumber                               @1316 NONAME
+cli_ldbtokenize                            @1317 NONAME
+cli_matchregex                             @1318 NONAME
+cli_ole2_extract                           @1319 NONAME
+cli_pcre_perf_events_destroy               @1320 NONAME
+cli_pcre_perf_print                        @1321 NONAME
+cli_ppt_vba_read                           @1322 NONAME
+cli_readn                                  @1323 NONAME
+cli_regcomp                                @1324 NONAME
+cli_regexec                                @1325 NONAME
+cli_regfree                                @1326 NONAME
+cli_rmdirs                                 @1327 NONAME
+cli_rndnum                                 @1328 NONAME
+cli_scancpio_newc                          @1329 NONAME
+cli_scancpio_odc                           @1330 NONAME
+cli_scancpio_old                           @1331 NONAME
+cli_scanmacho                              @1332 NONAME
+cli_sigperf_events_destroy                 @1333 NONAME
+cli_sigperf_print                          @1334 NONAME
+cli_str2hex                                @1335 NONAME
+cli_strbcasestr                            @1336 NONAME
+cli_strerror                               @1337 NONAME
+cli_strtok                                 @1338 NONAME
+cli_strtokenize                            @1339 NONAME
+cli_utf16toascii                           @1340 NONAME
+cli_vba_inflate                            @1341 NONAME
+cli_vba_readdir                            @1342 NONAME
+cli_versig2                                @1343 NONAME
+cli_wm_decrypt_macro                       @1344 NONAME
+cli_wm_readdir                             @1345 NONAME
+cli_writen                                 @1346 NONAME
+cli_genhash_pe                             @1347 NONAME
+cli_free_vba_project                       @1348 NONAME
+cli_check_auth_header                      @1349 NONAME
+cli_gentemp_with_prefix                    @1350 NONAME
+cli_realpath                               @1351 NONAME
+cli_strntoul                               @1352 NONAME
+cli_unlink                                 @1353 NONAME
+cli_get_filepath_from_filedesc             @1354 NONAME
+cli_add_content_match_pattern              @1355 NONAME
+readdb_parse_ldb_subsignature              @1356 NONAME
+cli_basename                               @1357 NONAME
+cli_infomsg_simple                         @1358 NONAME
+cli_dbgmsg                                 @1359 NONAME
+cli_dbgmsg_no_inline                       @1360 NONAME
+cli_safer_strdup                           @1361 NONAME
+cli_safer_realloc                          @1362 NONAME
+cli_get_debug_flag                         @1363 NONAME
+cli_getdsig                                @1364 NONAME
+cli_checklimits                            @1365 NONAME
+cli_matchmeta                              @1366 NONAME
+cli_magic_scan_buff                        @1367 NONAME
+html_normalise_map                         @1368 NONAME
+text_normalize_init                        @1369 NONAME
+text_normalize_reset                       @1370 NONAME
+text_normalize_map                         @1371 NONAME
+uniq_get                                   @1372 NONAME
+fmap_new                                   @1373 NONAME
+openlog                                    @1374 NONAME
+closelog                                   @1375 NONAME
+syslog                                     @1376 NONAME
+mpool_getstats                             @1377 NONAME
+cli_debug_flag                             @1378 NONAME DATA
+cli_errmsg                                 @1379 NONAME
+cli_warnmsg                                @1380 NONAME
+cli_apicall_maxapi                         @1381 NONAME DATA
+cli_apicall_maxglobal                      @1382 NONAME DATA
+cli_apicall_maxtypes                       @1383 NONAME DATA
+cli_apicall_types                          @1384 NONAME DATA
+cli_apicalls                               @1385 NONAME DATA
+cli_apicalls0                              @1386 NONAME DATA
+cli_apicalls1                              @1387 NONAME DATA
+cli_apicalls2                              @1388 NONAME DATA
+cli_apicalls3                              @1389 NONAME DATA
+cli_apicalls4                              @1390 NONAME DATA
+cli_apicalls5                              @1391 NONAME DATA
+cli_apicalls6                              @1392 NONAME DATA
+cli_apicalls7                              @1393 NONAME DATA
+cli_apicalls8                              @1394 NONAME DATA
+cli_apicalls9                              @1395 NONAME DATA
+cli_globals                                @1396 NONAME DATA
+cli_bytecode_context_alloc                 @1397 NONAME
+cli_bytecode_context_destroy               @1398 NONAME
+cli_bytecode_context_getresult_int         @1399 NONAME
+cli_bytecode_context_set_trace             @1400 NONAME
+cli_bytecode_context_setfile               @1401 NONAME
+cli_bytecode_context_setfuncid             @1402 NONAME
+cli_bytecode_context_setparam_int          @1403 NONAME
+cli_bytecode_debug                         @1404 NONAME
+cli_bytecode_debug_printsrc                @1405 NONAME
+cli_bytecode_describe                      @1406 NONAME
+cli_bytecode_destroy                       @1407 NONAME
+cli_bytecode_done                          @1408 NONAME
+cli_bytecode_init                          @1409 NONAME
+cli_bytecode_load                          @1410 NONAME
+cli_bytecode_prepare2                      @1411 NONAME
+cli_bytecode_printversion                  @1412 NONAME
+cli_bytecode_run                           @1413 NONAME
+cli_bytefunc_describe                      @1414 NONAME
+cli_bytetype_describe                      @1415 NONAME
+cli_bytevalue_describe                     @1416 NONAME
+__cli_strndup                              @1417 NONAME
+cli_cvdunpack_and_verify                   @1418 NONAME
+cli_cvdverify                              @1419 NONAME
+codesign_verifier_free                     @1420 NONAME
+codesign_verifier_new                      @1421 NONAME
+glob_rm                                    @1422 NONAME
