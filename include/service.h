@@ -25,7 +25,6 @@
 #include <windows.h>
 #include <stdbool.h>
 
-#ifdef _UNICODE
 bool svc_uninstall(const wchar_t *name, bool verbose);
 bool svc_install(const wchar_t *name, const wchar_t *dname, wchar_t *desc);
 void svc_register(wchar_t *name);
@@ -43,5 +42,4 @@ int svc_checkpoint(const char *type, const char *name, unsigned int custom, void
     fprintf(stderr, "Service is not supported on this build\n")
 #define svc_register(name)
 #define svc_ready()
-#endif
 #endif // _SERVICE_H_

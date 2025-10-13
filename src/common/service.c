@@ -19,7 +19,6 @@
  *  MA 02110-1301, USA.
  */
 
-#ifdef _UNICODE
 #include <stdio.h>
 #include <stdbool.h>
 #include <windows.h>
@@ -265,4 +264,3 @@ void WINAPI ServiceMain(DWORD dwArgc, LPWSTR *lpszArgv)
     WaitForSingleObject(DispatcherThread, INFINITE);
     cw_stop_ctrl_handler(CTRL_C_EVENT);
 }
-#endif // _UNICODE

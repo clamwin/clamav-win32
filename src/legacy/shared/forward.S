@@ -84,8 +84,6 @@ FindFirstFileExW:
 #else
 .align 4
 
-#ifdef _UNICODE
 _FindFirstFileExW@24:
     jmp _FindFirstFileExW_wrapper@24
-#endif
 #endif

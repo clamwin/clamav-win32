@@ -20,7 +20,6 @@
 
 #include <windows.h>
 
-#ifdef _UNICODE
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -158,9 +157,3 @@ BOOL EnsureElevated()
     free(params);
     return FALSE;
 }
-#else
-BOOL EnsureElevated()
-{
-    return TRUE;
-}
-#endif // _UNICODE

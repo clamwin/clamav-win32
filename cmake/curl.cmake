@@ -34,9 +34,7 @@ set(HAVE_OPENSSL_SRP 0)
 # must be OFF or libfreshclam will get openssl direct dependency, we export symbols in libclamav
 set(CURL_USE_OPENSSL OFF)
 
-if(CLAMWIN_UNICODE_BUILD)
-    set(ENABLE_UNICODE ON)
-endif()
+set(ENABLE_UNICODE ON)
 
 if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
     set(USE_WIN32_IDN OFF)

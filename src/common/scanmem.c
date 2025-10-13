@@ -36,12 +36,6 @@ typedef int (*proc_callback)(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void
 int sock;
 static struct optstruct *clamdopts;
 
-#ifdef _UNICODE
-#define ANSI(quote) quote##A
-#else
-#define ANSI(quote) quote
-#endif
-
 static inline int lookup_cache(filelist_t **list, const TCHAR *filename)
 {
     filelist_t *current = *list;
@@ -121,7 +115,6 @@ bool EnablePrivilege(LPTSTR PrivilegeName, DWORD yesno)
     return (GetLastError() == ERROR_SUCCESS);
 }
 
-#ifdef _UNICODE
 int walkmodules(proc_callback callback, void *data, struct mem_info *info)
 {
     DWORD procs[1024], needed, nprocs, mneeded;
@@ -193,57 +186,6 @@ int walkmodules(proc_callback callback, void *data, struct mem_info *info)
     }
     return 0;
 }
-#else
-int walkmodules(proc_callback callback, void *data, struct mem_info *info)
-{
-    HANDLE hSnap = INVALID_HANDLE_VALUE, hModuleSnap = INVALID_HANDLE_VALUE;
-    PROCESSENTRY32 ps;
-    MODULEENTRY32 me32;
-
-    logg(LOGG_INFO, " *** Memory Scan: using ToolHelp ***\n\n");
-
-    hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if (hSnap == INVALID_HANDLE_VALUE)
-        return -1;
-
-    ps.dwSize = sizeof(PROCESSENTRY32);
-
-    if (!Process32First(hSnap, &ps))
-    {
-        CloseHandle(hSnap);
-        return -1;
-    }
-
-    do
-    {
-        /* system process */
-        if (!ps.th32ProcessID)
-            continue;
-
-        hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, ps.th32ProcessID);
-
-        if (hModuleSnap == INVALID_HANDLE_VALUE)
-            continue;
-
-        me32.dwSize = sizeof(MODULEENTRY32);
-        if (!Module32First(hModuleSnap, &me32))
-        {
-            CloseHandle(hModuleSnap);
-            continue;
-        }
-
-        do
-            if (callback(ps, me32, data, info))
-                break;
-        while (Module32Next(hModuleSnap, &me32));
-
-        CloseHandle(hModuleSnap);
-    } while (Process32Next(hSnap, &ps));
-
-    CloseHandle(hSnap);
-    return 0;
-}
-#endif // _UNICODE
 
 int kill_process(DWORD pid)
 {
@@ -536,14 +478,12 @@ int scanmem_cb(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void *data, struct
         modulename[MAX_PATH] = 0;
     }
 
-#ifdef _UNICODE
     char modulenameA[MAX_PATH + 1];
     if (!WideCharToMultiByte(CP_ACP, 0, modulename, -1, modulenameA, MAX_PATH, NULL, NULL))
     {
         logg(LOGG_ERROR, "WideCharToMultiByte failed %ld\n", GetLastError());
         return 0;
     }
-#endif
 
     scan_data->res = lookup_cache(&scan_data->files, modulename);
     isprocess = !_tcsicmp(ProcStruct.szExeFile, modulename) ||
@@ -560,10 +500,10 @@ int scanmem_cb(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void *data, struct
 
         /* check for module exclusion */
         scan_data->res = CL_CLEAN;
-        if (!(scan_data->exclude && chkpath(ANSI(modulename), clamdopts)))
-            scan_data->res = scanfile(ANSI(modulename), scan_data, info);
+        if (!(scan_data->exclude && chkpath(modulenameA, clamdopts)))
+            scan_data->res = scanfile(modulenameA, scan_data, info);
 
-        if ((scan_data->res != CL_VIRUS) && is_packed(ANSI(modulename)))
+        if ((scan_data->res != CL_VIRUS) && is_packed(modulenameA))
         {
             char *dumped = cli_gentemp(NULL);
             int fd = -1;
@@ -587,14 +527,14 @@ int scanmem_cb(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void *data, struct
         }
         else if (scan_data->unload)
         {
-            logg(LOGG_INFO, "Unloading module %s from %s\n", me32.szModule, ANSI(modulename));
+            logg(LOGG_INFO, "Unloading module %s from %s\n", me32.szModule, modulenameA);
             if ((rc = unload_module(ProcStruct.th32ProcessID, me32.hModule)) == -1)
                 /* CreateProcessThread() is not implemented */
                 return 0;
         }
 
         if (action)
-            action(ANSI(modulename));
+            action(modulenameA);
         return rc;
     }
     return rc;

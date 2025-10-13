@@ -200,7 +200,6 @@ BOOL WINAPI GetFileSizeEx(HANDLE hFile, PLARGE_INTEGER lpFileSize)
     return TRUE;
 }
 
-#ifdef _UNICODE
 DWORD WINAPI GetProcessId(HANDLE Process)
 {
     PROCESS_BASIC_INFORMATION pbi;
@@ -219,122 +218,6 @@ DWORD WINAPI GetProcessId(HANDLE Process)
 
     return (DWORD)pbi.UniqueProcessId;
 }
-#else
-DWORD WINAPI GetProcessId(HANDLE Process)
-{
-    TRACE("GetProcessId(0x%p)\n", Process);
-    fprintf(stderr, "GetProcessId is not supported!\n");
-    return 0;
-}
-
-NTSTATUS NTAPI NtOpenFile(
-    PHANDLE FileHandle,
-    ACCESS_MASK DesiredAccess,
-    POBJECT_ATTRIBUTES ObjectAttributes,
-    PIO_STATUS_BLOCK IoStatusBlock,
-    ULONG ShareAccess,
-    ULONG OpenOptions)
-{
-    fprintf(stderr, "NtOpenFile is not supported!\n");
-    return STATUS_NOT_SUPPORTED;
-}
-
-NTSTATUS NTAPI NtReadFile(
-    HANDLE FileHandle,
-    HANDLE Event,
-    PIO_APC_ROUTINE ApcRoutine,
-    PVOID ApcContext,
-    PIO_STATUS_BLOCK IoStatusBlock,
-    PVOID Buffer,
-    ULONG Length,
-    PLARGE_INTEGER ByteOffset,
-    PULONG Key)
-{
-    DWORD bytesRead = 0;
-    BOOL result;
-
-    // TRACE("NtReadFile(0x%p, 0x%p): %lu\n", FileHandle, Event, Length);
-
-    if (Event || ByteOffset)
-    {
-        fprintf(stderr, "NtReadFile() unsupported Event or ByteOffset\n");
-        return STATUS_NOT_SUPPORTED;
-    }
-
-    result = ReadFile(FileHandle, Buffer, Length, &bytesRead, NULL);
-
-    if (result)
-    {
-        IoStatusBlock->Status = STATUS_SUCCESS;
-        IoStatusBlock->Information = bytesRead;
-    }
-    else
-    {
-        IoStatusBlock->Status = GetLastError();
-        IoStatusBlock->Information = 0;
-    }
-
-    return IoStatusBlock->Status;
-}
-
-NTSTATUS NTAPI NtWriteFile(
-    HANDLE FileHandle,
-    HANDLE Event,
-    PIO_APC_ROUTINE ApcRoutine,
-    PVOID ApcContext,
-    PIO_STATUS_BLOCK IoStatusBlock,
-    PVOID Buffer,
-    ULONG Length,
-    PLARGE_INTEGER ByteOffset,
-    PULONG Key)
-{
-    DWORD bytesWritten = 0;
-    BOOL result;
-
-    // TRACE("NtWriteFile(0x%p): %lu\n", FileHandle, Length);
-
-    if (Event || ByteOffset)
-    {
-        fprintf(stderr, "NtWriteFile() unsupported args\n");
-        return STATUS_NOT_SUPPORTED;
-    }
-
-    result = WriteFile(FileHandle, Buffer, Length, &bytesWritten, NULL);
-
-    if (result)
-    {
-        IoStatusBlock->Status = STATUS_SUCCESS;
-        IoStatusBlock->Information = bytesWritten;
-    }
-    else
-    {
-        IoStatusBlock->Status = GetLastError();
-        IoStatusBlock->Information = 0;
-    }
-
-    return IoStatusBlock->Status;
-}
-
-NTSTATUS NTAPI NtCreateNamedPipeFile(
-    PHANDLE FileHandle,
-    ULONG DesiredAccess,
-    POBJECT_ATTRIBUTES ObjectAttributes,
-    PIO_STATUS_BLOCK IoStatusBlock,
-    ULONG ShareAccess,
-    ULONG CreateDisposition,
-    ULONG CreateOptions,
-    ULONG NamedPipeType,
-    ULONG ReadMode,
-    ULONG CompletionMode,
-    ULONG MaximumInstances,
-    ULONG InboundQuota,
-    ULONG OutboundQuota,
-    PLARGE_INTEGER DefaultTimeout)
-{
-    fprintf(stderr, "NtCreateNamedPipeFile() is unsupported\n");
-    return STATUS_NOT_SUPPORTED;
-}
-#endif // _UNICODE
 
 imp_MultiByteToWideChar pMultiByteToWideChar = NULL;
 imp_RegisterWaitForSingleObject pRegisterWaitForSingleObject = RegisterWaitForSingleObject_compat;
@@ -349,23 +232,11 @@ imp_Module32FirstW pModule32FirstW = NULL;
 imp_Module32NextW pModule32NextW = NULL;
 imp_AddVectoredExceptionHandler pAddVectoredExceptionHandler = NULL;
 
-// windows 98/nt do not like MB_ERR_INVALID_CHARS and loop rust message function
+// windows nt4 does not like MB_ERR_INVALID_CHARS and loop rust message function
 int WINAPI MultiByteToWideChar_wrapper(UINT CodePage, DWORD dwFlags, LPCCH lpMultiByteStr, int cbMultiByte, LPWSTR lpWideCharStr, int cchWideChar)
 {
     return pMultiByteToWideChar(CodePage, dwFlags & ~MB_ERR_INVALID_CHARS, lpMultiByteStr, cbMultiByte, lpWideCharStr, cchWideChar);
 }
-
-#ifndef _UNICODE
-imp_CreateThread pCreateThread = NULL;
-// windows 98 does not like CreateThread with NULL lpThreadId
-HANDLE WINAPI CreateThread_wrapper(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize, LPTHREAD_START_ROUTINE lpStartAddress, LPVOID lpParameter, DWORD dwCreationFlags, LPDWORD lpThreadId)
-{
-    DWORD ThreadId;
-    if (!lpThreadId)
-        lpThreadId = &ThreadId;
-    return pCreateThread(lpThreadAttributes, dwStackSize, lpStartAddress, lpParameter, dwCreationFlags, lpThreadId);
-}
-#endif
 
 INITIALIZER(init_kernel32_4_0)
 {
@@ -373,10 +244,6 @@ INITIALIZER(init_kernel32_4_0)
     HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
     if (!kernel32) // meh
         return;
-
-#ifndef _UNICODE
-    IMPORT_FUNCTION(kernel32, CreateThread);
-#endif
 
     IMPORT_FUNCTION(kernel32, MultiByteToWideChar);
     IMPORT_FUNCTION(kernel32, RegisterWaitForSingleObject);

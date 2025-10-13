@@ -53,37 +53,13 @@ function(add_legacy_executable TARGET SOURCES LINK_LIBRARY)
 endfunction()
 
 # test tools
-if(CLAMWIN_UNICODE_BUILD AND ENABLE_TEST_TOOLS)
+if(ENABLE_TEST_TOOLS)
     add_legacy_executable(gfpn ${CLAMWIN_DIR}/src/legacy/tests/gfpn.c clamav_compat)
     add_legacy_executable(gfpn-native ${CLAMWIN_DIR}/src/legacy/tests/gfpn.c ntdll)
     add_legacy_executable(glpn ${CLAMWIN_DIR}/src/legacy/tests/glpn.c clamav_compat)
     add_legacy_executable(glpn-native ${CLAMWIN_DIR}/src/legacy/tests/glpn.c ntdll)
     add_legacy_executable(sfibh ${CLAMWIN_DIR}/src/legacy/tests/sfibh.c clamav_compat)
     add_legacy_executable(reopenfile ${CLAMWIN_DIR}/src/legacy/tests/reopenfile.c clamav_compat)
-endif()
-
-if(NOT CLAMWIN_UNICODE_BUILD)
-    # melt in opencow
-    file(GLOB opencow_headers ${CLAMWIN_DIR}/src/legacy/opencow/*.h)
-    file(GLOB opencow_sources
-        ${CLAMWIN_DIR}/src/legacy/opencow/*.c
-        ${CLAMWIN_DIR}/src/legacy/opencow/*.cpp
-        ${CLAMWIN_DIR}/src/legacy/opencow/forward.S
-    )
-    add_library(opencow STATIC ${opencow_headers} ${opencow_sources})
-    target_include_directories(opencow PRIVATE ${LEGACY_INCLUDES})
-    target_compile_options(opencow PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall -Wno-attributes>)
-    target_link_options(opencow PRIVATE $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
-
-    target_link_libraries(libclamav PRIVATE opencow)
-    target_link_libraries(libfreshclam PRIVATE opencow)
-    target_link_libraries(libclamunrar PRIVATE opencow)
-    target_link_libraries(libclamunrar_iface PRIVATE opencow)
-
-    target_link_libraries(clamscan PRIVATE opencow)
-    target_link_libraries(sigtool PRIVATE opencow)
-    target_link_libraries(freshclam PRIVATE opencow)
-    install(FILES ${CLAMWIN_DIR}/src/legacy/opencow/LICENCE.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME opencow.txt)
 endif()
 
 if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501 AND CLAMAV_ARCH STREQUAL "x86")
@@ -106,12 +82,9 @@ if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501 AND CLAMAV_ARCH STREQUAL "x86")
     target_link_libraries(freshclam PRIVATE clamav_compat)
     target_link_libraries(clamscan PRIVATE clamav_compat)
     target_link_libraries(libclamunrar PRIVATE clamav_compat)
-
-    if(CLAMWIN_UNICODE_BUILD)
-        target_link_libraries(clamd PRIVATE clamav_compat)
-        target_link_libraries(clamdscan PRIVATE clamav_compat)
-        target_link_libraries(clamdtop PRIVATE clamav_compat)
-    endif()
+    target_link_libraries(clamd PRIVATE clamav_compat)
+    target_link_libraries(clamdscan PRIVATE clamav_compat)
+    target_link_libraries(clamdtop PRIVATE clamav_compat)
 endif()
 
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")

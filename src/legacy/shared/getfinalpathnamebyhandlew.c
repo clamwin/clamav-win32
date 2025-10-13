@@ -28,7 +28,6 @@
 // https://github.com/zeroclear/xpext/blob/master/xpext_ver4/k32_file.cpp#L445
 // https://stackoverflow.com/questions/65170/how-to-get-name-associated-with-open-handle/5286888#5286888
 
-#ifdef _UNICODE
 static OSVERSIONINFOW osvi = {0};
 
 INITIALIZER(init_gfpn)
@@ -711,13 +710,3 @@ cleanup:
     TRACE("GetFinalPathNameByHandleW -> [%ls](%d)\n", result ? lpszFilePath : NULL, (DWORD)result);
     return (DWORD)result;
 }
-
-#else
-DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags)
-{
-    TRACE("GetFinalPathNameByHandleW(0x%p, 0x%p, %ld, %ld)\n", hFile, lpszFilePath, cchFilePath, dwFlags);
-    fprintf(stderr, "GetFinalPathNameByHandleW: ERROR_CALL_NOT_IMPLEMENTED\n");
-    SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
-    return 0;
-}
-#endif // _UNICODE

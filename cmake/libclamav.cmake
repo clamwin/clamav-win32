@@ -32,6 +32,7 @@ list(APPEND libclamav_win32_sources
     ${CLAMAV_DIR}/win32/compat/random.c
     ${CLAMAV_DIR}/win32/compat/strptime.c
     ${CLAMAV_DIR}/win32/compat/utf8_util.c
+    ${CLAMAV_DIR}/win32/compat/w32_stat.c
 )
 
 if(MSVC)

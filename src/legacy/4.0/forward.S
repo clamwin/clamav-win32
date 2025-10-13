@@ -67,11 +67,6 @@ __imp__UnregisterWaitEx@8:
 __imp__MultiByteToWideChar@24:
     .long _MultiByteToWideChar_wrapper@24
 
-#ifndef _UNICODE
-__imp__CreateThread@24:
-    .long _MultiByteToWideChar_wrapper@24
-#endif
-
 .section .text
 .align 4
 
@@ -80,11 +75,6 @@ _MultiByteToWideChar@24:
 
 _GetUserProfileDirectoryW@12:
     jmp *_pGetUserProfileDirectoryW
-
-#ifndef _UNICODE
-_CreateThread@24:
-    jmp _CreateThread_wrapper@24
-#endif
 
 thunk_pRegisterWaitForSingleObject@24:
     jmp *_pRegisterWaitForSingleObject

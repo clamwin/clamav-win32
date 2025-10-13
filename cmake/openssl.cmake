@@ -1,5 +1,5 @@
 if(MINGW)
-    if(CLAMWIN_UNICODE_BUILD AND CLAMAV_ARCH STREQUAL "x64")
+    if(CLAMAV_ARCH STREQUAL "x64")
         set(OPENSSL_ROOT_DIR ${3RDPARTY_DIR}/openssl/lib/mingw/${CLAMAV_ARCH})
     else()
         set(OPENSSL_ROOT_DIR ${3RDPARTY_DIR}/openssl/lib/mingw/legacy)

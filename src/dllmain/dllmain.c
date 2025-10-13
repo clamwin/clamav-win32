@@ -81,10 +81,10 @@ static void processattach(void)
         IMPORT_FUNCTION(kernel32, GetSystemTimePreciseAsFileTime);
         if (!pGetSystemTimePreciseAsFileTime)
             init_sysinfoapi();
-#ifdef _UNICODE
+
         IMPORT_FUNCTION(kernel32, AttachConsole);
         IMPORT_FUNCTION(kernel32, GetConsoleProcessList);
-#endif
+
 #ifndef _WIN64
         IMPORT_FUNCTION(kernel32, IsWow64Process);
 

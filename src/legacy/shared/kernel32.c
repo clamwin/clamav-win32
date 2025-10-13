@@ -219,7 +219,6 @@ HANDLE WINAPI CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LP
     return hTimer;
 }
 
-#ifdef _UNICODE
 imp_FindFirstFileExW pFindFirstFileExW = NULL;
 
 // FindFirstFileExW on Windows XP and lower does not support FindExInfoBasic
@@ -242,4 +241,3 @@ INITIALIZER(init_kernel32_shared)
 
     IMPORT_FUNCTION(kernel32, FindFirstFileExW);
 }
-#endif

@@ -11,28 +11,19 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "Do not build shared libraries" FORCE)
 set(BUILD_STATIC_LIBS ON CACHE BOOL "Build static libraries" FORCE)
 
 option(ENABLE_LLVM "Enable JIT using LLVM Engine" OFF)
-set(ENABLE_LEGACY "OFF" CACHE STRING "Enable support for legacy Windows Versions")
-set_property(CACHE ENABLE_LEGACY PROPERTY STRINGS OFF unicode ansi)
+set(ENABLE_LEGACY OFF CACHE BOOL "Enable support for legacy Windows Versions")
 
 option(ENABLE_TEST_TOOLS "Enable Test Tools" OFF)
 
-if(ENABLE_LEGACY STREQUAL "unicode")
-    set(CLAMWIN_UNICODE_BUILD ON)
+if(ENABLE_LEGACY)
     set(CLAMWIN_WINDOWS_VERSION 0x0501)
     set(CLAMWIN_WINNT_VERSION _WIN32_WINNT=_WIN32_WINNT_WINXP)
-elseif(ENABLE_LEGACY STREQUAL "ansi")
-    set(CLAMWIN_UNICODE_BUILD OFF)
-    set(CLAMWIN_WINDOWS_VERSION 0x0400)
-    set(CLAMWIN_WINNT_VERSION _WIN32_WINNT=_WIN32_WINNT_NT4)
-elseif(ENABLE_LEGACY STREQUAL "OFF")
-    set(CLAMWIN_UNICODE_BUILD ON)
+else()
     set(CLAMWIN_WINDOWS_VERSION 0x0600)
     set(CLAMWIN_WINNT_VERSION _WIN32_WINNT=_WIN32_WINNT_VISTA)
 endif()
 
-if(CLAMWIN_UNICODE_BUILD)
-    set(UNICODE_DEFINES UNICODE _UNICODE)
-endif()
+set(UNICODE_DEFINES UNICODE _UNICODE)
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(CLAMAV_ARCH x64)
@@ -153,13 +144,10 @@ include(cmake/clamscan.cmake)
 include(cmake/freshclam.cmake)
 include(cmake/sigtool.cmake)
 include(cmake/libclamunrar.cmake)
-
-if(CLAMWIN_UNICODE_BUILD)
-    include(cmake/clamd.cmake)
-    include(cmake/clamdscan.cmake)
-    include(cmake/pdcurses.cmake)
-    include(cmake/clamdtop.cmake)
-endif()
+include(cmake/clamd.cmake)
+include(cmake/clamdscan.cmake)
+include(cmake/pdcurses.cmake)
+include(cmake/clamdtop.cmake)
 
 if(ENABLE_TEST_TOOLS)
     include(cmake/tools.cmake)
@@ -172,8 +160,8 @@ set_source_files_properties(${CLAMWIN_DIR}/src/helpers/cw_main.c
 include(${CLAMAV_DIR}/cmake/FindRust.cmake)
 add_subdirectory(${CLAMAV_DIR}/libclamav_rust EXCLUDE_FROM_ALL)
 
-if(NOT ENABLE_LEGACY STREQUAL "OFF")
-    message(STATUS "Legacy support enabled for: ${ENABLE_LEGACY}")
+if(ENABLE_LEGACY)
+    message(STATUS "WIN32: Legacy support enabled")
 
     if(MSVC)
         message(WARNING "Compatibility layer makes only sense on MinGW")
@@ -192,9 +180,7 @@ install(TARGETS ${CLAMAV_INSTALL_TARGETS}
 
 set(DIST_FILES README.md freshclam.conf clamav.reg)
 
-if(CLAMWIN_UNICODE_BUILD)
-    list(APPEND DIST_FILES clamd.conf)
-endif()
+list(APPEND DIST_FILES clamd.conf)
 
 file(GLOB COPYRIGHT_FILES ${CLAMAV}/COPYING*)
 install(FILES ${COPYRIGHT_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright)
