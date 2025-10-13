@@ -5,6 +5,7 @@
 .global __imp__LoadLibraryW@4
 .global __imp__GetEnvironmentVariableW@12
 .global __imp__FindFirstFileW@8
+.global __imp__FindFirstFileExW@24
 .global __imp__FindNextFileW@8
 .global __imp__FormatMessageW@28
 .global __imp__SetFileAttributesW@8
@@ -37,6 +38,8 @@ __imp__GetEnvironmentVariableW@12:
     .long _GetEnvironmentVariableW@12
 __imp__FindFirstFileW@8:
     .long _FindFirstFileW@8
+__imp__FindFirstFileExW@24:
+    .long _FindFirstFileExW@24
 __imp__FindNextFileW@8:
     .long _FindNextFileW@8
 __imp__FormatMessageW@28:

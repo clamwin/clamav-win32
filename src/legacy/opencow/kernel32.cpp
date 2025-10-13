@@ -479,6 +479,23 @@ FindFirstFileW(
     return hFile;
 }
 
+HANDLE WINAPI
+FindFirstFileExW(
+    IN LPCWSTR lpFileName,
+    IN FINDEX_INFO_LEVELS fInfoLevelId,
+    OUT LPVOID lpFindFileData,
+    IN FINDEX_SEARCH_OPS fSearchOp,
+    LPVOID lpSearchFilter,
+    DWORD dwAdditionalFlags)
+{
+    if (fInfoLevelId > FindExInfoBasic)
+    {
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return INVALID_HANDLE_VALUE;
+    }
+    return FindFirstFileW(lpFileName, (LPWIN32_FIND_DATAW)lpFindFileData);
+}
+
 BOOL WINAPI
 FindNextFileW(
     IN HANDLE hFindFile,
