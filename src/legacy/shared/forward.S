@@ -34,6 +34,7 @@
 
 .global __imp_GetTimeZoneInformationForYear
 
+.global FindFirstFileExW
 .global _FindFirstFileExW@24
 
 .section .rdata,"dr"
@@ -74,7 +75,7 @@ __imp_GetTimeZoneInformationForYear:
     .long _GetTimeZoneInformationForYear@12
 #endif
 
-.section text
+.section .text
 
 #ifdef _WIN64
 .align 8

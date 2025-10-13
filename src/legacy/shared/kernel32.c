@@ -224,8 +224,10 @@ imp_FindFirstFileExW pFindFirstFileExW = NULL;
 // FindFirstFileExW on Windows XP and lower does not support FindExInfoBasic
 HANDLE WINAPI FindFirstFileExW_wrapper(LPCWSTR lpFileName, FINDEX_INFO_LEVELS fInfoLevelId, LPVOID lpFindFileData, FINDEX_SEARCH_OPS fSearchOp, LPVOID lpSearchFilter, DWORD dwAdditionalFlags)
 {
+    TRACE("FindFirstFileExW_wrapper(%ls, %d, %p, %d, %p, %d)\n", lpFileName, fInfoLevelId, lpFindFileData, fSearchOp, lpSearchFilter, dwAdditionalFlags);
     if (fInfoLevelId > FindExInfoBasic)
     {
+        fprintf(stderr, "[legacy] FindFirstFileExW_wrapper: fInfoLevelId (%d) > FindExInfoBasic\n", fInfoLevelId);
         SetLastError(ERROR_INVALID_PARAMETER);
         return INVALID_HANDLE_VALUE;
     }
