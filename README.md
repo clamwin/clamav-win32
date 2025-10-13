@@ -62,6 +62,12 @@ Clone repository using:
   it's probabily and old bogus cert you can safely remove from windows cert manager,
   on my system `Japan Certification Services, Inc. SecureSign RootCA1, RootCA2 and RootCA3`
 
+## Mini FAQ
+
+Q: freshclam: 403 or Forbidden; Blocked by CDN while trying to update
+
+A: <https://docs.clamav.net/faq/faq-troubleshoot.html#how-do-i-know-if-my-ip-address-has-been-blocked>, often it's enough to delete freshclam.dat in the database directory
+
 ## Running Clamd and FreshClam as services
 
 - import `clamav.reg` file
