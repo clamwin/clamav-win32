@@ -2,6 +2,8 @@ set(JSONC_DIR ${3RDPARTY_DIR}/json-c)
 
 set(BUILD_APPS OFF)
 set(BUILD_TESTING OFF)
+
+message(STATUS "==== Adding subproject json-c ====")
 add_subdirectory(${JSONC_DIR} EXCLUDE_FROM_ALL)
 target_compile_options(json-c PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4244 /wd4267>)
 

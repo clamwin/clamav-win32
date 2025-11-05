@@ -53,6 +53,7 @@ if(MSVC)
     set(HAVE_SIZEOF_SSIZE_T FALSE)
 endif()
 
+message(STATUS "==== Adding subproject curl ====")
 add_subdirectory(${CURL_DIR} EXCLUDE_FROM_ALL)
 target_include_directories(libcurl_object PRIVATE ${OPENSSL_INCLUDE_DIR})
 

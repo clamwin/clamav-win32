@@ -7,6 +7,7 @@ set(LIBXML2_WITH_PROGRAMS OFF)
 set(LIBXML2_WITH_TESTS OFF)
 set(LIBXML2_WITH_DEBUG OFF)
 
+message(STATUS "==== Adding subproject libxml2 ====")
 add_subdirectory(${LIBXML2_DIR} EXCLUDE_FROM_ALL)
 target_compile_options(LibXml2 PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4244 /wd4267>)
 

@@ -8,6 +8,7 @@ set(PCRE2_SUPPORT_LIBZ OFF)
 set(PCRE2_SUPPORT_LIBEDIT OFF)
 set(PCRE2_SUPPORT_LIBREADLINE OFF)
 
+message(STATUS "==== Adding subproject pcre2 ====")
 add_subdirectory(${PCRE2_DIR} EXCLUDE_FROM_ALL)
 
 list(APPEND CLAMWIN_INCLUDES "${PCRE2_BINARY_DIR}/interface")
