@@ -1,4 +1,4 @@
-# ClamAV native win32 port - 1.5.0
+# ClamAV native win32 port - 1.5.1
 
 Copyright (c) 2005-2025 Gianluigi Tiesi <sherpya@gmail.com>
 
@@ -32,14 +32,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 - OpenSSL: 3.5.2
 - bzip2: 1.0.8
-- curl: 8.16.0
+- curl: 8.17.0
 - json-c: 0.18-20240915
-- libxml2: 2.15.0
-- pcre2: 10.46
+- libxml2: 2.15.1
+- pcre2: 10.47
 - PDCurses: git-6ba6df38
 - Winpthreads: from MinGW-W64 v13.0.0
 - zlib-ng: 2.2.5
-- UnRAR: 7.1.10
+- UnRAR: 7.2.1
 - Opencow (custom build) on Win9x
 
 ## Getting sources
