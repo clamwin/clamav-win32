@@ -30,6 +30,7 @@ set(_ssl_enabled ON)
 set(USE_OPENSSL ON)
 set(HAVE_SSL_SET0_WBIO 1)
 set(HAVE_OPENSSL_SRP 0)
+set(HAVE_DES_ECB_ENCRYPT 0)
 
 # must be OFF or libfreshclam will get openssl direct dependency, we export symbols in libclamav
 set(CURL_USE_OPENSSL OFF)
