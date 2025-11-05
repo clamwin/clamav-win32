@@ -89,17 +89,16 @@ endif()
 
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     get_target_property(RUST_ARCHIVE clamav_rust IMPORTED_LOCATION)
-    set(RUST_FILTERED_ARCHIVE "${RUST_ARCHIVE}.filtered")
+    set(RUST_FILTERED_ARCHIVE "${RUST_ARCHIVE}.filtered.a")
 
     add_custom_command(
         OUTPUT "${RUST_FILTERED_ARCHIVE}"
         COMMAND ${CMAKE_COMMAND} -E copy "${RUST_ARCHIVE}" "${RUST_FILTERED_ARCHIVE}"
-        COMMAND ${CMAKE_AR} t "${RUST_FILTERED_ARCHIVE}" > filelist.txt
-        COMMAND ${CMAKE_COMMAND} -E env bash -c 'for f in $$$(grep -E "api-ms-win-core-synch-l1-2-0\\|bcryptprimitives\\|kernel32\.dlls00000\.o\\|libkernel32s00394\.o" filelist.txt) \; do ${CMAKE_AR} d ${RUST_FILTERED_ARCHIVE} $$f \; done'
-        DEPENDS "${RUST_ARCHIVE}"
+        COMMAND ${CMAKE_COMMAND} -E env python3 "${CMAKE_SOURCE_DIR}/filter-rust.py" "${CMAKE_OBJDUMP}" "${CMAKE_AR}" "${RUST_FILTERED_ARCHIVE}"
+        DEPENDS "${RUST_ARCHIVE}" "${CMAKE_SOURCE_DIR}/filter-rust.py"
     )
 
-    add_custom_target(filter_clamav_rust DEPENDS "${RUST_FILTERED_ARCHIVE}")
+    add_custom_target(filter_clamav_rust DEPENDS "${RUST_FILTERED_ARCHIVE}" JOB_POOL single)
     set_target_properties(clamav_rust PROPERTIES IMPORTED_LOCATION "${RUST_FILTERED_ARCHIVE}")
     add_dependencies(libclamav filter_clamav_rust clamav_rust)
     add_dependencies(libfreshclam filter_clamav_rust clamav_rust)

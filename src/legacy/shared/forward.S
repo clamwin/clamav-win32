@@ -37,6 +37,9 @@
 .global FindFirstFileExW
 .global _FindFirstFileExW@24
 
+.global __imp_ReOpenFile
+.global __imp_SetFileInformationByHandle
+
 .section .rdata,"dr"
 
 #ifdef _WIN64
@@ -57,6 +60,11 @@ __imp__wassert:
 
 __imp_GetTimeZoneInformationForYear:
     .quad GetTimeZoneInformationForYear
+
+__imp_ReOpenFile:
+    .quad ReOpenFile
+__imp_SetFileInformationByHandle:
+    .quad SetFileInformationByHandle
 #else
 .align 4
 
@@ -73,6 +81,9 @@ __imp__InitOnceExecuteOnce@16:
 
 __imp_GetTimeZoneInformationForYear:
     .long _GetTimeZoneInformationForYear@12
+
+__imp_ReOpenFile:
+    .long _ReOpenFile@16
 #endif
 
 .section .text
