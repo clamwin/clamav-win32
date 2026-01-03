@@ -1,7 +1,7 @@
 /*
  * Clamav Native Windows Port: scanner for in-memory modules/exe
  *
- * Copyright (c) 2005-2025 Gianluigi Tiesi <sherpya@gmail.com>
+ * Copyright (c) 2005-2026 Gianluigi Tiesi <sherpya@gmail.com>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -32,13 +32,35 @@
 #include "clamdcom.h"
 #include "scanmem.h"
 
+/* cache helpers */
+typedef struct _tc_filelist_t {
+    TCHAR filename[MAX_PATH];
+    int res;
+    struct _tc_filelist_t *next;
+} tc_filelist_t;
+
+/* Callback */
+typedef struct _tc_cb_data_t {
+    const TCHAR *filename;
+    size_t size, count;
+    int oldvalue;
+    int fd;
+} tc_cb_data_t;
+
+typedef struct _tc_scanmem_data_t {
+    tc_filelist_t *files;
+    int printclean, kill, unload, exclude;
+    int res;
+    uint32_t processes, modules;
+} tc_scanmem_data;
+
 typedef int (*proc_callback)(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void *data, struct mem_info *info);
 int sock;
 static struct optstruct *clamdopts;
 
-static inline int lookup_cache(filelist_t **list, const TCHAR *filename)
+static inline int lookup_cache(tc_filelist_t **list, const TCHAR *filename)
 {
-    filelist_t *current = *list;
+    tc_filelist_t *current = *list;
     while (current)
     {
         /* Cache hit */
@@ -50,18 +72,18 @@ static inline int lookup_cache(filelist_t **list, const TCHAR *filename)
     return -1;
 }
 
-static inline void insert_cache(filelist_t **list, const TCHAR *filename, int res)
+static inline void insert_cache(tc_filelist_t **list, const TCHAR *filename, int res)
 {
-    filelist_t *current = *list, *prev = NULL;
+    tc_filelist_t *current = *list, *prev = NULL;
 
     if (!current) /* New */
-        *list = current = malloc(sizeof(filelist_t));
+        *list = current = malloc(sizeof(tc_filelist_t));
     else
     {
         while (current->next)
             current = current->next;
         prev = current;
-        prev->next = current = malloc(sizeof(filelist_t));
+        prev->next = current = malloc(sizeof(tc_filelist_t));
     }
 
     /* OOM */
@@ -75,9 +97,9 @@ static inline void insert_cache(filelist_t **list, const TCHAR *filename, int re
     current->filename[MAX_PATH - 1] = 0;
 }
 
-static inline void free_cache(filelist_t **list)
+static inline void free_cache(tc_filelist_t **list)
 {
-    filelist_t *current, *prev;
+    tc_filelist_t *current, *prev;
     current = prev = *list;
 
     if (!current)
@@ -92,7 +114,7 @@ static inline void free_cache(filelist_t **list)
 }
 
 /* Needed to Scan System Processes */
-bool EnablePrivilege(LPTSTR PrivilegeName, DWORD yesno)
+static bool EnablePrivilege(LPTSTR PrivilegeName, DWORD yesno)
 {
     HANDLE hToken;
     TOKEN_PRIVILEGES tp;
@@ -115,7 +137,7 @@ bool EnablePrivilege(LPTSTR PrivilegeName, DWORD yesno)
     return (GetLastError() == ERROR_SUCCESS);
 }
 
-int walkmodules(proc_callback callback, void *data, struct mem_info *info)
+static int walkmodules(proc_callback callback, void *data, struct mem_info *info)
 {
     DWORD procs[1024], needed, nprocs, mneeded;
     HANDLE hProc;
@@ -155,8 +177,7 @@ int walkmodules(proc_callback callback, void *data, struct mem_info *info)
             continue;
         }
 
-        if (!GetModuleBaseName(hProc, mods[0], ps.szExeFile,
-                               MAX_PATH - 1))
+        if (!GetModuleBaseName(hProc, mods[0], ps.szExeFile, ARRAYSIZE(ps.szExeFile) - 1))
         {
             CloseHandle(hProc);
             continue;
@@ -187,7 +208,7 @@ int walkmodules(proc_callback callback, void *data, struct mem_info *info)
     return 0;
 }
 
-int kill_process(DWORD pid)
+static int kill_process(DWORD pid)
 {
     HANDLE hProc;
     if (GetCurrentProcessId() == pid)
@@ -209,7 +230,7 @@ int kill_process(DWORD pid)
 }
 
 /* Not so safe ;) */
-int unload_module(DWORD pid, HANDLE hModule)
+static int unload_module(DWORD pid, HANDLE hModule)
 {
     DWORD rc = 1;
     HANDLE ht;
@@ -273,7 +294,7 @@ int unload_module(DWORD pid, HANDLE hModule)
     memcpy(&dst, seek, sizeof(dst))
 
 /* PE Realignment - FIXME: a lot of code is copy/paste from exeScanner.c */
-int align_pe(unsigned char *buffer, size_t size)
+static int align_pe(unsigned char *buffer, size_t size)
 {
     int i = 0;
     uint16_t e_mz;
@@ -338,7 +359,7 @@ int align_pe(unsigned char *buffer, size_t size)
     return 1;
 }
 
-int dump_pe(const char *filename, PROCESSENTRY32 ProcStruct,
+static int dump_pe(const char *filename, PROCESSENTRY32 ProcStruct,
             MODULEENTRY32 me32)
 {
     SIZE_T bytesread = 0;
@@ -381,23 +402,23 @@ int dump_pe(const char *filename, PROCESSENTRY32 ProcStruct,
     return ret;
 }
 
-int scanfile(const char *filename, scanmem_data *scan_data, struct mem_info *info)
+static int scanfile(const char* filename, tc_scanmem_data* scan_data, struct mem_info* info)
 {
     int fd;
     int scantype;
     int ret = CL_CLEAN;
-    const char *virname = NULL;
+
+    cl_verdict_t verdict = CL_VERDICT_NOTHING_FOUND;
+    const char* alert_name = NULL;
 
     logg(LOGG_DEBUG, "Scanning %s\n", filename);
 
-    if ((fd = safe_open(filename, O_RDONLY | O_BINARY)) == -1)
-    {
+    if ((fd = safe_open(filename, O_RDONLY | O_BINARY)) == -1) {
         logg(LOGG_WARNING, "Can't open file %s, %s\n", filename, strerror(errno));
         return -1;
     }
 
-    if (info->d)
-    { // clamdscan
+    if (info->d) { // clamdscan
         if (optget(info->opts, "stream")->enabled)
             scantype = STREAM;
         else if (optget(info->opts, "multiscan")->enabled)
@@ -407,28 +428,47 @@ int scanfile(const char *filename, scanmem_data *scan_data, struct mem_info *inf
         else
             scantype = CONT;
 
-        if ((sock = dconnect(clamdopts)) < 0)
-        {
+        if ((sock = dconnect(clamdopts)) < 0) {
             info->errors++;
             return -1;
         }
-        if (dsresult(sock, scantype, filename, NULL, &info->errors, clamdopts) > 0)
-        {
+        if (dsresult(sock, scantype, filename, NULL, &info->errors, clamdopts) > 0) {
             info->ifiles++;
             ret = CL_VIRUS;
         }
     }
-    else
-    { // clamscan
-        ret = cl_scandesc(fd, filename, &virname, &info->blocks, info->engine, info->options);
-        if (ret == CL_VIRUS)
-        {
-            logg(LOGG_INFO, "%s: %s FOUND\n", filename, virname);
-            info->ifiles++;
-        }
-        else if (scan_data->printclean)
-        {
+    else { // clamscan
+        ret = cl_scandesc_ex(
+            fd,
+            filename,
+            &verdict,
+            &alert_name,
+            &info->bytes_scanned,
+            info->engine,
+            info->options,
+            NULL,  // void *context,
+            NULL,  // const char *hash_hint,
+            NULL,  // char **hash_out,
+            NULL,  // const char *hash_alg,
+            NULL,  // const char *file_type_hint,
+            NULL); // char **file_type_out);
+
+        switch (verdict) {
+        case CL_VERDICT_NOTHING_FOUND: {
             logg(LOGG_INFO, "%s: OK    \n", filename);
+            ret = CL_CLEAN;
+        } break;
+        case CL_VERDICT_TRUSTED: {
+            // TODO: Option to print "TRUSTED" verdict instead of "OK"?
+            logg(LOGG_INFO, "%s: OK    \n", filename);
+            ret = CL_CLEAN;
+        } break;
+        case CL_VERDICT_STRONG_INDICATOR:
+        case CL_VERDICT_POTENTIALLY_UNWANTED: {
+            logg(LOGG_INFO, "%s: %s FOUND\n", filename, alert_name);
+            info->ifiles++;
+            ret = CL_VIRUS;
+        } break;
         }
     }
 
@@ -436,18 +476,18 @@ int scanfile(const char *filename, scanmem_data *scan_data, struct mem_info *inf
     return ret;
 }
 
-int scanmem_cb(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void *data, struct mem_info *info)
+
+static int scanmem_cb(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void *data, struct mem_info *info)
 {
-    scanmem_data *scan_data = data;
+    tc_scanmem_data *scan_data = data;
     int rc = 0;
     int isprocess = 0;
-    TCHAR modulename[MAX_PATH + 1];
-    TCHAR expandmodule[MAX_PATH + 1];
+    TCHAR modulename[MAX_PATH + 1] = TEXT("");
+    TCHAR expandmodule[MAX_PATH + 1] = TEXT("");
 
     if (!scan_data)
         return 0;
 
-    modulename[0] = expandmodule[0] = 0;
     scan_data->res = CL_CLEAN;
 
     /* Special cases:
@@ -542,7 +582,7 @@ int scanmem_cb(PROCESSENTRY32 ProcStruct, MODULEENTRY32 me32, void *data, struct
 
 int scanmem(struct mem_info *info)
 {
-    scanmem_data data;
+    tc_scanmem_data data = { 0 };
     data.files = NULL;
     data.printclean = 1;
     data.kill = 0;
