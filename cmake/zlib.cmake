@@ -18,7 +18,7 @@ if(CLAMAV_ARCH STREQUAL "x86")
 else()
     set(ZLIB_DIR ${3RDPARTY_DIR}/zlib-ng)
     set(ZLIB_COMPAT ON)
-    set(ZLIB_ENABLE_TESTS OFF)
+    set(BUILD_TESTING OFF)
     set(ZLIBNG_ENABLE_TESTS OFF)
     set(WITH_GTEST OFF)
 
