@@ -1,6 +1,6 @@
 # ClamAV native win32 port - 1.5.1
 
-Copyright (c) 2005-2025 Gianluigi Tiesi <sherpya@gmail.com>
+Copyright (c) 2005-2026 Gianluigi Tiesi <sherpya@gmail.com>
 
 Upstream ClamAV Project:
 Copyright (c) Cisco Systems, Inc. and/or its affiliates. All rights reserved.
@@ -30,17 +30,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 ## 3rdparty libraries and versions
 
-- OpenSSL: 3.5.2
+- OpenSSL: 3.5.5
 - bzip2: 1.0.8
-- curl: 8.17.0
+- curl: 8.18.0
 - json-c: 0.18-20240915
 - libxml2: 2.15.1
 - pcre2: 10.47
 - PDCurses: git-6ba6df38
 - Winpthreads: from MinGW-W64 v13.0.0
-- zlib-ng: 2.2.5
-- UnRAR: 7.2.1
+- zlib: 1.3.1.2
+- zlib-ng: 2.3.3
+- UnRAR: 7.2.4
 - Opencow (custom build) on Win9x
+
+- Rust 1.92 for legacy versions
 
 ## Getting sources
 
