@@ -613,7 +613,7 @@ GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, 
         else
         {
             DWORD le = GetLastError();
-            if ((le != ERROR_INVALID_PARAMETER) && (le != ERROR_INVALID_LEVEL) && (le != ERROR_NOT_SUPPORTED))
+            if ((le != ERROR_INVALID_PARAMETER) && (le != ERROR_INVALID_LEVEL) && (le != ERROR_NOT_SUPPORTED) && (le != ERROR_INVALID_FUNCTION))
                 goto cleanup;
 
             wchar_t *Source = NULL;
