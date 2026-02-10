@@ -23,9 +23,6 @@
  */
 
 #include "legacy.h"
-#include "dynload.h"
-#include "loadlibrary.h"
-#include "initializer.h"
 
 // added in rust 1.93
 static int WINAPI GetHostNameW_compat(PWSTR name, int namelen)
@@ -49,6 +46,11 @@ static int WINAPI GetHostNameW_compat(PWSTR name, int namelen)
     return 0;
 }
 
+#ifdef __MINGW32__
+#include "dynload.h"
+#include "loadlibrary.h"
+#include "initializer.h"
+
 imp_GetHostNameW pGetHostNameW = GetHostNameW_compat;
 
 INITIALIZER(init_ws2_32)
@@ -59,3 +61,4 @@ INITIALIZER(init_ws2_32)
     if (ws2_32)
         IMPORT_FUNCTION(ws2_32, GetHostNameW);
 }
+#endif // _GNU_SOURCE

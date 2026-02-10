@@ -70,6 +70,7 @@ if(MSVC)
     target_link_options(libclamav PRIVATE
         "/DELAYLOAD:bcryptprimitives.dll"
         "/DELAYLOAD:api-ms-win-core-synch-l1-2-0.dll"
+        "/DELAYLOAD:ws2_32.dll"
     )
     if(CLAMAV_ARCH STREQUAL "x86")
         target_link_options(libclamav PRIVATE "/SAFESEH:NO")
