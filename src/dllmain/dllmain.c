@@ -109,9 +109,6 @@ static void processattach(void)
         }
     }
 
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != NO_ERROR)
-        fprintf(stderr, "[DllMain] Error at WSAStartup(): %d\n", WSAGetLastError());
-
 #ifndef _WIN64
     /* Some of Windows API tries to load dll from system32 and if fs redirection
        is disabled it will fail because the image loaded is 64bit, so we will preload
