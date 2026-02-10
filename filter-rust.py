@@ -11,6 +11,7 @@ BLACKLIST_SYMBOLS = [
     'GetTimeZoneInformationForYear',
     'ReOpenFile',
     'SetFileInformationByHandle',
+    'GetHostNameW',
 ]
 
 BLACKLIST_MODULES = [

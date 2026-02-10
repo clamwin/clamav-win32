@@ -43,8 +43,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 - UnRAR: 7.2.4
 - Opencow (custom build) on Win9x
 
-- Rust 1.92 for legacy versions
-
 ## Getting sources
 
 Clone repository using:

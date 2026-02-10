@@ -1,7 +1,7 @@
 /*
  * Legacy Windows Compatibility Layer: common
  *
- * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
+ * Copyright (c) 2025-2026 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,21 @@
 .global __imp_ReOpenFile
 .global __imp_SetFileInformationByHandle
 
+.global GetHostNameW
+.global _GetHostNameW@8
+
+// crt
+.global __imp___wsopen_s
+.global __imp__wsopen_s
+.global __imp___wfreopen_s
+.global __imp__wfreopen_s
+.global __imp__wcscpy_s
+.global __imp_wcscpy_s
+.global __imp__wcsncpy_s
+.global __imp_wcsncpy_s
+.global __imp__wcstombs_s
+.global __imp_wcstombs_s
+
 .section .rdata,"dr"
 
 #ifdef _WIN64
@@ -65,6 +80,18 @@ __imp_ReOpenFile:
     .quad ReOpenFile
 __imp_SetFileInformationByHandle:
     .quad SetFileInformationByHandle
+
+__imp__wsopen_s:
+    .quad _wsopen_s_compat
+__imp__wfreopen_s:
+    .quad _wfreopen_s_compat
+__imp_wcscpy_s:
+    .quad wcscpy_s_compat
+__imp_wcsncpy_s:
+    .quad wcsncpy_s_compat
+__imp_wcstombs_s:
+    .quad wcstombs_s_compat
+
 #else
 .align 4
 
@@ -84,6 +111,18 @@ __imp_GetTimeZoneInformationForYear:
 
 __imp_ReOpenFile:
     .long _ReOpenFile@16
+
+__imp___wsopen_s:
+    .long __wsopen_s_compat
+__imp___wfreopen_s:
+    .long __wfreopen_s_compat
+__imp__wcscpy_s:
+    .long _wcscpy_s_compat
+__imp__wcsncpy_s:
+    .long _wcsncpy_s_compat
+__imp__wcstombs_s:
+    .long _wcstombs_s_compat
+
 #endif
 
 .section .text
@@ -93,9 +132,17 @@ __imp_ReOpenFile:
 
 FindFirstFileExW:
     jmp FindFirstFileExW_wrapper
+
+GetHostNameW:
+    jmp *pGetHostNameW(%rip)
+
 #else
 .align 4
 
 _FindFirstFileExW@24:
     jmp _FindFirstFileExW_wrapper@24
+
+_GetHostNameW@8:
+    jmp *_pGetHostNameW
+
 #endif
