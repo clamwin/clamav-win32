@@ -185,7 +185,12 @@ bool CWConfig::load(const std::string& path)
         iniPath = path;
 
     if (GetFileAttributesA(iniPath.c_str()) == INVALID_FILE_ATTRIBUTES)
+    {
+        /* Keep freshclam.conf in sync with the default/profile config path
+         * even when ClamWin.conf does not exist yet. */
+        writeFreshclamConf();
         return false;  /* no file — defaults already applied */
+    }
 
     databasePath   = getStr(SEC_CLAMAV, "Database",      databasePath);
     scanRecursive  = getInt(SEC_CLAMAV, "ScanRecursive", scanRecursive) != 0;
@@ -261,6 +266,8 @@ bool CWConfig::load(const std::string& path)
     excludePatterns = getStr(SEC_CLAMAV, "ExcludePatterns", excludePatterns);
     includePatterns = normalizeFilterPatterns(includePatterns);
     excludePatterns = normalizeFilterPatterns(excludePatterns);
+
+    writeFreshclamConf();
 
     return true;
 }

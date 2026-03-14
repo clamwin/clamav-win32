@@ -80,14 +80,14 @@ TEST_SUITE("scan_commands")
     {
         TestTempDir tempDir;
         REQUIRE(testWriteFile(testJoinPath(tempDir.path, "freshclam.exe"), ""));
-        REQUIRE(testWriteFile(testJoinPath(tempDir.path, "freshclam.conf"), "DatabaseMirror database.clamav.net\n"));
         REQUIRE(testMakeDirectory(testJoinPath(tempDir.path, "certs")));
 
         CWConfig cfg = makeBaseConfig();
+        cfg.iniPath = testJoinPath(tempDir.path, "ClamWin.conf");
         std::string cmd = CWScanLogic::buildFreshclamCommand(cfg, tempDir.path);
 
         CHECK(cmd.find(std::string("\"") + testJoinPath(tempDir.path, "freshclam.exe") + "\"") != std::string::npos);
-        CHECK(cmd.find(std::string("--config-file=\"") + testJoinPath(tempDir.path, "freshclam.conf") + "\"") != std::string::npos);
+        CHECK(cmd.find(std::string("--config-file=\"") + cfg.freshclamConfPath() + "\"") != std::string::npos);
         CHECK(cmd.find(std::string("--cvdcertsdir=\"") + testJoinPath(tempDir.path, "certs") + "\"") != std::string::npos);
         CHECK(cmd.find("--datadir=\"C:\\db path\"") != std::string::npos);
         CHECK(cmd.find("--log=\"C:\\logs\\update report.log\"") != std::string::npos);

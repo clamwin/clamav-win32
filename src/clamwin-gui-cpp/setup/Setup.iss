@@ -417,7 +417,7 @@ end;
 { Returns the freshclam.conf path alongside ClamWin.conf in the profile dir. }
 function FreshclamConfPath(Default: String): String;
 begin
-  Result := CommonProfileDir('') + '\.clamwin\freshclam.conf';
+  Result := ExpandConstant('{%USERPROFILE}') + '\.clamwin\freshclam.conf';
 end;
 
 { Bootstrap a minimal freshclam.conf at install time so the [Run] freshclam
@@ -427,8 +427,8 @@ var
   DbDir, LogDir, ConfPath: String;
   Lines: TStringList;
 begin
-  DbDir    := CommonProfileDir('') + '\.clamwin\db';
-  LogDir   := CommonProfileDir('') + '\.clamwin\log';
+  DbDir    := ExpandConstant('{%USERPROFILE}') + '\.clamwin\db';
+  LogDir   := ExpandConstant('{%USERPROFILE}') + '\.clamwin\log';
   ConfPath := FreshclamConfPath('');
 
   ForceDirectories(ExtractFileDir(ConfPath));
