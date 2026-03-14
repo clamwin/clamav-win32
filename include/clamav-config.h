@@ -506,7 +506,7 @@
 /* #undef LLVM_VERSION */
 
 /* Version number of package */
-#define VERSION "1.5.1"
+#define VERSION "1.5.2"
 
 /* Version suffix for package */
 #define VERSION_SUFFIX ""
