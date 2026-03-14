@@ -46,7 +46,7 @@ else()
 endif()
 
 if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
-    set(CURL_TARGET_WINDOWS_VERSION "0x0501" CACHE STRING "Minimum target Windows version as hex string")
+    set(CURL_TARGET_WINDOWS_VERSION "0x0501" CACHE STRING "Minimum target Windows version as hex string" FORCE)
 endif()
 
 if(MSVC)
