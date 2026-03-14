@@ -34,11 +34,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 - bzip2: 1.0.8
 - curl: 8.18.0
 - json-c: 0.18-20240915
-- libxml2: 2.15.1
+- libxml2: 2.15.2
 - pcre2: 10.47
 - PDCurses: git-6ba6df38
 - Winpthreads: from MinGW-W64 v13.0.0
-- zlib: 1.3.1.2
+- zlib: 1.3.1
 - zlib-ng: 2.3.3
 - UnRAR: 7.2.4
 - Opencow (custom build) on Win9x
