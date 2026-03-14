@@ -1,0 +1,18 @@
+Windows Registry Editor Version 5.00
+
+; Update the DLL path below before importing this file.
+; Deployment path used by installer/package layout:
+;   C:\clamav\bin\libExpShell.dll
+
+[HKEY_CURRENT_USER\Software\Classes\CLSID\{65713842-C410-4f44-8383-BFE01A398C90}]
+@="ClamWin Shell Extension"
+
+[HKEY_CURRENT_USER\Software\Classes\CLSID\{65713842-C410-4f44-8383-BFE01A398C90}\InProcServer32]
+@="C:\\clamav\\bin\\libExpShell.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CURRENT_USER\Software\Classes\*\shellex\ContextMenuHandlers\ClamWin]
+@="{65713842-C410-4f44-8383-BFE01A398C90}"
+
+[HKEY_CURRENT_USER\Software\Classes\Folder\shellex\ContextMenuHandlers\ClamWin]
+@="{65713842-C410-4f44-8383-BFE01A398C90}"

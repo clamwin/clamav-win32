@@ -21,6 +21,16 @@ $env:PATH = "C:\msys64\mingw64\bin;C:\Program Files\CMake\bin;" + $env:PATH
 cmake -S . -B build-gui -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_MAKE_PROGRAM=mingw32-make
 ```
 
+Set shell extension mode explicitly per build folder:
+
+- `-DCLAMWIN_SHELLEXT_UNICODE=ON` for `build-gui`, `build-x64`, `build-x86-mingw-winxp`
+- `-DCLAMWIN_SHELLEXT_UNICODE=OFF` for `build-x86-mingw-win98`
+
+Example:
+```powershell
+cmake -S . -B build-gui -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_MAKE_PROGRAM=mingw32-make -DCLAMWIN_SHELLEXT_UNICODE=ON
+```
+
 ## Build GUI Only
 ```powershell
 # // turbo
@@ -37,6 +47,8 @@ Remove-Item -Recurse -Force (Join-Path $repoRoot "build-gui")
 cmake -S $repoRoot -B (Join-Path $repoRoot "build-gui") -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_MAKE_PROGRAM=mingw32-make -DRUST_COMPILER_TARGET=x86_64-pc-windows-gnu -DCMAKE_C_STANDARD=11 -DCMAKE_C_STANDARD_REQUIRED=ON -DCMAKE_C_EXTENSIONS=ON
 rustup target add x86_64-pc-windows-gnu
 ```
+
+Add `-DCLAMWIN_SHELLEXT_UNICODE=ON` for this profile.
 
 ## Build ClamAV Scanner/Engine Targets
 

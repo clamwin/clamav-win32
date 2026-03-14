@@ -84,6 +84,7 @@ set(CLAMWIN_DEFINES
     WIN32_LEAN_AND_MEAN
     PCRE2_STATIC
     LIBXML_STATIC
+    ${CLAMWIN_WINNT_VERSION}
 )
 
 configure_file(libclamav.def ${CMAKE_BINARY_DIR}/libclamav.def @ONLY)

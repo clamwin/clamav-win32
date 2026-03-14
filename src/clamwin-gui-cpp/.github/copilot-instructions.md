@@ -55,6 +55,10 @@ Configure (first time or after CMakeLists.txt changes):
 cmake -S . -B build-gui -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_MAKE_PROGRAM=mingw32-make
 ```
 
+For shell extension builds, pass Unicode mode explicitly:
+- `-DCLAMWIN_SHELLEXT_UNICODE=ON` for `build-gui`, `build-x64`, `build-x86-mingw-winxp`
+- `-DCLAMWIN_SHELLEXT_UNICODE=OFF` for `build-x86-mingw-win98`
+
 Build GUI:
 ```powershell
 Push-Location .\build-gui; mingw32-make clamwin 2>&1 | Select-Object -Last 20; Pop-Location

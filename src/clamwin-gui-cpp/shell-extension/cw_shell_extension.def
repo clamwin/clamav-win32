@@ -1,0 +1,4 @@
+LIBRARY ExpShell
+EXPORTS
+    DllCanUnloadNow
+    DllGetClassObject

@@ -120,6 +120,8 @@ function Invoke-ConfigureProfile {
         $args = @()
         # Force a stable C dialect for all profiles to avoid compiler-default keyword collisions.
         $args += @("-DCMAKE_C_STANDARD=11", "-DCMAKE_C_STANDARD_REQUIRED=ON", "-DCMAKE_C_EXTENSIONS=ON")
+        $shellExtUnicode = if ($Profile.Name -eq "win9x") { "OFF" } else { "ON" }
+        $args += @("-DCLAMWIN_SHELLEXT_UNICODE=$shellExtUnicode")
         if ($expectedRustTarget) {
             # Pass both typed and untyped forms to avoid option typing edge-cases in subprojects.
             $args += @("-DRUST_COMPILER_TARGET=$expectedRustTarget")
@@ -165,6 +167,8 @@ $stageRoot = Join-Path $repoRoot "binaries\all-os-staging"
 $isoPath = Join-Path $repoRoot "binaries\clamwin-all-os.iso"
 $bashExe = "C:\msys64\usr\bin\bash.exe"
 $certSrc = Join-Path $clamavRoot "clamav\certs\clamav.crt"
+$shellExtRegTemplate = Join-Path $clamavRoot "src\clamwin-gui-cpp\shell-extension\cw_shell_extension.reg"
+$xpRefreshBatTemplate = Join-Path $clamavRoot "src\clamwin-gui-cpp\tools\xp-refresh-clamav-bin.bat"
 $defaultDbSource = Join-Path $clamavRoot "build-gui\db"
 $dbFallbackSingle = Join-Path $clamavRoot "clam.hdb"
 
@@ -176,6 +180,12 @@ if (!(Test-Path $bashExe)) {
 }
 if (!(Test-Path $certSrc)) {
     throw "Certificate source not found: $certSrc"
+}
+if (!(Test-Path $shellExtRegTemplate)) {
+    throw "Shell extension reg template not found: $shellExtRegTemplate"
+}
+if (!(Test-Path $xpRefreshBatTemplate)) {
+    throw "XP refresh batch template not found: $xpRefreshBatTemplate"
 }
 
 if ([string]::IsNullOrWhiteSpace($DatabaseSource)) {
@@ -213,6 +223,7 @@ $profiles = @(
             "-DCMAKE_RC_COMPILER=windres",
             "-DCMAKE_C_FLAGS=-std=gnu11",
             "-DENABLE_LEGACY=ON",
+            "-DCLAMWIN_SHELLEXT_UNICODE=OFF",
             "-DRUST_COMPILER_TARGET:STRING=i686-pc-windows-gnu",
             "-DUSE_ZLIB_NG_ON_X86=ON"
         )
@@ -232,6 +243,7 @@ $profiles = @(
             "-DCMAKE_RC_COMPILER=windres",
             "-DCMAKE_C_FLAGS=-std=gnu11",
             "-DENABLE_LEGACY=ON",
+            "-DCLAMWIN_SHELLEXT_UNICODE=ON",
             "-DRUST_COMPILER_TARGET:STRING=i686-pc-windows-gnu",
             "-DUSE_ZLIB_NG_ON_X86=ON"
         )
@@ -251,6 +263,7 @@ $profiles = @(
             "-DCMAKE_RC_COMPILER=windres",
             "-DCMAKE_C_FLAGS=-std=gnu11",
             "-DENABLE_LEGACY=ON",
+            "-DCLAMWIN_SHELLEXT_UNICODE=ON",
             "-DRUST_COMPILER_TARGET:STRING=x86_64-pc-windows-gnu"
         )
     },
@@ -269,12 +282,13 @@ $profiles = @(
             "-DCMAKE_RC_COMPILER=windres",
             "-DCMAKE_C_FLAGS=-std=gnu11",
             "-DENABLE_LEGACY=OFF",
+            "-DCLAMWIN_SHELLEXT_UNICODE=ON",
             "-DRUST_COMPILER_TARGET:STRING=x86_64-pc-windows-gnu"
         )
     }
 )
 
-$clamavTargets = @("clambc", "clamscan", "freshclam", "sigtool", "clamd", "clamdscan", "clamdtop", "clamwin")
+$clamavTargets = @("clambc", "clamscan", "freshclam", "sigtool", "clamd", "clamdscan", "clamdtop", "clamwin", "clamwin_shell_extension")
 $copyNames = @(
     "clambc.exe",
     "clamscan.exe",
@@ -285,7 +299,8 @@ $copyNames = @(
     "clamdtop.exe",
     "libclamav.dll",
     "libfreshclam.dll",
-    "clamwin.exe"
+    "clamwin.exe",
+    "libExpShell.dll"
 )
 
 if (-not $SkipBuild) {
@@ -317,6 +332,16 @@ foreach ($p in $profiles) {
         else {
             Write-Warning "Missing source binary for $($p.Name): $src"
         }
+    }
+
+    $pkgRegPath = Join-Path $pkgPath "cw_shell_extension.reg"
+    Copy-Item $shellExtRegTemplate $pkgRegPath -Force
+    Write-Host "[sync] copied shell extension reg to $pkgRegPath"
+
+    if ($p.Name -eq "legacy-x86") {
+        $xpDeployBat = Join-Path $pkgPath "xp-refresh-clamav-bin.bat"
+        Copy-Item $xpRefreshBatTemplate $xpDeployBat -Force
+        Write-Host "[sync] wrote XP refresh script to $xpDeployBat"
     }
 
     $pkgCertDir = Join-Path $pkgPath "certs"

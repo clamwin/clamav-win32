@@ -21,6 +21,7 @@ cmake -S . -B build-x64-mingw -G "MinGW Makefiles" `
   -DCMAKE_C_COMPILER=gcc `
   -DCMAKE_CXX_COMPILER=g++ `
   -DCMAKE_RC_COMPILER=windres `
+  -DCLAMWIN_SHELLEXT_UNICODE=ON `
   -DCMAKE_TOOLCHAIN_FILE=c:/Users/alexc/source/repos/clamwin-uplift/clamav-win32/cmake/toolchain-mingw-x64.cmake `
   -DCMAKE_C_FLAGS="-std=gnu17" `
   -DRUST_COMPILER_TARGET:STRING=x86_64-pc-windows-gnu
@@ -34,6 +35,7 @@ cmake --build build-x64-mingw -j 4
 - `-DCMAKE_RC_COMPILER=windres`: uses the RC tool that exists in this environment.
 - `-DCMAKE_C_FLAGS="-std=gnu17"`: avoids GCC 15 keyword collision with legacy `alignof` symbol in ClamAV C sources, without changing source code.
 - `-DRUST_COMPILER_TARGET:STRING=x86_64-pc-windows-gnu`: keeps Rust static lib output compatible with MinGW build artifacts.
+- `-DCLAMWIN_SHELLEXT_UNICODE=ON`: explicitly locks shell extension to Unicode mode for x64/xp class builds.
 - `rustup target add x86_64-pc-windows-gnu`: installs the Rust stdlib required for the GNU target.
 
 ## Output Location
