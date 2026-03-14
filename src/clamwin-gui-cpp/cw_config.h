@@ -93,6 +93,13 @@ public:
     /* Returns the default INI path (%USERPROFILE%\.clamwin\ClamWin.conf) */
     static std::string defaultIniPath();
 
+    /* Returns the freshclam.conf path (same dir as iniPath, freshclam.conf) */
+    std::string freshclamConfPath() const;
+
+    /* Writes freshclam.conf from current config fields.
+     * Called automatically by save(). Also call after load() to keep in sync. */
+    bool writeFreshclamConf() const;
+
 private:
     std::string getStr(const char* section, const char* key,
                        const std::string& def) const;

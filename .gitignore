@@ -12,3 +12,4 @@ cw_debug.log
 empty_file.lib
 libempty_file.a
 install_rust.ps1
+src/clamwin-gui-cpp/setup/Output
