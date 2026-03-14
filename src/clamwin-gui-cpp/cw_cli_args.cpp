@@ -64,6 +64,13 @@ void CW_ParseCommandLineArgs(const char* cmdLine, CWCliArgs& out)
             continue;
         }
 
+        if (arg == "--open-dashboard")
+        {
+            out.hasSwitches = true;
+            out.openDashboard = true;
+            continue;
+        }
+
         if (startsWith(arg, "--mode="))
         {
             out.hasSwitches = true;

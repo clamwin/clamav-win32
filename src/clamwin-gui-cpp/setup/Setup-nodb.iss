@@ -129,7 +129,7 @@ Name: {group}\Uninstall ClamWin Free Antivirus; Filename: {uninstallexe}
 
 [Run]
 Filename: {app}\bin\freshclam.exe; Parameters: "--config-file=""{code:FreshclamConfPath}"""; WorkingDir: {app}\bin; StatusMsg: Downloading Virus Database Files...; Components: ClamAV; Tasks: DownloadDB; Flags: runhidden
-Filename: {app}\bin\clamwin.exe;   WorkingDir: {app}\bin; Flags: nowait postinstall skipifsilent; Description: Launch ClamWin Free Antivirus; Components: ClamWin
+Filename: {app}\bin\clamwin.exe;   Parameters: "--open-dashboard"; WorkingDir: {app}\bin; Flags: nowait postinstall skipifsilent; Description: Launch ClamWin Free Antivirus; Components: ClamWin
 
 [INI]
 Filename: {app}\bin\ClamWin.conf; Section: ClamAV;  Key: clamscan;        String: {app}\bin\clamscan.exe;   Check: IsIniValueEmpty(ExpandConstant('ClamAV*clamscan*{app}\bin\ClamWin.conf'))
@@ -162,9 +162,20 @@ Root: HKCU;   Subkey: Software\Classes\Folder\shellex\ContextMenuHandlers\ClamWi
 var
   AllUsers:       Boolean;
   SetupCompleted: Boolean;
+  UninstallCloseAttempted: Boolean;
   Time:           String;
   PreviousVersion, ThisVersion: Integer;
   AllUsersPage:   TInputOptionWizardPage;
+
+const
+  WM_QUIT = $0012;
+
+function FindWindow(lpClassName: string; lpWindowName: string): Integer;
+  external 'FindWindowA@user32.dll stdcall';
+function GetWindowThreadProcessId(hWnd: Integer; var ProcessId: Cardinal): Cardinal;
+  external 'GetWindowThreadProcessId@user32.dll stdcall';
+function PostThreadMessage(ThreadId: Cardinal; Msg: Cardinal; wParam: Cardinal; lParam: Cardinal): Boolean;
+  external 'PostThreadMessageA@user32.dll stdcall';
 
 function IsWin9xTier(): Boolean;
 var Version: TWindowsVersion;
@@ -185,7 +196,11 @@ end;
 
 function BaseDir(Default: String): String;
 begin
-  if IsAllUsers() then Result := ExpandConstant('{pf}')
+  if IsAllUsers() then
+  begin
+    if IsWin64 then Result := ExpandConstant('{pf64}')
+    else Result := ExpandConstant('{pf}');
+  end
   else Result := ExpandConstant('{userappdata}');
 end;
 
@@ -229,6 +244,53 @@ begin
     path := RemoveQuotes(path) + '\WClose.exe';
     if FileExists(path) then Exec(path, '', '', SW_SHOWNORMAL, ewWaitUntilTerminated, resultcode);
   end;
+end;
+
+function IsClamWinRunning(): Boolean;
+begin
+  Result := CheckForMutexes('ClamWinMutex');
+end;
+
+function PostQuitToClamWin(): Boolean;
+var
+  hwnd: Integer;
+  processId, threadId: Cardinal;
+begin
+  Result := False;
+  hwnd := FindWindow('ClamWinTrayClass', '');
+  if hwnd = 0 then
+    exit;
+
+  processId := 0;
+  threadId := GetWindowThreadProcessId(hwnd, processId);
+  if threadId <> 0 then
+    Result := PostThreadMessage(threadId, WM_QUIT, 0, 0);
+end;
+
+procedure ForceKillClamWin();
+var
+  resultcode: Integer;
+begin
+  Exec(ExpandConstant('{cmd}'), '/C taskkill /IM clamwin.exe /T /F >nul 2>&1', '', SW_HIDE, ewWaitUntilTerminated, resultcode);
+end;
+
+procedure CloseClamWinForUninstall();
+var
+  i: Integer;
+begin
+  if not IsClamWinRunning() then
+    exit;
+
+  PostQuitToClamWin();
+
+  for i := 1 to 30 do
+  begin
+    Sleep(200);
+    if not IsClamWinRunning() then
+      exit;
+  end;
+
+  ForceKillClamWin();
 end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
@@ -330,5 +392,14 @@ begin
     WriteFreshclamConf();
     if IsTaskSelected('DownloadDB') then
       SetIniString('Updates', 'UpdateOnStartup', '1', ExpandConstant('{app}\bin\ClamWin.conf'));
+  end;
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  if (CurUninstallStep = usUninstall) and (not UninstallCloseAttempted) then
+  begin
+    UninstallCloseAttempted := True;
+    CloseClamWinForUninstall();
   end;
 end;

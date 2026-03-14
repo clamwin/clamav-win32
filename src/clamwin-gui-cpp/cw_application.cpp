@@ -640,6 +640,9 @@ normal_startup:
     /* Start scheduler */
     m_scheduler.start(m_hwndTray, &m_config);
 
+    if (cli.openDashboard)
+        PostMessageA(m_hwndTray, WM_COMMAND, IDM_TRAY_OPEN, 0);
+
     /* Run on startup update if configured */
     if (m_config.updateOnStartup)
         PostMessageA(m_hwndTray, WM_COMMAND, IDM_TRAY_UPDATE, 0);
