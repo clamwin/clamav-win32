@@ -66,10 +66,10 @@ function Resolve-StagePackageBySuffix {
         }
     }
 
-    $candidates = Get-ChildItem -Path $StageRoot -Directory -ErrorAction SilentlyContinue |
-        Where-Object { $_.Name -like "clamav-*-$Suffix" }
+    $candidates = @(Get-ChildItem -Path $StageRoot -Directory -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -like "clamav-*-$Suffix" })
 
-    if (-not $candidates -or $candidates.Count -eq 0) {
+    if ($candidates.Count -eq 0) {
         throw "No stage package found for suffix '$Suffix' under '$StageRoot'"
     }
 
@@ -263,68 +263,27 @@ function Invoke-BuildSetupNodb {
 
 $clamavRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\..\.."))
 $repoRoot = Split-Path $clamavRoot -Parent
-$stageRoot = Join-Path $repoRoot "binaries\all-os-staging"
+$isoPayloadRoot = Join-Path $repoRoot "binaries\iso-payload"
 $isoPath = Join-Path $repoRoot "binaries\clamwin-all-os.iso"
 $projectVersion = Get-ProjectVersion -CMakeListsPath (Join-Path $clamavRoot "CMakeLists.txt")
-$stagePackagePrefix = "clamav-$projectVersion"
 $isToolExe = "C:\Program Files (x86)\ISTool\ISTool.exe"
 $setupDir = Join-Path $clamavRoot "src\clamwin-gui-cpp\setup"
 $setupNodbIss = Join-Path $setupDir "Setup-nodb.iss"
 $setupOutputDir = Join-Path $setupDir "Output"
 $bashExe = "C:\msys64\usr\bin\bash.exe"
-$certSrc = Join-Path $clamavRoot "clamav\certs\clamav.crt"
-$shellExtRegTemplate = Join-Path $clamavRoot "src\clamwin-gui-cpp\shell-extension\cw_shell_extension.reg"
-$xpRefreshBatTemplate = Join-Path $clamavRoot "src\clamwin-gui-cpp\tools\xp-refresh-clamav-bin.bat"
-$defaultDbSource = Join-Path $clamavRoot "build-gui\db"
-$dbFallbackSingle = Join-Path $clamavRoot "clam.hdb"
 
-if (!(Test-Path $stageRoot)) {
-    throw "Staging folder not found: $stageRoot"
-}
 if (!(Test-Path $bashExe)) {
     throw "MSYS bash not found: $bashExe"
-}
-if (!(Test-Path $certSrc)) {
-    throw "Certificate source not found: $certSrc"
-}
-if (!(Test-Path $shellExtRegTemplate)) {
-    throw "Shell extension reg template not found: $shellExtRegTemplate"
-}
-if (!(Test-Path $xpRefreshBatTemplate)) {
-    throw "XP refresh batch template not found: $xpRefreshBatTemplate"
-}
-
-if ([string]::IsNullOrWhiteSpace($DatabaseSource)) {
-    $DatabaseSource = $defaultDbSource
 }
 
 if ($SkipBuild) {
     Write-Host "[build] SkipBuild enabled: skipping configure/compile; installer will still be rebuilt"
 }
-
-$dbFileList = @()
-if (Test-Path $DatabaseSource) {
-    $dbFileList = @(Get-ChildItem -Path $DatabaseSource -File -Include *.cvd,*.cld,*.cud,*.hdb,*.ndb,*.ldb,*.ign2 -ErrorAction SilentlyContinue)
-}
-
-if ($dbFileList.Count -eq 0 -and (Test-Path $dbFallbackSingle)) {
-    $dbFileList = @(Get-Item $dbFallbackSingle)
-}
-
-if ($dbFileList.Count -eq 0) {
-    throw "No virus database files found. Checked '$DatabaseSource' and fallback '$dbFallbackSingle'."
-}
-
-Write-Host ("[db] using source '{0}' with {1} file(s)" -f $DatabaseSource, $dbFileList.Count)
 Write-Host ("[version] detected clamav-win32 version: {0}" -f $projectVersion)
-
-$legacyWin9xStagePackage = Resolve-StagePackageBySuffix -StageRoot $stageRoot -Suffix "legacy-win9x" -PreferredName "$stagePackagePrefix-legacy-win9x"
-Write-Host ("[stage] win9x package: {0}" -f $legacyWin9xStagePackage)
 
 $profiles = @(
     @{
         Name = "win9x"
-        StagePackage = $legacyWin9xStagePackage
         BuildDir = Join-Path $clamavRoot "build-x86-mingw-win98"
         UseMingw32 = $true
         ConfigureArgs = @(
@@ -344,7 +303,6 @@ $profiles = @(
     },
     @{
         Name = "legacy-x86"
-        StagePackage = "$stagePackagePrefix-legacy-x86"
         BuildDir = Join-Path $clamavRoot "build-x86-mingw-winxp"
         UseMingw32 = $true
         ConfigureArgs = @(
@@ -364,7 +322,6 @@ $profiles = @(
     },
     @{
         Name = "legacy-x64"
-        StagePackage = "$stagePackagePrefix-legacy-x64"
         BuildDir = Join-Path $clamavRoot "build-x64"
         UseMingw32 = $false
         ConfigureArgs = @(
@@ -383,7 +340,6 @@ $profiles = @(
     },
     @{
         Name = "x64"
-        StagePackage = "$stagePackagePrefix-x64"
         BuildDir = Join-Path $clamavRoot "build-gui"
         UseMingw32 = $false
         ConfigureArgs = @(
@@ -403,19 +359,6 @@ $profiles = @(
 )
 
 $clamavTargets = @("clambc", "clamscan", "freshclam", "sigtool", "clamd", "clamdscan", "clamdtop", "clamwin", "clamwin_shell_extension")
-$copyNames = @(
-    "clambc.exe",
-    "clamscan.exe",
-    "freshclam.exe",
-    "sigtool.exe",
-    "clamd.exe",
-    "clamdscan.exe",
-    "clamdtop.exe",
-    "libclamav.dll",
-    "libfreshclam.dll",
-    "clamwin.exe",
-    "libExpShell.dll"
-)
 
 if (-not $SkipBuild) {
     foreach ($p in $profiles) {
@@ -430,70 +373,22 @@ if (-not $SkipBuild) {
 
 $setupNodbExe = Invoke-BuildSetupNodb -ISToolExe $isToolExe -SetupDir $setupDir -SetupScript $setupNodbIss -SetupOutputDir $setupOutputDir
 
-foreach ($p in $profiles) {
-    $pkgPath = Join-Path $stageRoot $p.StagePackage
-    if (!(Test-Path $pkgPath)) {
-        throw "Stage package folder missing: $pkgPath"
-    }
-
-    Write-Host "[sync] profile=$($p.Name) stage=$pkgPath"
-
-    foreach ($name in $copyNames) {
-        $src = Join-Path $p.BuildDir $name
-        $dst = Join-Path $pkgPath $name
-
-        if (Test-Path $src) {
-            Copy-Item $src $dst -Force
-        }
-        else {
-            Write-Warning "Missing source binary for $($p.Name): $src"
-        }
-    }
-
-    $pkgRegPath = Join-Path $pkgPath "cw_shell_extension.reg"
-    Copy-Item $shellExtRegTemplate $pkgRegPath -Force
-    Write-Host "[sync] copied shell extension reg to $pkgRegPath"
-
-    if ($p.Name -eq "legacy-x86") {
-        $xpDeployBat = Join-Path $pkgPath "xp-refresh-clamav-bin.bat"
-        Copy-Item $xpRefreshBatTemplate $xpDeployBat -Force
-        Write-Host "[sync] wrote XP refresh script to $xpDeployBat"
-    }
-
-    $pkgCertDir = Join-Path $pkgPath "certs"
-    New-Item -ItemType Directory -Force $pkgCertDir | Out-Null
-    Copy-Item $certSrc (Join-Path $pkgCertDir "clamav.crt") -Force
-
-    $pkgDbDir = Join-Path $pkgPath "db"
-    New-Item -ItemType Directory -Force $pkgDbDir | Out-Null
-    foreach ($dbFile in $dbFileList) {
-        Copy-Item $dbFile.FullName (Join-Path $pkgDbDir $dbFile.Name) -Force
-    }
+if (Test-Path $isoPayloadRoot) {
+    Remove-Item $isoPayloadRoot -Recurse -Force
 }
+New-Item -ItemType Directory -Force $isoPayloadRoot | Out-Null
 
-$topCertDir = Join-Path $stageRoot "certs"
-New-Item -ItemType Directory -Force $topCertDir | Out-Null
-Copy-Item $certSrc (Join-Path $topCertDir "clamav.crt") -Force
-
-$topDbDir = Join-Path $stageRoot "db"
-New-Item -ItemType Directory -Force $topDbDir | Out-Null
-foreach ($dbFile in $dbFileList) {
-    Copy-Item $dbFile.FullName (Join-Path $topDbDir $dbFile.Name) -Force
-}
-
-if (-not [string]::IsNullOrWhiteSpace($setupNodbExe) -and (Test-Path $setupNodbExe)) {
-    $setupStagePath = Join-Path $stageRoot (Split-Path $setupNodbExe -Leaf)
-    Copy-Item $setupNodbExe $setupStagePath -Force
-    Write-Host "[sync] staged setup-nodb installer to $setupStagePath"
-}
+$setupPayloadPath = Join-Path $isoPayloadRoot (Split-Path $setupNodbExe -Leaf)
+Copy-Item $setupNodbExe $setupPayloadPath -Force
+Write-Host "[iso] payload prepared: $setupPayloadPath"
 
 $isoBuilt = $false
 if ($GenerateIso) {
-    $stageMsys = Convert-ToMsysPath -WindowsPath $stageRoot
+    $payloadMsys = Convert-ToMsysPath -WindowsPath $isoPayloadRoot
     $isoMsys = Convert-ToMsysPath -WindowsPath $isoPath
 
     Write-Host "[iso] building $isoPath"
-    & $bashExe -lc "xorriso -as mkisofs -J -R -V CLAMWIN_ALL_OS -o '$isoMsys' '$stageMsys'"
+    & $bashExe -lc "xorriso -as mkisofs -J -R -V CLAMWIN_ALL_OS -o '$isoMsys' '$payloadMsys'"
     if ($LASTEXITCODE -ne 0) {
         throw "ISO build failed (exit $LASTEXITCODE)"
     }
@@ -524,5 +419,5 @@ if ($isoBuilt) {
     Write-Host "[done] ISO ready: $($isoInfo.FullName) ($([Math]::Round($isoInfo.Length / 1MB, 2)) MB)"
 }
 else {
-    Write-Host "[done] setup/staging complete (ISO not generated; use -GenerateIso)"
+    Write-Host "[done] setup ready: $setupNodbExe (ISO not generated; use -GenerateIso)"
 }
