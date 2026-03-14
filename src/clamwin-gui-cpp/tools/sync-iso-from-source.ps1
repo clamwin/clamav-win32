@@ -31,6 +31,49 @@ function Get-ExpectedRustTarget {
     return ""
 }
 
+function Get-ProjectVersion {
+    param([Parameter(Mandatory = $true)][string]$CMakeListsPath)
+
+    if (-not (Test-Path $CMakeListsPath)) {
+        throw "CMakeLists.txt not found: $CMakeListsPath"
+    }
+
+    $hit = Select-String -Path $CMakeListsPath -Pattern '^\s*project\s*\(\s*clamav-win32\s+VERSION\s+"([0-9]+\.[0-9]+\.[0-9]+)"\s*\)' -CaseSensitive:$false | Select-Object -First 1
+    if (-not $hit) {
+        throw "Unable to detect clamav-win32 version from: $CMakeListsPath"
+    }
+
+    return $hit.Matches[0].Groups[1].Value
+}
+
+function Resolve-StagePackageBySuffix {
+    param(
+        [Parameter(Mandatory = $true)][string]$StageRoot,
+        [Parameter(Mandatory = $true)][string]$Suffix,
+        [string]$PreferredName = ""
+    )
+
+    if (-not (Test-Path $StageRoot)) {
+        throw "Stage root not found: $StageRoot"
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($PreferredName)) {
+        $preferredPath = Join-Path $StageRoot $PreferredName
+        if (Test-Path $preferredPath) {
+            return $PreferredName
+        }
+    }
+
+    $candidates = Get-ChildItem -Path $StageRoot -Directory -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -like "clamav-*-$Suffix" }
+
+    if (-not $candidates -or $candidates.Count -eq 0) {
+        throw "No stage package found for suffix '$Suffix' under '$StageRoot'"
+    }
+
+    return ($candidates | Sort-Object LastWriteTime -Descending | Select-Object -First 1).Name
+}
+
 function Invoke-BuildTarget {
     param(
         [Parameter(Mandatory = $true)][string]$BuildDir,
@@ -165,6 +208,8 @@ $clamavRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\..\..")
 $repoRoot = Split-Path $clamavRoot -Parent
 $stageRoot = Join-Path $repoRoot "binaries\all-os-staging"
 $isoPath = Join-Path $repoRoot "binaries\clamwin-all-os.iso"
+$projectVersion = Get-ProjectVersion -CMakeListsPath (Join-Path $clamavRoot "CMakeLists.txt")
+$stagePackagePrefix = "clamav-$projectVersion"
 $bashExe = "C:\msys64\usr\bin\bash.exe"
 $certSrc = Join-Path $clamavRoot "clamav\certs\clamav.crt"
 $shellExtRegTemplate = Join-Path $clamavRoot "src\clamwin-gui-cpp\shell-extension\cw_shell_extension.reg"
@@ -206,11 +251,15 @@ if ($dbFileList.Count -eq 0) {
 }
 
 Write-Host ("[db] using source '{0}' with {1} file(s)" -f $DatabaseSource, $dbFileList.Count)
+Write-Host ("[version] detected clamav-win32 version: {0}" -f $projectVersion)
+
+$legacyWin9xStagePackage = Resolve-StagePackageBySuffix -StageRoot $stageRoot -Suffix "legacy-win9x" -PreferredName "$stagePackagePrefix-legacy-win9x"
+Write-Host ("[stage] win9x package: {0}" -f $legacyWin9xStagePackage)
 
 $profiles = @(
     @{
         Name = "win9x"
-        StagePackage = "clamav-1.4.3-legacy-win9x"
+        StagePackage = $legacyWin9xStagePackage
         BuildDir = Join-Path $clamavRoot "build-x86-mingw-win98"
         UseMingw32 = $true
         ConfigureArgs = @(
@@ -230,7 +279,7 @@ $profiles = @(
     },
     @{
         Name = "legacy-x86"
-        StagePackage = "clamav-1.5.1-legacy-x86"
+        StagePackage = "$stagePackagePrefix-legacy-x86"
         BuildDir = Join-Path $clamavRoot "build-x86-mingw-winxp"
         UseMingw32 = $true
         ConfigureArgs = @(
@@ -250,7 +299,7 @@ $profiles = @(
     },
     @{
         Name = "legacy-x64"
-        StagePackage = "clamav-1.5.1-legacy-x64"
+        StagePackage = "$stagePackagePrefix-legacy-x64"
         BuildDir = Join-Path $clamavRoot "build-x64"
         UseMingw32 = $false
         ConfigureArgs = @(
@@ -269,7 +318,7 @@ $profiles = @(
     },
     @{
         Name = "x64"
-        StagePackage = "clamav-1.5.1-x64"
+        StagePackage = "$stagePackagePrefix-x64"
         BuildDir = Join-Path $clamavRoot "build-gui"
         UseMingw32 = $false
         ConfigureArgs = @(

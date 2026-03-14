@@ -69,7 +69,7 @@ $root = "C:\Users\alexc\source\repos\clamwin-uplift\clamav-win32"
 .\clamd.exe --config-file "$root\clamd.conf" --version
 ```
 
-Expected result: each command prints `ClamAV 1.5.1` (or the currently built version) and exits successfully.
+Expected result: each command prints `ClamAV 1.5.2` (or the currently built version) and exits successfully.
 
 ## GUI Test Suite
 

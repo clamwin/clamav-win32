@@ -24,7 +24,7 @@
 #include "cw_build_version.h"
 
 #ifndef CLAMWIN_VERSION_STR
-#define CLAMWIN_VERSION_STR     "1.5.1.0"
+#define CLAMWIN_VERSION_STR     "1.5.2.0"
 #endif
 #define CLAMWIN_APPNAME         "ClamWin Free Antivirus"
 #define CLAMWIN_APPNAME_W       L"ClamWin Free Antivirus"
