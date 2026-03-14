@@ -453,5 +453,9 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssPostInstall then
+  begin
     WriteFreshclamConf();
+    if IsTaskSelected('DownloadDB') then
+      SetIniString('Updates', 'UpdateOnStartup', '1', ExpandConstant('{app}\bin\ClamWin.conf'));
+  end;
 end;

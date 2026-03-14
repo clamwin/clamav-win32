@@ -1,4 +1,5 @@
 param(
+    [Alias('SkipClamBuild','SkipClamAvBuild')]
     [switch]$SkipBuild,
     [switch]$GenerateIso,
     [string]$DatabaseSource = "",
@@ -252,6 +253,10 @@ if ([string]::IsNullOrWhiteSpace($DatabaseSource)) {
     $DatabaseSource = $defaultDbSource
 }
 
+if ($SkipBuild) {
+    Write-Host "[build] SkipBuild enabled: skipping configure/compile; installer will still be rebuilt"
+}
+
 $dbFileList = @()
 if (Test-Path $DatabaseSource) {
     $dbFileList = @(Get-ChildItem -Path $DatabaseSource -File -Include *.cvd,*.cld,*.cud,*.hdb,*.ndb,*.ldb,*.ign2 -ErrorAction SilentlyContinue)
@@ -374,19 +379,7 @@ if (-not $SkipBuild) {
     }
 }
 
-$setupNodbExe = ""
-if (-not $SkipBuild) {
-    $setupNodbExe = Invoke-BuildSetupNodb -ISToolExe $isToolExe -SetupDir $setupDir -SetupScript $setupNodbIss -SetupOutputDir $setupOutputDir
-}
-else {
-    $setupNodbExe = Get-LatestSetupNodbExe -SetupOutputDir $setupOutputDir
-    if ([string]::IsNullOrWhiteSpace($setupNodbExe)) {
-        Write-Warning "[setup] SkipBuild is set and no existing setup-nodb EXE was found in $setupOutputDir"
-    }
-    else {
-        Write-Host "[setup] reusing existing setup-nodb: $setupNodbExe"
-    }
-}
+$setupNodbExe = Invoke-BuildSetupNodb -ISToolExe $isToolExe -SetupDir $setupDir -SetupScript $setupNodbIss -SetupOutputDir $setupOutputDir
 
 foreach ($p in $profiles) {
     $pkgPath = Join-Path $stageRoot $p.StagePackage
