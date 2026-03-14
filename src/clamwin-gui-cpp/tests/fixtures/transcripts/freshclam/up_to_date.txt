@@ -1,0 +1,2 @@
+main database is up-to-date
+daily.cvd updated (version: 12345, sigs: 67890)

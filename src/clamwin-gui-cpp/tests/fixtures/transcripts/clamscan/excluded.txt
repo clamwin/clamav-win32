@@ -1,0 +1,1 @@
+C:\scan\skip.tmp: Excluded by pattern

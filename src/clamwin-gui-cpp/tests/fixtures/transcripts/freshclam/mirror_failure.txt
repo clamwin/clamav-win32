@@ -1,0 +1,4 @@
+daily.cvd database available for download
+ERROR: Can't query current.cvd.clamav.net
+WARNING: Invalid DNS reply. Falling back to HTTP mode.
+ERROR: Database update process failed: Connection timeout

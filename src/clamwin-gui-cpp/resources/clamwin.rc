@@ -1,0 +1,54 @@
+/* ClamWin Free Antivirus resource script */
+
+#include <windows.h>
+#include <commctrl.h>
+#include "cw_build_version.rc"
+
+/* ─── Icons ─────────────────────────────────────────────────── */
+100 ICON "clamwin.ico"
+
+/* ─── Version info ──────────────────────────────────────────── */
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+
+VS_VERSION_INFO VERSIONINFO
+    FILEVERSION     CLAMWIN_FILEVERSION
+    PRODUCTVERSION  CLAMWIN_PRODUCTVERSION
+    FILEFLAGSMASK   0x17L
+#ifdef _DEBUG
+    FILEFLAGS       0x1L
+#else
+    FILEFLAGS       0x0L
+#endif
+    FILEOS          0x4L
+    FILETYPE        0x1L
+    FILESUBTYPE     0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "FileDescription", "ClamWin Free Antivirus"
+            VALUE "FileVersion", CLAMWIN_FILEVERSION_STR
+            VALUE "InternalName", "clamwin"
+            VALUE "LegalCopyright", "Copyright (C) 2004-2026 ClamWin Pty Ltd"
+            VALUE "OriginalFilename", "clamwin.exe"
+            VALUE "ProductName", "ClamWin Free Antivirus"
+            VALUE "ProductVersion", CLAMWIN_PRODUCTVERSION_STR
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
+
+/* ─── Application manifest ──────────────────────────────────── */
+1 RT_MANIFEST "clamwin.manifest"
+
+/* --- Logos --- */
+200 RCDATA "ClamAV_Logo.png"
+201 RCDATA "clamwin_logo.png"
+202 RCDATA "netfarm_logo.png"
+
+/* Touching file to rebuild resources */
+

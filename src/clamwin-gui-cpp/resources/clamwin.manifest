@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1"
+    xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">
+    <assemblyIdentity
+        type="win32"
+        name="ClamWin.ClamWin"
+        version="0.103.2.0"
+        processorArchitecture="*"
+    />
+    <description>ClamWin Free Antivirus</description>
+
+    <!-- Enable visual styles (comctl32 v6) on XP+ -->
+    <dependency>
+        <dependentAssembly>
+            <assemblyIdentity
+                type="win32"
+                name="Microsoft.Windows.Common-Controls"
+                version="6.0.0.0"
+                processorArchitecture="*"
+                publicKeyToken="6595b64144ccf1df"
+                language="*"
+            />
+        </dependentAssembly>
+    </dependency>
+
+    <!-- Supported OS versions -->
+    <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
+        <application>
+            <!-- Windows 10 and Windows 11 -->
+            <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}" />
+            <!-- Windows 8.1 -->
+            <supportedOS Id="{1f676c76-80e1-4239-95bb-83d0f6d0da78}" />
+            <!-- Windows 8 -->
+            <supportedOS Id="{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}" />
+            <!-- Windows 7 -->
+            <supportedOS Id="{35138b9a-5d96-4fbd-8e2d-a2440225f93a}" />
+            <!-- Windows Vista -->
+            <supportedOS Id="{e2011457-1546-43c5-a5fe-008deee3d3f0}" />
+        </application>
+    </compatibility>
+
+    <!-- UAC: run as invoker -->
+    <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
+        <security>
+            <requestedPrivileges>
+                <requestedExecutionLevel
+                    level="asInvoker"
+                    uiAccess="false"
+                />
+            </requestedPrivileges>
+        </security>
+    </trustInfo>
+
+    <!-- DPI awareness on Win8.1+ -->
+    <asmv3:application>
+        <asmv3:windowsSettings xmlns:dpi="http://schemas.microsoft.com/SMI/2005/WindowsSettings">
+            <dpi:dpiAware>true</dpi:dpiAware>
+        </asmv3:windowsSettings>
+    </asmv3:application>
+</assembly>

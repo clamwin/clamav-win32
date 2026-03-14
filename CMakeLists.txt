@@ -153,6 +153,8 @@ if(ENABLE_TEST_TOOLS)
     include(cmake/tools.cmake)
 endif()
 
+include(cmake/clamwin_gui.cmake)
+
 set_source_files_properties(${CLAMWIN_DIR}/src/helpers/cw_main.c
     PROPERTIES COMPILE_DEFINITIONS "${UNICODE_DEFINES}"
 )

@@ -1,0 +1,4 @@
+daily.cvd database available for download (remote version: 12345)
+90.0MiB/100.0MiB
+bytecode.cvd database available for download (remote version: 67890)
+10.0MiB/200.0MiB

@@ -1,0 +1,5 @@
+Loading: 10/20 sigs
+ERROR: Can't open file C:\scan\locked.dat
+C:\scan\clean.txt: OK
+Scanned files: 1
+Infected files: 0

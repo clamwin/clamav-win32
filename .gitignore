@@ -2,3 +2,13 @@
 /.vscode
 /.idea
 *.o
+
+/build-*
+/clamav-*-x64
+/vdi/W98/iso-staging
+/vdi/W98/win98-x86-drop.iso
+/.agents
+cw_debug.log
+empty_file.lib
+libempty_file.a
+install_rust.ps1

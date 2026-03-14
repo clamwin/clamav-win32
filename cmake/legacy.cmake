@@ -87,14 +87,27 @@ if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501 AND CLAMAV_ARCH STREQUAL "x86")
     target_link_libraries(clamdtop PRIVATE clamav_compat)
 endif()
 
-if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+if(NOT DEFINED Python3_EXECUTABLE)
+    find_package(Python3 COMPONENTS Interpreter QUIET)
+endif()
+
+set(_RUST_FILTER_PY_CMD)
+if(Python3_EXECUTABLE)
+    set(_RUST_FILTER_PY_CMD "${Python3_EXECUTABLE}")
+elseif(WIN32)
+    set(_RUST_FILTER_PY_CMD "py" "-3")
+else()
+    set(_RUST_FILTER_PY_CMD "python3")
+endif()
+
+if(_RUST_FILTER_PY_CMD)
     get_target_property(RUST_ARCHIVE clamav_rust IMPORTED_LOCATION)
     set(RUST_FILTERED_ARCHIVE "${RUST_ARCHIVE}.filtered.a")
 
     add_custom_command(
         OUTPUT "${RUST_FILTERED_ARCHIVE}"
         COMMAND ${CMAKE_COMMAND} -E copy "${RUST_ARCHIVE}" "${RUST_FILTERED_ARCHIVE}"
-        COMMAND ${CMAKE_COMMAND} -E env python3 "${CMAKE_SOURCE_DIR}/filter-rust.py" "${CMAKE_OBJDUMP}" "${CMAKE_AR}" "${RUST_FILTERED_ARCHIVE}"
+        COMMAND ${CMAKE_COMMAND} -E env ${_RUST_FILTER_PY_CMD} "${CMAKE_SOURCE_DIR}/filter-rust.py" "${CMAKE_OBJDUMP}" "${CMAKE_AR}" "${RUST_FILTERED_ARCHIVE}"
         DEPENDS "${RUST_ARCHIVE}" "${CMAKE_SOURCE_DIR}/filter-rust.py"
     )
 

@@ -73,6 +73,7 @@ A: <https://docs.clamav.net/faq/faq-troubleshoot.html#how-do-i-know-if-my-ip-add
 
 - import `clamav.reg` file
 - create `C:\ClamAV` and `C:\ClamAV\db`
+- create `C:\ClamAV\certs` and copy `clamav.crt` into it
 - put executables in `C:\ClamAV`
 - create freshclam.conf in `C:\ClamAV`
 - create clamd.conf in `C:\ClamAV`
@@ -84,6 +85,8 @@ freshclam.conf
 ```text
 DatabaseMirror database.clamav.net
 DNSDatabaseInfo current.cvd.clamav.net
+# Optional explicit cert path (recommended for portable/non-default layouts):
+# CVDCertsDirectory "C:\\ClamAV\\certs"
 ```
 
 clamd.conf
@@ -99,6 +102,46 @@ DatabaseDirectory C:\ClamAV\db
 Make sure `C:\Clamav` is writable by the `System Service` user.
 
 Finally start the service with net start clamd
+
+## GUI Test Workflow
+
+The native Win32 C++ GUI under `src/clamwin-gui-cpp/` has a dedicated test executable named `clamwin_gui_test.exe`.
+
+The shortest way to run the GUI suite from the `clamav-win32/` root is:
+
+```powershell
+.\test-gui.ps1
+```
+
+Optional switches:
+
+```powershell
+.\test-gui.ps1 -RealTools
+.\test-gui.ps1 -RealTools -FreshclamUpdate -FreshclamNegative
+.\test-gui.ps1 -BuildOnly
+```
+
+Build it from the `clamav-win32/` root:
+
+```powershell
+$env:PATH = "C:\msys64\mingw64\bin;C:\Program Files\CMake\bin;" + $env:PATH
+cmake -S . -B build-gui -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_MAKE_PROGRAM=mingw32-make
+cmake --build build-gui --target clamwin_gui_test
+```
+
+Run the default GUI tests:
+
+```powershell
+cmake --build build-gui --target clamwin_gui_check
+```
+
+Enable the real-binary smoke tests for `clamscan.exe` and `freshclam.exe`:
+
+```powershell
+cmake --build build-gui --target clamwin_gui_check_real_tools
+```
+
+For more detailed build and test commands, including the stricter gated FreshClam update probe and the opt-in invalid-config negative smoke test, see `build-clamav-win32.md`.
 
 ---
 
