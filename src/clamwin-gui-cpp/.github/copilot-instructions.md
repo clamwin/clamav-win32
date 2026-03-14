@@ -64,6 +64,11 @@ Build GUI:
 Push-Location .\build-gui; mingw32-make clamwin 2>&1 | Select-Object -Last 20; Pop-Location
 ```
 
+Build full staged setup and ISO:
+```powershell
+Stop-Process -Name clamwin -ErrorAction SilentlyContinue; Start-Sleep -Milliseconds 400; Set-Location C:/Users/alexc/source/repos/clamwin-uplift/clamav-win32; powershell -ExecutionPolicy Bypass -File ./src/clamwin-gui-cpp/tools/build-setup.ps1 -GenerateIso
+```
+
 Build tests:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\tools\test-gui.ps1
