@@ -71,6 +71,13 @@ void CW_ParseCommandLineArgs(const char* cmdLine, CWCliArgs& out)
             continue;
         }
 
+        if (arg == "--download-db")
+        {
+            out.hasSwitches = true;
+            out.downloadDb = true;
+            continue;
+        }
+
         if (startsWith(arg, "--mode="))
         {
             out.hasSwitches = true;

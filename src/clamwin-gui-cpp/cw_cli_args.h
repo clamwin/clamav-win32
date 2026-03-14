@@ -14,6 +14,7 @@ struct CWCliArgs
     bool hasSwitches;
     bool close;
     bool openDashboard;
+    bool downloadDb;
     std::string mode;
     std::string configFile;
     std::vector<std::string> paths;
@@ -22,6 +23,7 @@ struct CWCliArgs
         : hasSwitches(false)
         , close(false)
         , openDashboard(false)
+        , downloadDb(false)
         , mode("main")
     {
     }

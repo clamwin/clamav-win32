@@ -643,6 +643,9 @@ normal_startup:
     if (cli.openDashboard)
         PostMessageA(m_hwndTray, WM_COMMAND, IDM_TRAY_OPEN, 0);
 
+    if (cli.downloadDb)
+        PostMessageA(m_hwndTray, WM_COMMAND, IDM_TRAY_UPDATE, 0);
+
     /* Run on startup update if configured */
     if (m_config.updateOnStartup)
         PostMessageA(m_hwndTray, WM_COMMAND, IDM_TRAY_UPDATE, 0);

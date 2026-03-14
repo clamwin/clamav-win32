@@ -19,12 +19,13 @@ TEST_SUITE("cli_args")
     TEST_CASE("parses config file switch")
     {
         CWCliArgs args;
-        CW_ParseCommandLineArgs("--mode=update --config_file=\"C:\\Users\\alex\\ClamWin.conf\" --open-dashboard", args);
+        CW_ParseCommandLineArgs("--mode=update --config_file=\"C:\\Users\\alex\\ClamWin.conf\" --open-dashboard --download-db", args);
 
         CHECK(args.hasSwitches);
         CHECK(args.mode == "update");
         CHECK(args.configFile == "C:\\Users\\alex\\ClamWin.conf");
         CHECK(args.openDashboard);
+        CHECK(args.downloadDb);
     }
 
     TEST_CASE("keeps legacy non-switch command line untouched")

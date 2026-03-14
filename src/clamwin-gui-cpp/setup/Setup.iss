@@ -152,7 +152,7 @@ Name: {group}\Uninstall ClamWin Free Antivirus; Filename: {uninstallexe}
 ; Download databases after install if user selected the task
 Filename: {app}\bin\freshclam.exe; Parameters: "--config-file=""{code:FreshclamConfPath}"""; WorkingDir: {app}\bin; StatusMsg: Downloading Virus Database Files...; Components: ClamAV; Tasks: DownloadDB; Flags: runhidden
 ; Launch clamwin.exe when done
-Filename: {app}\bin\clamwin.exe; Parameters: "--open-dashboard"; WorkingDir: {app}\bin; Flags: nowait postinstall skipifsilent; Description: Launch ClamWin Free Antivirus; Components: ClamWin
+Filename: {app}\bin\clamwin.exe; Parameters: "{code:ClamWinPostInstallParams}"; WorkingDir: {app}\bin; Flags: nowait postinstall skipifsilent; Description: Launch ClamWin Free Antivirus; Components: ClamWin
 
 [INI]
 ; Only write these if the key is currently empty — preserves existing config on upgrade
@@ -486,6 +486,13 @@ begin
   Result := ExpandConstant('{%USERPROFILE}') + '\.clamwin\freshclam.conf';
 end;
 
+function ClamWinPostInstallParams(Default: String): String;
+begin
+  Result := '--open-dashboard';
+  if IsTaskSelected('DownloadDB') then
+    Result := Result + ' --download-db';
+end;
+
 { Bootstrap a minimal freshclam.conf at install time so the [Run] freshclam
   invocation works even before the user opens preferences. }
 procedure WriteFreshclamConf();
@@ -518,8 +525,6 @@ begin
   if CurStep = ssPostInstall then
   begin
     WriteFreshclamConf();
-    if IsTaskSelected('DownloadDB') then
-      SetIniString('Updates', 'UpdateOnStartup', '1', ExpandConstant('{app}\bin\ClamWin.conf'));
   end;
 end;
 
