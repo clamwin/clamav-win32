@@ -132,13 +132,13 @@ Filename: {app}\bin\freshclam.exe; Parameters: "--config-file=""{code:FreshclamC
 Filename: {app}\bin\clamwin.exe;   Parameters: "{code:ClamWinPostInstallParams}"; WorkingDir: {app}\bin; Flags: nowait postinstall skipifsilent; Description: Launch ClamWin Free Antivirus; Components: ClamWin
 
 [INI]
-Filename: {app}\bin\ClamWin.conf; Section: ClamAV;  Key: clamscan;        String: {app}\bin\clamscan.exe;   Check: IsIniValueEmpty(ExpandConstant('ClamAV*clamscan*{app}\bin\ClamWin.conf'))
-Filename: {app}\bin\ClamWin.conf; Section: ClamAV;  Key: freshclam;       String: {app}\bin\freshclam.exe;  Check: IsIniValueEmpty(ExpandConstant('ClamAV*freshclam*{app}\bin\ClamWin.conf'))
-Filename: {app}\bin\ClamWin.conf; Section: ClamAV;  Key: database;        String: {code:CommonProfileDir}\.clamwin\db;         Check: IsIniValueEmpty(ExpandConstant('ClamAV*database*{app}\bin\ClamWin.conf'))
-Filename: {app}\bin\ClamWin.conf; Section: ClamAV;  Key: quarantinedir;   String: {code:CommonProfileDir}\.clamwin\quarantine; Check: IsIniValueEmpty(ExpandConstant('ClamAV*quarantinedir*{app}\bin\ClamWin.conf'))
-Filename: {app}\bin\ClamWin.conf; Section: ClamAV;  Key: logfile;         String: {code:CommonProfileDir}\.clamwin\log\ClamScanLog.txt;   Check: IsIniValueEmpty(ExpandConstant('ClamAV*logfile*{app}\bin\ClamWin.conf'))
-Filename: {app}\bin\ClamWin.conf; Section: Updates; Key: dbupdatelogfile; String: {code:CommonProfileDir}\.clamwin\log\ClamUpdateLog.txt; Check: IsIniValueEmpty(ExpandConstant('Updates*dbupdatelogfile*{app}\bin\ClamWin.conf'))
-Filename: {app}\bin\ClamWin.conf; Section: Updates; Key: time;            String: {code:CurTime};           Check: IsIniValueEmpty(ExpandConstant('Updates*time*{app}\bin\ClamWin.conf'))
+Filename: {code:ClamWinConfPath}; Section: ClamAV;  Key: clamscan;        String: {app}\bin\clamscan.exe;   Check: IsIniValueEmpty(ExpandConstant('ClamAV*clamscan*{code:ClamWinConfPath}'))
+Filename: {code:ClamWinConfPath}; Section: ClamAV;  Key: freshclam;       String: {app}\bin\freshclam.exe;  Check: IsIniValueEmpty(ExpandConstant('ClamAV*freshclam*{code:ClamWinConfPath}'))
+Filename: {code:ClamWinConfPath}; Section: ClamAV;  Key: database;        String: {code:CommonProfileDir}\.clamwin\db;         Check: IsIniValueEmpty(ExpandConstant('ClamAV*database*{code:ClamWinConfPath}'))
+Filename: {code:ClamWinConfPath}; Section: ClamAV;  Key: quarantinedir;   String: {code:CommonProfileDir}\.clamwin\quarantine; Check: IsIniValueEmpty(ExpandConstant('ClamAV*quarantinedir*{code:ClamWinConfPath}'))
+Filename: {code:ClamWinConfPath}; Section: ClamAV;  Key: logfile;         String: {code:CommonProfileDir}\.clamwin\log\ClamScanLog.txt;   Check: IsIniValueEmpty(ExpandConstant('ClamAV*logfile*{code:ClamWinConfPath}'))
+Filename: {code:ClamWinConfPath}; Section: Updates; Key: dbupdatelogfile; String: {code:CommonProfileDir}\.clamwin\log\ClamUpdateLog.txt; Check: IsIniValueEmpty(ExpandConstant('Updates*dbupdatelogfile*{code:ClamWinConfPath}'))
+Filename: {code:ClamWinConfPath}; Section: Updates; Key: time;            String: {code:CurTime};           Check: IsIniValueEmpty(ExpandConstant('Updates*time*{code:ClamWinConfPath}'))
 
 [Registry]
 Root: HKLM;   Subkey: Software\ClamWin; ValueType: string; ValueName: Path;    ValueData: {app}\bin; Flags: uninsdeletekey deletevalue; Components: ClamWin; Check: IsAllUsers
@@ -350,6 +350,12 @@ begin
   end;
   if AllUsers then AllUsersPage.SelectedValueIndex := 0
   else AllUsersPage.SelectedValueIndex := 1;
+end;
+
+{ Returns the freshclam.conf path alongside ClamWin.conf in the profile dir. }
+function ClamWinConfPath(Default: String): String;
+begin
+  Result := ExpandConstant('{%USERPROFILE}') + '\.clamwin\ClamWin.conf';
 end;
 
 { Returns the freshclam.conf path alongside ClamWin.conf in the profile dir. }
