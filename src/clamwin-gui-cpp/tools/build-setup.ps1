@@ -2,6 +2,7 @@ param(
     [Alias('SkipClamBuild','SkipClamAvBuild')]
     [switch]$SkipBuild,
     [switch]$GenerateIso,
+    [switch]$IncludeFulldbInstaller,
     [string]$DatabaseSource = "",
     [string[]]$MountVm = @()
 )
@@ -206,15 +207,26 @@ function Invoke-ConfigureProfile {
     }
 }
 
-function Get-LatestSetupNodbExe {
-    param([Parameter(Mandatory = $true)][string]$SetupOutputDir)
+function Get-LatestSetupExe {
+    param(
+        [Parameter(Mandatory = $true)][string]$SetupOutputDir,
+        [Parameter(Mandatory = $true)][string]$SetupScript
+    )
 
     if (-not (Test-Path $SetupOutputDir)) {
         return ""
     }
 
+    $scriptLeaf = (Split-Path $SetupScript -Leaf).ToLowerInvariant()
+    if ($scriptLeaf -eq "setup-nodb.iss") {
+        $pattern = '(^clamwin-.*-setup-nodb\.exe$)|(^Setup-nodb\.exe$)'
+    }
+    else {
+        $pattern = '(^clamwin-.*-setup\.exe$)|(^Setup\.exe$)'
+    }
+
     $latest = Get-ChildItem -Path $SetupOutputDir -File |
-        Where-Object { $_.Name -match '(^clamwin-.*-setup-nodb\.exe$)|(^Setup-nodb\.exe$)|(^Setup\.exe$)' } |
+        Where-Object { $_.Name -match $pattern } |
         Sort-Object LastWriteTime -Descending |
         Select-Object -First 1
 
@@ -225,7 +237,7 @@ function Get-LatestSetupNodbExe {
     return $latest.FullName
 }
 
-function Invoke-BuildSetupNodb {
+function Invoke-BuildSetup {
     param(
         [Parameter(Mandatory = $true)][string]$ISToolExe,
         [Parameter(Mandatory = $true)][string]$SetupDir,
@@ -252,13 +264,65 @@ function Invoke-BuildSetupNodb {
         Pop-Location
     }
 
-    $setupExe = Get-LatestSetupNodbExe -SetupOutputDir $SetupOutputDir
+    $setupExe = Get-LatestSetupExe -SetupOutputDir $SetupOutputDir -SetupScript $SetupScript
     if ([string]::IsNullOrWhiteSpace($setupExe) -or -not (Test-Path $setupExe)) {
-        throw "Setup-nodb output not found in: $SetupOutputDir"
+        throw "Setup output not found in: $SetupOutputDir"
     }
 
     Write-Host "[setup] built $setupExe"
     return $setupExe
+}
+
+function Invoke-PrepareBundledDatabases {
+    param(
+        [Parameter(Mandatory = $true)][string]$FreshclamExe,
+        [Parameter(Mandatory = $true)][string]$CvdDir,
+        [Parameter(Mandatory = $true)][string]$CertSource
+    )
+
+    if (-not (Test-Path $FreshclamExe)) {
+        throw "freshclam.exe not found: $FreshclamExe"
+    }
+    if (-not (Test-Path $CertSource)) {
+        throw "clamav.crt not found: $CertSource"
+    }
+
+    $freshclamDir = Split-Path $FreshclamExe -Parent
+    $freshclamCertDir = Join-Path $freshclamDir "certs"
+    New-Item -ItemType Directory -Force $freshclamCertDir | Out-Null
+    Copy-Item $CertSource (Join-Path $freshclamCertDir "clamav.crt") -Force
+
+    if (Test-Path $CvdDir) {
+        Get-ChildItem -Path $CvdDir -File -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+    }
+    else {
+        New-Item -ItemType Directory -Force $CvdDir | Out-Null
+    }
+
+    $freshclamConf = Join-Path $CvdDir "freshclam-build-setup.conf"
+    $freshclamLog = Join-Path $CvdDir "freshclam-build-setup.log"
+    $conf = @(
+        "DatabaseDirectory $CvdDir",
+        "UpdateLogFile $freshclamLog",
+        "DatabaseMirror database.clamav.net"
+    )
+    Set-Content -Path $freshclamConf -Value $conf -Encoding ascii
+
+    Write-Host "[db] downloading bundled CVD files via $FreshclamExe"
+    & $FreshclamExe --config-file "$freshclamConf"
+    if ($LASTEXITCODE -ne 0) {
+        throw "freshclam failed while preparing setup CVD files (exit $LASTEXITCODE)"
+    }
+
+    $required = @("main.cvd", "daily.cvd", "bytecode.cvd")
+    foreach ($name in $required) {
+        $path = Join-Path $CvdDir $name
+        if (-not (Test-Path $path)) {
+            throw "Missing required CVD file for Setup.iss: $path"
+        }
+    }
+
+    Write-Host "[db] bundled CVD files prepared in $CvdDir"
 }
 
 $clamavRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\..\.."))
@@ -268,9 +332,12 @@ $isoPath = Join-Path $repoRoot "binaries\clamwin-all-os.iso"
 $projectVersion = Get-ProjectVersion -CMakeListsPath (Join-Path $clamavRoot "CMakeLists.txt")
 $isToolExe = "C:\Program Files (x86)\ISTool\ISTool.exe"
 $setupDir = Join-Path $clamavRoot "src\clamwin-gui-cpp\setup"
+$setupIss = Join-Path $setupDir "Setup.iss"
 $setupNodbIss = Join-Path $setupDir "Setup-nodb.iss"
 $setupOutputDir = Join-Path $setupDir "Output"
+$setupCvdDir = Join-Path $setupDir "cvd"
 $bashExe = "C:\msys64\usr\bin\bash.exe"
+$clamavCert = Join-Path $clamavRoot "clamav\certs\clamav.crt"
 
 if (!(Test-Path $bashExe)) {
     throw "MSYS bash not found: $bashExe"
@@ -371,16 +438,27 @@ if (-not $SkipBuild) {
     }
 }
 
-$setupNodbExe = Invoke-BuildSetupNodb -ISToolExe $isToolExe -SetupDir $setupDir -SetupScript $setupNodbIss -SetupOutputDir $setupOutputDir
+$setupNodbExe = Invoke-BuildSetup -ISToolExe $isToolExe -SetupDir $setupDir -SetupScript $setupNodbIss -SetupOutputDir $setupOutputDir
+$setupExe = ""
+if ($IncludeFulldbInstaller) {
+    $freshclamForSetup = Join-Path (Join-Path $clamavRoot "build-gui") "freshclam.exe"
+    Invoke-PrepareBundledDatabases -FreshclamExe $freshclamForSetup -CvdDir $setupCvdDir -CertSource $clamavCert
+    $setupExe = Invoke-BuildSetup -ISToolExe $isToolExe -SetupDir $setupDir -SetupScript $setupIss -SetupOutputDir $setupOutputDir
+}
 
 if (Test-Path $isoPayloadRoot) {
     Remove-Item $isoPayloadRoot -Recurse -Force
 }
 New-Item -ItemType Directory -Force $isoPayloadRoot | Out-Null
 
-$setupPayloadPath = Join-Path $isoPayloadRoot (Split-Path $setupNodbExe -Leaf)
-Copy-Item $setupNodbExe $setupPayloadPath -Force
-Write-Host "[iso] payload prepared: $setupPayloadPath"
+$setupNodbPayloadPath = Join-Path $isoPayloadRoot (Split-Path $setupNodbExe -Leaf)
+Copy-Item $setupNodbExe $setupNodbPayloadPath -Force
+Write-Host "[iso] payload prepared: $setupNodbPayloadPath"
+if ($IncludeFulldbInstaller -and -not [string]::IsNullOrWhiteSpace($setupExe) -and (Test-Path $setupExe)) {
+    $setupPayloadPath = Join-Path $isoPayloadRoot (Split-Path $setupExe -Leaf)
+    Copy-Item $setupExe $setupPayloadPath -Force
+    Write-Host "[iso] payload prepared: $setupPayloadPath"
+}
 
 $isoBuilt = $false
 if ($GenerateIso) {
@@ -419,5 +497,10 @@ if ($isoBuilt) {
     Write-Host "[done] ISO ready: $($isoInfo.FullName) ($([Math]::Round($isoInfo.Length / 1MB, 2)) MB)"
 }
 else {
-    Write-Host "[done] setup ready: $setupNodbExe (ISO not generated; use -GenerateIso)"
+    if ($IncludeFulldbInstaller -and -not [string]::IsNullOrWhiteSpace($setupExe)) {
+        Write-Host "[done] nodb setup ready: $setupNodbExe ; fulldb setup ready: $setupExe (ISO not generated; use -GenerateIso)"
+    }
+    else {
+        Write-Host "[done] nodb setup ready: $setupNodbExe (ISO not generated; use -GenerateIso)"
+    }
 }

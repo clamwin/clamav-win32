@@ -13,3 +13,4 @@ empty_file.lib
 libempty_file.a
 install_rust.ps1
 src/clamwin-gui-cpp/setup/Output
+src/clamwin-gui-cpp/setup/cvd
