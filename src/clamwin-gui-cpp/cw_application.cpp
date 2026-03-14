@@ -8,6 +8,7 @@
 #include "cw_application.h"
 #include "cw_dashboard.h"
 #include "cw_dashboard.h"
+#include "cw_cli_args.h"
 #include "cw_gui_shared.h"
 #include "cw_dpi.h"
 #include "cw_theme.h"
@@ -531,6 +532,70 @@ int CWApplication::run(HINSTANCE hInst, LPSTR cmdLine)
 {
     m_hInst = hInst;
 
+    CWCliArgs cli;
+    CW_ParseCommandLineArgs(cmdLine, cli);
+
+    std::string startupConfigPath;
+    if (cli.hasSwitches)
+    {
+        startupConfigPath = cli.configFile;
+    }
+    else if (cmdLine && cmdLine[0])
+    {
+        startupConfigPath = cmdLine;
+    }
+
+    if (cli.hasSwitches)
+    {
+        bool handledCliMode =
+            _stricmp(cli.mode.c_str(), "scanner") == 0 ||
+            _stricmp(cli.mode.c_str(), "updater") == 0 ||
+            _stricmp(cli.mode.c_str(), "update") == 0 ||
+            _stricmp(cli.mode.c_str(), "viewlog") == 0;
+
+        if (!handledCliMode)
+            goto normal_startup;
+
+        INITCOMMONCONTROLSEX icc;
+        icc.dwSize = sizeof(icc);
+        icc.dwICC  = ICC_WIN95_CLASSES | ICC_BAR_CLASSES | ICC_PROGRESS_CLASS | ICC_UPDOWN_CLASS;
+        InitCommonControlsEx(&icc);
+
+        LoadLibraryA("riched20.dll");
+        CoInitialize(NULL);
+
+        if (!cli.configFile.empty())
+            m_config.load(cli.configFile);
+        else
+            m_config.load();
+
+        CW_ThemeInit();
+
+        int cliRc = 0;
+        if (_stricmp(cli.mode.c_str(), "scanner") == 0)
+        {
+            const char* target = cli.paths.empty() ? "" : cli.paths[0].c_str();
+            cliRc = CW_ScanDialogRun(NULL, &m_config, target);
+        }
+        else if (_stricmp(cli.mode.c_str(), "updater") == 0 ||
+                 _stricmp(cli.mode.c_str(), "update") == 0)
+        {
+            cliRc = CW_UpdateDialogRun(NULL, &m_config);
+        }
+        else if (_stricmp(cli.mode.c_str(), "viewlog") == 0)
+        {
+            const char* logPath = cli.paths.empty() ? m_config.scanLogFile.c_str() : cli.paths[0].c_str();
+            CW_LogViewerRun(NULL, logPath, "ClamWin Report");
+            cliRc = 0;
+        }
+
+        CW_ThemeDeinit();
+        CoUninitialize();
+        return cliRc;
+    }
+
+normal_startup:
+
     /* Single-instance check */
     HANDLE hMutex = CreateMutexA(NULL, FALSE, "ClamWinMutex");
     if (GetLastError() == ERROR_ALREADY_EXISTS)
@@ -551,8 +616,8 @@ int CWApplication::run(HINSTANCE hInst, LPSTR cmdLine)
     CoInitialize(NULL);
 
     /* Load config */
-    if (cmdLine && cmdLine[0])
-        m_config.load(cmdLine);
+    if (!startupConfigPath.empty())
+        m_config.load(startupConfigPath);
     else
         m_config.load();
 
