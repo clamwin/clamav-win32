@@ -32,4 +32,9 @@ else()
     install(FILES ${ZLIB_DIR}/LICENSE.md DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME zlib-ng.md)
 endif()
 
+set(ZLIB_FOUND TRUE)
+set(ZLIB_LIBRARY zlibstatic)
+set(ZLIB_LIBRARIES zlibstatic)
+set(ZLIB_INCLUDE_DIR ${ZLIB_DIR})
+
 list(APPEND CLAMWIN_LIBRARIES zlibstatic)
