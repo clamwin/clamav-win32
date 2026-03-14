@@ -43,10 +43,24 @@ void CWConfig::defaults()
     char* slash = strrchr(exedir, '\\');
     if (slash) *(slash + 1) = '\0';
 
-    databasePath    = std::string(exedir) + "db";
-    quarantinePath  = std::string(exedir) + "Quarantine";
-    scanLogFile     = std::string(exedir) + "ClamScan.log";
-    updateLogFile   = std::string(exedir) + "FreshClam.log";
+    char profile[MAX_PATH];
+    DWORD profileLen = GetEnvironmentVariableA("USERPROFILE", profile, MAX_PATH);
+    if (profileLen > 0 && profileLen < MAX_PATH)
+    {
+        std::string profileRoot = std::string(profile) + "\\.clamwin";
+        databasePath   = profileRoot + "\\db";
+        quarantinePath = profileRoot + "\\Quarantine";
+        scanLogFile    = profileRoot + "\\ClamScan.log";
+        updateLogFile  = profileRoot + "\\FreshClam.log";
+    }
+    else
+    {
+        databasePath   = std::string(exedir) + "db";
+        quarantinePath = std::string(exedir) + "Quarantine";
+        scanLogFile    = std::string(exedir) + "ClamScan.log";
+        updateLogFile  = std::string(exedir) + "FreshClam.log";
+    }
+
     iniPath         = defaultIniPath();
 
     scanRecursive   = true;
@@ -260,6 +274,36 @@ bool CWConfig::load(const std::string& path)
         if (slash)
             *(slash + 1) = '\0';
         updateLogFile = std::string(exedir) + "FreshClam.log";
+    }
+
+    /* Migrate legacy install-dir defaults to user profile paths.
+     * This avoids update failures when ClamWin is installed under Program Files. */
+    {
+        char exedir[MAX_PATH];
+        GetModuleFileNameA(NULL, exedir, MAX_PATH);
+        char* slash = strrchr(exedir, '\\');
+        if (slash)
+            *(slash + 1) = '\0';
+
+        std::string installDb         = std::string(exedir) + "db";
+        std::string installQuarantine = std::string(exedir) + "Quarantine";
+        std::string installScanLog    = std::string(exedir) + "ClamScan.log";
+        std::string installUpdateLog  = std::string(exedir) + "FreshClam.log";
+
+        char profile[MAX_PATH];
+        DWORD profileLen = GetEnvironmentVariableA("USERPROFILE", profile, MAX_PATH);
+        if (profileLen > 0 && profileLen < MAX_PATH)
+        {
+            std::string profileRoot = std::string(profile) + "\\.clamwin";
+            if (databasePath == installDb)
+                databasePath = profileRoot + "\\db";
+            if (quarantinePath == installQuarantine)
+                quarantinePath = profileRoot + "\\Quarantine";
+            if (scanLogFile == installScanLog)
+                scanLogFile = profileRoot + "\\ClamScan.log";
+            if (updateLogFile == installUpdateLog)
+                updateLogFile = profileRoot + "\\FreshClam.log";
+        }
     }
 
     includePatterns = getStr(SEC_CLAMAV, "IncludePatterns", includePatterns);
