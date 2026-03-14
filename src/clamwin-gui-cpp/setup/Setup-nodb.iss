@@ -85,6 +85,9 @@ Source: {#BuildDirWin9x}\libfreshclam.dll; DestDir: {app}\bin; Components: ClamA
 Source: {#BuildDir32}\libfreshclam.dll;    DestDir: {app}\bin; Components: ClamAV; Check: Is32bitNT;   Flags: restartreplace uninsrestartdelete replacesameversion
 Source: {#BuildDir64}\libfreshclam.dll;    DestDir: {app}\bin; Components: ClamAV; Check: IsWin64;     Flags: restartreplace uninsrestartdelete replacesameversion
 
+; certs
+Source: ..\..\..\clamav\certs\clamav.crt; DestDir: {app}\bin\certs; Components: ClamAV; Flags: ignoreversion
+
 ; NOTE: No CVD files in this variant — user downloads databases via freshclam.
 
 [Dirs]
