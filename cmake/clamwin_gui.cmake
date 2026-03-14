@@ -5,6 +5,7 @@
 set(clamwin_gui_new
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_main.cpp
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_application.cpp
+    ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_cli_args.cpp
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_dashboard.cpp
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_window.cpp
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_dialog.cpp
@@ -81,6 +82,8 @@ set(clamwin_gui_test_dir ${CLAMWIN_DIR}/src/clamwin-gui-cpp/tests)
 set(clamwin_gui_test_sources
     ${clamwin_gui_test_dir}/test_main.cpp
     ${clamwin_gui_test_dir}/test_support.cpp
+    ${clamwin_gui_test_dir}/test_cli_args.cpp
+    ${clamwin_gui_test_dir}/test_shell_extension_command.cpp
     ${clamwin_gui_test_dir}/test_config.cpp
     ${clamwin_gui_test_dir}/test_scan_commands.cpp
     ${clamwin_gui_test_dir}/test_scan_parsers.cpp
@@ -90,10 +93,12 @@ set(clamwin_gui_test_sources
     ${clamwin_gui_test_dir}/test_scheduler.cpp
     ${clamwin_gui_test_dir}/test_update_checker.cpp
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_config.cpp
+    ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_cli_args.cpp
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_scan_logic.cpp
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_prefs_validation.cpp
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_scheduler.cpp
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_update_checker.cpp
+    ${CLAMWIN_DIR}/src/clamwin-gui-cpp/shell-extension/cw_shell_extension_command.cpp
 )
 
 add_executable(clamwin_gui_test
@@ -114,6 +119,7 @@ target_include_directories(clamwin PRIVATE
 
 target_include_directories(clamwin_gui_test PRIVATE
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp
+    ${CLAMWIN_DIR}/src/clamwin-gui-cpp/shell-extension
     ${CLAMWIN_DIR}/3rdparty/doctest
     ${clamwin_gui_test_dir}
     ${CMAKE_BINARY_DIR}
@@ -171,5 +177,7 @@ add_custom_target(clamwin_gui_check_real_tools
     WORKING_DIRECTORY $<TARGET_FILE_DIR:clamwin_gui_test>
     USES_TERMINAL
 )
+
+add_subdirectory(${CLAMWIN_DIR}/src/clamwin-gui-cpp/shell-extension)
 
 list(APPEND CLAMAV_INSTALL_TARGETS clamwin)
