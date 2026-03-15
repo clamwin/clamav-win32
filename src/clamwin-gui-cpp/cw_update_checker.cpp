@@ -162,10 +162,16 @@ static bool extractTagName(const char* json, int jsonLen, char* out, int outCap)
     ++pos;  /* skip opening quote */
 
     int i = 0;
-    while (pos < end && *pos != '"' && i < outCap - 1)
+    while (pos < end && *pos != '"')
     {
+        if (i >= outCap - 1)
+            return false;
         out[i++] = *pos++;
     }
+
+    if (pos >= end || *pos != '"')
+        return false;
+
     out[i] = '\0';
     return i > 0;
 }

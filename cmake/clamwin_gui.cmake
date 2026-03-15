@@ -91,12 +91,14 @@ set(clamwin_gui_test_sources
     ${clamwin_gui_test_dir}/test_prefs_validation.cpp
     ${clamwin_gui_test_dir}/test_real_tools.cpp
     ${clamwin_gui_test_dir}/test_scheduler.cpp
+    ${clamwin_gui_test_dir}/test_utils.cpp
     ${clamwin_gui_test_dir}/test_update_checker.cpp
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_config.cpp
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_cli_args.cpp
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_scan_logic.cpp
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_prefs_validation.cpp
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_scheduler.cpp
+    ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_utils.cpp
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/cw_update_checker.cpp
     ${CLAMWIN_DIR}/src/clamwin-gui-cpp/shell-extension/cw_shell_extension_command.cpp
 )

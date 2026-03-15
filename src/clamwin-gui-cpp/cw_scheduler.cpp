@@ -97,14 +97,23 @@ int CWScheduler::isDue(time_t now, int scheduled, int hour, int minute, int freq
         return 1;
     }
 
+    bool reached_scheduled_time = false;
+    if (frequency == 3)
+        reached_scheduled_time = (tm->tm_min >= minute);
+    else
+        reached_scheduled_time = (tm->tm_hour > hour || (tm->tm_hour == hour && tm->tm_min >= minute));
+
     /* Catch up on missed tasks if computer was off */
     if (runMissed && last_rt > 0)
     {
         int gap = (int)(now - last_rt);
-        if (frequency == 3 && gap > 5400) time_to_run = true;
-        if (frequency == 0 && gap > 129600) time_to_run = true; /* 36h */
-        if (frequency == 1 && gap > 302400) time_to_run = true; /* 84h (3.5 days) */
-        if (frequency == 2 && gap > 648000) time_to_run = true; /* 7.5 days */
+        if (reached_scheduled_time)
+        {
+            if (frequency == 3 && gap > 5400) time_to_run = true;
+            if (frequency == 0 && gap > 129600) time_to_run = true; /* 36h */
+            if (frequency == 1 && gap > 302400) time_to_run = true; /* 84h (3.5 days) */
+            if (frequency == 2 && gap > 648000) time_to_run = true; /* 7.5 days */
+        }
     }
 
     if (time_to_run) {

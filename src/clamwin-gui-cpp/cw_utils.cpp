@@ -14,6 +14,21 @@
 #include "cw_gui_shared.h"
 #include <time.h>
 
+static bool composeDbPath(char* out, size_t outCap, const char* dbPath, const char* fileName)
+{
+    if (!out || outCap == 0 || !dbPath || !fileName)
+        return false;
+
+    int n = _snprintf(out, outCap, "%s\\%s", dbPath, fileName);
+    if (n < 0 || (size_t)n >= outCap)
+    {
+        out[outCap - 1] = '\0';
+        return false;
+    }
+
+    return true;
+}
+
 /* ─── Parse a ClamAV .cvd/.cld header for version/sig info ─── */
 
 /*
@@ -34,9 +49,13 @@ int CW_GetDBInfo(const char *db_path, CW_DBInfo *info)
     memset(info, 0, sizeof(*info));
 
     /* Try main.cld first, then main.cvd */
-    wsprintfA(main_path, "%s\\main.cld", db_path);
+    if (!composeDbPath(main_path, sizeof(main_path), db_path, "main.cld"))
+        return 0;
     if (GetFileAttributesA(main_path) == INVALID_FILE_ATTRIBUTES)
-        wsprintfA(main_path, "%s\\main.cvd", db_path);
+    {
+        if (!composeDbPath(main_path, sizeof(main_path), db_path, "main.cvd"))
+            return 0;
+    }
 
     hFile = CreateFileA(main_path, GENERIC_READ, FILE_SHARE_READ,
                         NULL, OPEN_EXISTING, 0, NULL);
@@ -63,9 +82,13 @@ int CW_GetDBInfo(const char *db_path, CW_DBInfo *info)
     }
 
     /* Try daily.cld first, then daily.cvd */
-    wsprintfA(daily_path, "%s\\daily.cld", db_path);
+    if (!composeDbPath(daily_path, sizeof(daily_path), db_path, "daily.cld"))
+        return (info->main_ver > 0 || info->daily_ver > 0) ? 1 : 0;
     if (GetFileAttributesA(daily_path) == INVALID_FILE_ATTRIBUTES)
-        wsprintfA(daily_path, "%s\\daily.cvd", db_path);
+    {
+        if (!composeDbPath(daily_path, sizeof(daily_path), db_path, "daily.cvd"))
+            return (info->main_ver > 0 || info->daily_ver > 0) ? 1 : 0;
+    }
 
     hFile = CreateFileA(daily_path, GENERIC_READ, FILE_SHARE_READ,
                         NULL, OPEN_EXISTING, 0, NULL);
@@ -92,10 +115,12 @@ int CW_GetDBInfo(const char *db_path, CW_DBInfo *info)
                 /* ClamAV uses "DD Mon YYYY HH-MM +0000" format */
                 /* For now, use the file modification time instead */
                 FILETIME ft;
+                FILETIME ftLocal;
                 SYSTEMTIME st;
-                if (GetFileTime(hFile, NULL, NULL, &ft))
+                if (GetFileTime(hFile, NULL, NULL, &ft) &&
+                    FileTimeToLocalFileTime(&ft, &ftLocal) &&
+                    FileTimeToSystemTime(&ftLocal, &st))
                 {
-                    FileTimeToSystemTime(&ft, &st);
                     struct tm tm_val = {0};
                     tm_val.tm_year = st.wYear - 1900;
                     tm_val.tm_mon  = st.wMonth - 1;

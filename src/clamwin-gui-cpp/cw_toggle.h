@@ -69,8 +69,8 @@ inline void CW_DrawOwnerToggle(DRAWITEMSTRUCT* dis,
     markRc.right  = markRc.left + markSize;
     markRc.bottom = markRc.top  + markSize;
 
-    COLORREF fill   = checked  ? theme->colorAccent()    : theme->colorSurface();
-    COLORREF border = disabled ? theme->colorTextMuted() : theme->colorTextMuted();
+    COLORREF fill   = checked  ? theme->colorAccent() : theme->colorSurface();
+    COLORREF border = disabled ? theme->colorTextMuted() : theme->colorText();
 
     HBRUSH markBrush = CreateSolidBrush(fill);
     HPEN   markPen   = CreatePen(PS_SOLID, 1, border);

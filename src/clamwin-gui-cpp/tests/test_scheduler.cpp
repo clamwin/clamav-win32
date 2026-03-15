@@ -144,7 +144,6 @@ TEST_SUITE("Scheduler")
         cfg.scanDay = tm_mock.tm_wday;
         cfg.updateHour = tm_mock.tm_hour;
         cfg.updateMinute = tm_mock.tm_min;
-        cfg.updateDay = tm_mock.tm_wday;
 
         // Simulate that the last runs were 3 days ago, so they definitely trigger runMissed logic.
         time_t past = now - (3 * 86400);

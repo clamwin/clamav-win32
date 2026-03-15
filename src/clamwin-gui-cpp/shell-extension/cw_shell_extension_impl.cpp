@@ -246,7 +246,7 @@ BOOL CWShellExtension::runScan(HWND hwnd)
         return FALSE;
     }
     // Expand Env
-    ExpandEnvironmentStrings(szClamWinPath, szPathExpanded, sizeof(szPathExpanded));
+    ExpandEnvironmentStrings(szClamWinPath, szPathExpanded, _countof(szPathExpanded));
     len = _tcslen(szPathExpanded);
     // remove trailing slash
     if(szPathExpanded[len-1] == _T('\\'))
@@ -270,7 +270,7 @@ BOOL CWShellExtension::runScan(HWND hwnd)
         if (szParams[0] != _T('\0'))
         {
             // Expand Env
-            ExpandEnvironmentStrings(szParams, szParamsExpanded, sizeof(szParamsExpanded));
+            ExpandEnvironmentStrings(szParams, szParamsExpanded, _countof(szParamsExpanded));
             command = CWBuildShellScannerCommand(szPathExpanded, scanPathArgs, szParamsExpanded);
         }
     }
