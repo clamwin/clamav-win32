@@ -205,7 +205,7 @@ void CWProcess::stop()
 
     if (m_hThread)
     {
-        WaitForSingleObject(m_hThread, 5000);
+        WaitForSingleObject(m_hThread, INFINITE);
         CloseHandle(m_hThread);
         m_hThread = NULL;
     }

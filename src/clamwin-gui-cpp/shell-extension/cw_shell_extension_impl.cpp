@@ -76,6 +76,10 @@ STDMETHODIMP CWShellExtension::Initialize(LPCITEMIDLIST pIDFolder,
 		m_pDataObj = pDataObj;
 		pDataObj->AddRef();
 	}
+    else
+    {
+        return E_INVALIDARG;
+    }
 
 	// use the given IDataObject to get a list of filenames (CF_HDROP)
 	hres = pDataObj->GetData(&fmte, &medium);
@@ -86,8 +90,11 @@ STDMETHODIMP CWShellExtension::Initialize(LPCITEMIDLIST pIDFolder,
 	// find out how many files the user selected
 	// not more than 250 though, otherwise explorer crashes
 	numFiles = DragQueryFile((HDROP)medium.hGlobal, (UINT)-1, NULL, 0);
-	if(numFiles > 250)
+    if(numFiles > 250)
+    {
+        ::ReleaseStgMedium(&medium);
 		return E_FAIL;
+    }
 
 	// free old path (just in case)
 	if(m_szPath)
@@ -102,7 +109,7 @@ STDMETHODIMP CWShellExtension::Initialize(LPCITEMIDLIST pIDFolder,
 	m_szPath[0] = _T('\0');
 	for(int i = 0; i < numFiles; i++)
 	{
-		DragQueryFile((HDROP)medium.hGlobal, i, szPath, sizeof(szPath));
+        DragQueryFile((HDROP)medium.hGlobal, i, szPath, _countof(szPath));
 		// check the long path validity for a unicode build
 #if defined UNICODE || defined _UNICODE
 		{
@@ -113,7 +120,7 @@ STDMETHODIMP CWShellExtension::Initialize(LPCITEMIDLIST pIDFolder,
     		{
     			WCHAR wtemp[MAX_PATH];
     			// unicode name is not directly tranleatable to ascii, use the shortname instead
-       		if(GetShortPathNameW(szPath, wtemp, sizeof(wtemp)) > 0)
+           		if(GetShortPathNameW(szPath, wtemp, _countof(wtemp)) > 0)
    	  			wcscpy(szPath, wtemp);
     		}
 		}
@@ -124,9 +131,15 @@ STDMETHODIMP CWShellExtension::Initialize(LPCITEMIDLIST pIDFolder,
 		// remove last slash from the scanning path
         if(szPath[len-1] == _T('\\'))
             szPath[len-1] = _T('\0');
-        _tcsncat(m_szPath, _T(" --path=\""), cbPath);
-        _tcsncat(m_szPath, szPath, cbPath);
-        _tcsncat(m_szPath, _T("\""), cbPath);
+        {
+            size_t used = _tcslen(m_szPath);
+            size_t cap = (size_t)cbPath;
+            if (used < cap)
+            {
+                _sntprintf(m_szPath + used, cap - used, _T(" --path=\"%s\""), szPath);
+                m_szPath[cbPath - 1] = _T('\0');
+            }
+        }
 	}
 	::ReleaseStgMedium(&medium);
 
@@ -291,7 +304,7 @@ BOOL CWShellExtension::runScan(HWND hwnd)
     )
     {
         TCHAR szMsg[MAX_PATH*2];
-        _sntprintf(szMsg, sizeof(szMsg), _T("Error: Unable to execute command %s."), command.c_str());
+        _sntprintf(szMsg, _countof(szMsg), _T("Error: Unable to execute command %s."), command.c_str());
         MessageBox(hwnd, szMsg, _T("ClamWin Free Antivirus"), MB_OK | MB_ICONERROR);
         return FALSE;
     }

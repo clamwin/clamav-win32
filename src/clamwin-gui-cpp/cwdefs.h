@@ -10,13 +10,13 @@
 #ifndef CWDEFS_H
 #define CWDEFS_H
 
-/* Target Windows XP (5.1) minimum — for InitCommonControlsEx, etc.
+/* Target Windows XP (5.1) minimum — for InitCommonControlsEx, etc. */
 #ifndef _WIN32_WINNT
-#  define _WIN32_WINNT 0x0410
+#  define _WIN32_WINNT 0x0501
 #endif
 
 #ifndef WINVER
-#  define WINVER 0x0410
+#  define WINVER 0x0501
 #endif
 
 /* Require IE5.0+ headers for balloon tips, even on Win98 */

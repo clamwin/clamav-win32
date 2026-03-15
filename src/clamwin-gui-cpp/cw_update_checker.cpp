@@ -22,7 +22,7 @@
 /* ─── Hardcoded endpoints ───────────────────────────────────── */
 
 static const char* CW_GITHUB_API_HOST = "api.github.com";
-static const char* CW_GITHUB_API_PATH = "/repos/clamwin/update-test/releases/latest";
+static const char* CW_GITHUB_API_PATH = "/repos/clamwin/clamwin/releases/latest";
 static const char* CW_DOWNLOAD_PAGE   = "https://www.clamwin.com/download";
 
 const char* CWUpdateChecker::apiUrl()
@@ -88,7 +88,7 @@ void CWUpdateChecker::waitForThread()
 {
     if (m_hThread)
     {
-        WaitForSingleObject(m_hThread, 15000);
+        WaitForSingleObject(m_hThread, INFINITE);
         CloseHandle(m_hThread);
         m_hThread = NULL;
     }

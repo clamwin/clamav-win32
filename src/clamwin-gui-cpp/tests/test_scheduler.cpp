@@ -118,6 +118,17 @@ TEST_SUITE("Scheduler")
     TEST_CASE("CWScheduler integration check")
     {
         // Simple test to ensure check() correctly posts messages and updates config's last run times
+        // Fixed "now" for deterministic behavior: 2026-03-10 10:00:00
+        struct tm tm_mock = {0};
+        tm_mock.tm_year = 2026 - 1900;
+        tm_mock.tm_mon = 2; // March
+        tm_mock.tm_mday = 10;
+        tm_mock.tm_hour = 10;
+        tm_mock.tm_min = 0;
+        tm_mock.tm_sec = 0;
+        tm_mock.tm_isdst = -1;
+        time_t now = mktime(&tm_mock);
+
         CWConfig cfg;
         cfg.defaults(); // Apply defaults
         cfg.scanScheduled = true;
@@ -128,9 +139,15 @@ TEST_SUITE("Scheduler")
         cfg.updateRunMissed = true;
         cfg.updateFrequency = 0;
         cfg.updateLastRunTime = 0;
+        cfg.scanHour = tm_mock.tm_hour;
+        cfg.scanMinute = tm_mock.tm_min;
+        cfg.scanDay = tm_mock.tm_wday;
+        cfg.updateHour = tm_mock.tm_hour;
+        cfg.updateMinute = tm_mock.tm_min;
+        cfg.updateDay = tm_mock.tm_wday;
 
         // Simulate that the last runs were 3 days ago, so they definitely trigger runMissed logic.
-        time_t past = time(NULL) - (3 * 86400);
+        time_t past = now - (3 * 86400);
         cfg.scanLastRunTime = past;
         cfg.updateLastRunTime = past;
 
@@ -139,7 +156,6 @@ TEST_SUITE("Scheduler")
         REQUIRE(hwnd != NULL);
 
         long long dummy_scan_last = past;
-        time_t now = time(NULL);
         struct tm* tm = localtime(&now);
         int tm_hour = tm ? tm->tm_hour : -1;
         int tm_yday = tm ? tm->tm_yday : -1;

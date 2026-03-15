@@ -28,7 +28,7 @@
 #endif
 #define CLAMWIN_APPNAME         "ClamWin Free Antivirus"
 #define CLAMWIN_APPNAME_W       L"ClamWin Free Antivirus"
-#define CLAMWIN_WEBSITE         "http://www.clamwin.com"
+#define CLAMWIN_WEBSITE         "https://www.clamwin.com"
 #define CLAMWIN_CLASS_MAIN      "ClamWinMainWnd"
 #define CLAMWIN_CLASS_MAIN_W    L"ClamWinMainWnd"
 #define CLAMWIN_MUTEX_NAME      L"ClamWinGUI_SingleInstance"
