@@ -33,8 +33,6 @@
 #ifndef CW_SHELL_EXTENSION_H
 #define CW_SHELL_EXTENSION_H
 
-#define CF_HDROP        15
-
 // {65713842-C410-4f44-8383-BFE01A398C90}
 DEFINE_GUID(CLSID_ShellExtension,
 				0x65713842, 0xc410, 0x4f44, 0x83, 0x83, 0xbf, 0xe0, 0x1a, 0x39, 0x8c, 0x90);

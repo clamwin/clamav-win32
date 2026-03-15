@@ -4,72 +4,55 @@ description: How to run tests and add new tests for the ClamWin GUI
 
 # Testing Workflow
 
-## Strategy: MinUnit + Console Test Runner
-We use a minimal C unit test approach (MinUnit macros in `minunit.h`) with a console test runner.
-The test executable (`clamwin_test.exe`) is a separate build target that links the same source files
-as the GUI but replaces `clamwin_main.c` with `test_main.c`.
+## Strategy: doctest + C++ Test Runner
+The GUI test suite uses doctest in `src/clamwin-gui-cpp/tests/`.
+The primary executable is `clamwin_gui_test.exe`, with CMake targets that run
+normal checks and optional real-tools smoke tests.
 
 ## Running Tests
 
-// turbo-all
-
-1. Build the test target:
+1. Configure and build test target:
 ```powershell
-$env:PATH = "C:\msys64\mingw64\bin;C:\Program Files\CMake\bin;" + $env:PATH; mingw32-make -C build-gui-test clamwin_test > .\build-gui-test\test_build_log.txt 2>&1
+$env:PATH = "C:\msys64\mingw64\bin;C:\Program Files\CMake\bin;" + $env:PATH
+cmake -S . -B build-gui -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_MAKE_PROGRAM=mingw32-make
+cmake --build build-gui --target clamwin_gui_test
 ```
 
-2. Check for build errors:
+2. Run standard GUI test checks:
 ```powershell
-Get-Content .\build-gui-test\test_build_log.txt
+cmake --build build-gui --target clamwin_gui_check
 ```
 
-3. Run the tests:
+3. Optional: run real-tools smoke checks (requires binaries/db and may be environment-dependent):
 ```powershell
-$env:PATH = "C:\msys64\mingw64\bin;C:\Program Files\CMake\bin;" + $env:PATH; Push-Location .\build-gui-test; .\clamwin_test.exe > .\test_output.txt 2>&1; Pop-Location
-```
-
-4. Check test results:
-```powershell
-Get-Content .\build-gui-test\test_output.txt
+cmake --build build-gui --target clamwin_gui_check_real_tools
 ```
 
 ## Adding New Tests
 
-1. Create a new test file in `src/gui/tests/` (e.g., `test_prefs.c`)
-2. Include `minunit.h` and the module header
-3. Write test functions using `mu_assert`, `mu_assert_eq`, `mu_assert_str_eq`
-4. Add a test suite function and register it in `test_main.c`
-5. Add the source file to `CLAMWIN_TEST_SOURCES` in `cmake/clamwin.cmake`
+1. Add a new test file in `src/clamwin-gui-cpp/tests/` (e.g., `test_feature.cpp`).
+2. Include `doctest.h` and the header(s) under test.
+3. Add `TEST_CASE(...)` blocks with deterministic inputs.
+4. Ensure the file is listed in the GUI test target sources in CMake.
 
 ## Test File Template
-```c
-#include "minunit.h"
-#include "../clamwin_gui.h"
+```cpp
+#include "doctest.h"
 
-MU_TEST(test_example)
+TEST_CASE("example")
 {
-    mu_assert(1 == 1, "basic truth");
-}
-
-MU_TEST_SUITE(test_example_suite)
-{
-    MU_RUN_TEST(test_example);
+    CHECK(1 == 1);
 }
 ```
 
-## Stubs
-The test target includes `stubs_clamav.c` which provides minimal implementations of the `cl_*` functions (libclamav API). This allows unit testing of the `clamwin_engine.c` wrapper logic (state management, locking, error handling) without requiring the full libclamav DLL or virus databases.
-
 ## What Can Be Tested
-- **Config**: Load/save/defaults, key parsing, path resolution
-- **Utils**: DB header parsing, protection status logic
-- **Engine**: Wrapper state transitions, thread safety, error handling (via stubs)
-- **Tray/UI**: Cannot easily test GUI drawing, but can test data structures
+- **Config/Parsing/Validation**: deterministic unit tests.
+- **Scheduler/CLI/Command-building**: behavior-focused tests.
+- **Real tools**: smoke tests behind opt-in targets.
 
 ## TDD Cycle
 1. Write a failing test for the new feature
 2. Run tests — confirm failure
-3. Implement the feature in the C module
+3. Implement the feature in production code
 4. Run tests — confirm pass
 5. Refactor if needed
-6. Update `docs/REFACTORING_LOG.md` with the change

@@ -14,6 +14,14 @@
 #define SCHEDULER_TIMER_ID  42
 #define SCHEDULER_INTERVAL  60000  /* 60 seconds */
 
+static int cfgDayToTmWday(int cfgDay)
+{
+    /* Config uses 0=Monday..6=Sunday, tm_wday uses 0=Sunday..6=Saturday. */
+    if (cfgDay < 0 || cfgDay > 6)
+        return -1;
+    return (cfgDay + 1) % 7;
+}
+
 CWScheduler::CWScheduler()
     : m_hwnd(NULL)
     , m_config(NULL)
@@ -48,7 +56,6 @@ int CWScheduler::isDue(time_t now, int scheduled, int hour, int minute, int freq
     if (last_rt > 0) {
         if (frequency == 3) {
             ran_this_interval = (ltm.tm_year == tm->tm_year && ltm.tm_yday == tm->tm_yday && ltm.tm_hour == tm->tm_hour);
-            if (now - last_rt < 3000) ran_this_interval = true;
         } else {
             ran_this_interval = (ltm.tm_year == tm->tm_year && ltm.tm_yday == tm->tm_yday);
         }
@@ -61,7 +68,7 @@ int CWScheduler::isDue(time_t now, int scheduled, int hour, int minute, int freq
     switch (frequency) {
         case 0: /* Daily */     eligible_day = true; break;
         case 1: /* Workdays */  eligible_day = (tm->tm_wday >= 1 && tm->tm_wday <= 5); break;
-        case 2: /* Weekly */    eligible_day = (tm->tm_wday == day); break;
+        case 2: /* Weekly */    eligible_day = (tm->tm_wday == cfgDayToTmWday(day)); break;
         case 3: /* Hourly */    eligible_day = true; break;
     }
 

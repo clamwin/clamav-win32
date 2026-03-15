@@ -56,7 +56,7 @@ target_compile_definitions(clamwin_shell_extension PRIVATE
     _CRT_SECURE_NO_WARNINGS
 )
 
-if(CLAMWIN_SHELLEXT_UNICODE)
+if(CLAMWIN_SHELLEXT_UNICODE STREQUAL "ON")
     target_compile_definitions(clamwin_shell_extension PRIVATE UNICODE _UNICODE)
 endif()
 

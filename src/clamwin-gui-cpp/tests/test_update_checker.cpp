@@ -58,7 +58,7 @@ TEST_CASE("parseVersion: invalid input returns false")
 {
     int maj = 0, min = 0, pat = 0;
     CHECK_FALSE(CWUpdateChecker::parseVersion("", maj, min, pat));
-    CHECK_FALSE(CWUpdateChecker::parseVersion(NULL, maj, min, pat));
+    CHECK_FALSE(CWUpdateChecker::parseVersion(nullptr, maj, min, pat));
     CHECK_FALSE(CWUpdateChecker::parseVersion("abc", maj, min, pat));
 }
 

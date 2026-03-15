@@ -25,6 +25,19 @@ static const char* CW_GITHUB_API_HOST = "api.github.com";
 static const char* CW_GITHUB_API_PATH = "/repos/clamwin/clamwin/releases/latest";
 static const char* CW_DOWNLOAD_PAGE   = "https://www.clamwin.com/download";
 
+/* GitHub API requires modern TLS; skip check on legacy OS families (Win9x/XP). */
+static bool canUseGithubTlsOnThisOs()
+{
+    OSVERSIONINFOA osv;
+    memset(&osv, 0, sizeof(osv));
+    osv.dwOSVersionInfoSize = sizeof(osv);
+
+    if (!GetVersionExA(&osv))
+        return true; /* If detection fails, keep behavior unchanged. */
+
+    return osv.dwMajorVersion >= 6;
+}
+
 const char* CWUpdateChecker::apiUrl()
 {
     return "https://api.github.com/repos/clamwin/clamwin/releases/latest";
@@ -170,6 +183,9 @@ void CWUpdateChecker::doCheck()
 
     do
     {
+        if (!canUseGithubTlsOnThisOs())
+            break;
+
         hInet = InternetOpenA("ClamWin/" CLAMWIN_VERSION_STR,
                               INTERNET_OPEN_TYPE_PRECONFIG,
                               NULL, NULL, 0);
