@@ -1,5 +1,6 @@
-# disable zlib-ng on x86
-if(CLAMAV_ARCH STREQUAL "x86")
+option(USE_ZLIB_NG_ON_X86 "Use zlib-ng for x86 builds" OFF)
+
+if(CLAMAV_ARCH STREQUAL "x86" AND NOT USE_ZLIB_NG_ON_X86)
     set(ZLIB_DIR ${3RDPARTY_DIR}/zlib)
     set(zlib_headers ${ZLIB_DIR}/zconf.h ${ZLIB_DIR}/zlib.h)
     list(APPEND CLAMWIN_INCLUDES ${ZLIB_DIR})
