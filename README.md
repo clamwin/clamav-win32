@@ -1,4 +1,4 @@
-# ClamAV native win32 port - 1.5.1
+# ClamAV native win32 port - 1.5.2
 
 Copyright (c) 2005-2026 Gianluigi Tiesi <sherpya@gmail.com>
 
@@ -73,6 +73,7 @@ A: <https://docs.clamav.net/faq/faq-troubleshoot.html#how-do-i-know-if-my-ip-add
 
 - import `clamav.reg` file
 - create `C:\ClamAV` and `C:\ClamAV\db`
+- create `C:\ClamAV\certs` and copy `clamav.crt` into it
 - put executables in `C:\ClamAV`
 - create freshclam.conf in `C:\ClamAV`
 - create clamd.conf in `C:\ClamAV`
@@ -84,6 +85,8 @@ freshclam.conf
 ```text
 DatabaseMirror database.clamav.net
 DNSDatabaseInfo current.cvd.clamav.net
+# Optional explicit cert path (recommended for portable/non-default layouts):
+# CVDCertsDirectory "C:\\ClamAV\\certs"
 ```
 
 clamd.conf
