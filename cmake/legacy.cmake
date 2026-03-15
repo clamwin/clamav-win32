@@ -87,23 +87,52 @@ if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501 AND CLAMAV_ARCH STREQUAL "x86")
     target_link_libraries(clamdtop PRIVATE clamav_compat)
 endif()
 
-if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
-    get_target_property(RUST_ARCHIVE clamav_rust IMPORTED_LOCATION)
-    set(RUST_FILTERED_ARCHIVE "${RUST_ARCHIVE}.filtered.a")
-
-    add_custom_command(
-        OUTPUT "${RUST_FILTERED_ARCHIVE}"
-        COMMAND ${CMAKE_COMMAND} -E copy "${RUST_ARCHIVE}" "${RUST_FILTERED_ARCHIVE}"
-        COMMAND ${CMAKE_COMMAND} -E env python3 "${CMAKE_SOURCE_DIR}/filter-rust.py" "${CMAKE_OBJDUMP}" "${CMAKE_AR}" "${RUST_FILTERED_ARCHIVE}"
-        DEPENDS "${RUST_ARCHIVE}" "${CMAKE_SOURCE_DIR}/filter-rust.py"
-    )
-
-    add_custom_target(filter_clamav_rust DEPENDS "${RUST_FILTERED_ARCHIVE}" JOB_POOL single)
-    set_target_properties(clamav_rust PROPERTIES IMPORTED_LOCATION "${RUST_FILTERED_ARCHIVE}")
-    add_dependencies(libclamav filter_clamav_rust clamav_rust)
-    add_dependencies(libfreshclam filter_clamav_rust clamav_rust)
-    add_dependencies(sigtool filter_clamav_rust clamav_rust)
-    add_dependencies(clambc filter_clamav_rust clamav_rust)
+if(NOT DEFINED Python3_EXECUTABLE)
+    find_package(Python3 COMPONENTS Interpreter QUIET)
 endif()
+
+set(_RUST_FILTER_PY_CMD)
+if(Python3_EXECUTABLE)
+    set(_RUST_FILTER_PY_CMD "${Python3_EXECUTABLE}")
+elseif(WIN32)
+    find_program(_PY_LAUNCHER NAMES py)
+    if(_PY_LAUNCHER)
+        set(_RUST_FILTER_PY_CMD "${_PY_LAUNCHER}" "-3")
+    else()
+        find_program(_PYTHON_FALLBACK NAMES python3 python)
+        if(_PYTHON_FALLBACK)
+            set(_RUST_FILTER_PY_CMD "${_PYTHON_FALLBACK}")
+        endif()
+    endif()
+else()
+    find_program(_PYTHON_FALLBACK NAMES python3 python)
+    if(_PYTHON_FALLBACK)
+        set(_RUST_FILTER_PY_CMD "${_PYTHON_FALLBACK}")
+    endif()
+endif()
+
+if(NOT _RUST_FILTER_PY_CMD)
+    message(FATAL_ERROR
+        "No Python interpreter found for filter-rust.py. "
+        "Install Python or pass -DPython3_EXECUTABLE=<path to python>."
+    )
+endif()
+
+get_target_property(RUST_ARCHIVE clamav_rust IMPORTED_LOCATION)
+set(RUST_FILTERED_ARCHIVE "${RUST_ARCHIVE}.filtered.a")
+
+add_custom_command(
+    OUTPUT "${RUST_FILTERED_ARCHIVE}"
+    COMMAND ${CMAKE_COMMAND} -E copy "${RUST_ARCHIVE}" "${RUST_FILTERED_ARCHIVE}"
+    COMMAND ${CMAKE_COMMAND} -E env ${_RUST_FILTER_PY_CMD} "${CMAKE_SOURCE_DIR}/filter-rust.py" "${CMAKE_OBJDUMP}" "${CMAKE_AR}" "${RUST_FILTERED_ARCHIVE}"
+    DEPENDS "${RUST_ARCHIVE}" "${CMAKE_SOURCE_DIR}/filter-rust.py"
+)
+
+add_custom_target(filter_clamav_rust DEPENDS "${RUST_FILTERED_ARCHIVE}" JOB_POOL single)
+set_target_properties(clamav_rust PROPERTIES IMPORTED_LOCATION "${RUST_FILTERED_ARCHIVE}")
+add_dependencies(libclamav filter_clamav_rust clamav_rust)
+add_dependencies(libfreshclam filter_clamav_rust clamav_rust)
+add_dependencies(sigtool filter_clamav_rust clamav_rust)
+add_dependencies(clambc filter_clamav_rust clamav_rust)
 
 target_link_options(libclamav PRIVATE $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
