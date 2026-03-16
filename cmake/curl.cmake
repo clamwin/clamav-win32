@@ -45,6 +45,27 @@ if(MSVC)
     set(HAVE_SIZEOF_SSIZE_T FALSE)
 endif()
 
+set(CURL_WIN9X_PATCH "${CLAMWIN_DIR}/patches/curl-win9x.diff")
+execute_process(
+    COMMAND git apply --check --reverse "${CURL_WIN9X_PATCH}"
+    WORKING_DIRECTORY "${CURL_DIR}"
+    RESULT_VARIABLE CURL_PATCH_ALREADY_APPLIED
+    OUTPUT_QUIET ERROR_QUIET
+)
+if(NOT CURL_PATCH_ALREADY_APPLIED EQUAL 0)
+    message(STATUS "Applying patch curl-win9x.diff")
+    execute_process(
+        COMMAND git apply "${CURL_WIN9X_PATCH}"
+        WORKING_DIRECTORY "${CURL_DIR}"
+        RESULT_VARIABLE CURL_PATCH_RESULT
+    )
+    if(NOT CURL_PATCH_RESULT EQUAL 0)
+        message(FATAL_ERROR "Failed to apply patch curl-win9x.diff")
+    endif()
+else()
+    message(STATUS "Patch curl-win9x.diff already applied, skipping")
+endif()
+
 message(STATUS "==== Adding subproject curl ====")
 add_subdirectory(${CURL_DIR} EXCLUDE_FROM_ALL)
 target_include_directories(libcurl_object PRIVATE ${OPENSSL_INCLUDE_DIR})
