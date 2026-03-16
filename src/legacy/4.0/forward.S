@@ -54,9 +54,6 @@ missing_module32next:
 
 .global _GetUserProfileDirectoryW@12
 
-.global __imp__CreateThread@24
-.global _CreateThread@24
-
 __imp__RegisterWaitForSingleObject@24:
     .long thunk_pRegisterWaitForSingleObject@24
 __imp__UnregisterWait@4:
