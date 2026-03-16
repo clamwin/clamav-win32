@@ -1,8 +1,8 @@
 diff --git a/lib/cf-socket.c b/lib/cf-socket.c
-index 273258fea..77af54b5a 100644
+index 2ebbe4df4d..56694715c4 100644
 --- a/lib/cf-socket.c
 +++ b/lib/cf-socket.c
-@@ -1187,7 +1187,7 @@ static CURLcode cf_socket_open(struct Curl_cfilter *cf,
+@@ -1155,7 +1155,7 @@ static CURLcode cf_socket_open(struct Curl_cfilter *cf,
    }
  #endif
  
