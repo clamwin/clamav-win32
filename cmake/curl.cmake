@@ -46,7 +46,7 @@ else()
 endif()
 
 if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
-    set(CURL_TARGET_WINDOWS_VERSION "0x0501" CACHE STRING "Minimum target Windows version as hex string")
+    set(CURL_TARGET_WINDOWS_VERSION "0x0600" CACHE STRING "Minimum target Windows version as hex string" FORCE)
 endif()
 
 if(MSVC)
@@ -60,6 +60,7 @@ target_include_directories(libcurl_object PRIVATE ${OPENSSL_INCLUDE_DIR})
 if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
     set_source_files_properties(
         ${CURL_DIR}/lib/curlx/version_win32.c
+        ${CURL_DIR}/lib/system_win32.c
         DIRECTORY ${CURL_DIR}/lib
         PROPERTIES COMPILE_DEFINITIONS "CURL_WINDOWS_UWP"
     )

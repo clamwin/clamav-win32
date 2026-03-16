@@ -225,3 +225,29 @@ void WINAPI WRAP(WakeByAddressAll)(void *Address)
     for (int i = 0; i < count; ++i)
         SetEvent(events[i]);
 }
+
+void WINAPI WRAP(AcquireSRWLockExclusive)(PSRWLOCK SRWLock)
+{
+    for (;;)
+    {
+        void *state = InterlockedCompareExchangePointer(&SRWLock->Ptr, (void *)1, NULL);
+        if (!state)
+            return;
+
+        if (state != (void *)2)
+        {
+            state = InterlockedCompareExchangePointer(&SRWLock->Ptr, (void *)2, state);
+            if (!state)
+                return;
+        }
+
+        PVOID compare = (void *)2;
+        WRAP(WaitOnAddress)(&SRWLock->Ptr, &compare, sizeof(compare), INFINITE);
+    }
+}
+
+void WINAPI WRAP(ReleaseSRWLockExclusive)(PSRWLOCK SRWLock)
+{
+    if (InterlockedExchangePointer(&SRWLock->Ptr, NULL) == (void *)2)
+        WRAP(WakeByAddressSingle)(&SRWLock->Ptr);
+}
