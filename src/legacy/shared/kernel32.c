@@ -190,25 +190,8 @@ HANDLE WINAPI CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LP
           lpTimerAttributes, lpTimerName, dwFlags, dwDesiredAccess);
 
     BOOL bManualReset = (dwFlags & CREATE_WAITABLE_TIMER_MANUAL_RESET) != 0;
-#ifdef UNICODE
     HANDLE hTimer = CreateWaitableTimerW(lpTimerAttributes, bManualReset, lpTimerName);
-#else
-    char *lpTimerNameA = NULL;
 
-    if (lpTimerName)
-    {
-        int size = WideCharToMultiByte(CP_ACP, 0, lpTimerName, -1, NULL, 0, NULL, NULL);
-        if (size)
-        {
-            lpTimerNameA = RtlAllocateHeap(GetProcessHeap(), 0, size);
-            WideCharToMultiByte(CP_ACP, 0, lpTimerName, -1, NULL, 0, NULL, NULL);
-        }
-    }
-
-    HANDLE hTimer = CreateWaitableTimerA(lpTimerAttributes, bManualReset, lpTimerNameA);
-    if (lpTimerNameA)
-        RtlFreeHeap(GetProcessHeap(), 0, lpTimerNameA);
-#endif
     // If the timer was created successfully but HIGH_RESOLUTION was requested,
     if ((hTimer != NULL) && (dwFlags & CREATE_WAITABLE_TIMER_HIGH_RESOLUTION))
     {

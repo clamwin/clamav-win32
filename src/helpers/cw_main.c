@@ -41,8 +41,6 @@ int main(int argc, char* argv[])
     disablefsredir();
 #endif
 
-#ifdef UNICODE
     w32_glob(&argc, &argv);
-#endif
     return cw_main(argc, argv);
 }
