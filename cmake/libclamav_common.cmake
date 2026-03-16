@@ -1,8 +1,5 @@
 file(GLOB libclamav_common_win32_sources ${CLAMWIN_DIR}/src/common/*.c)
 
-set_source_files_properties(${libclamav_common_win32_sources}
-    PROPERTIES COMPILE_DEFINITIONS "${UNICODE_DEFINES}")
-
 set(libclamav_common_sources
     ${CLAMAV_DIR}/common/clamdcom.c
     ${CLAMAV_DIR}/common/exeScanner.c

@@ -98,11 +98,6 @@ int res_init(void);
 int res_query(const char *dname, int klass, int type, unsigned char *answer, int anslen);
 int dn_expand(unsigned char *msg, unsigned char *eomorig, unsigned char *comp_dn, char *exp_dn, int length);
 
-/* re-route main to cw_main to handle some startup code */
-#ifndef CLAMWIN_MAIN_HANDLED
-#define main cw_main
-#endif
-
 #define WORDS_BIGENDIAN 0
 #define EAI_SYSTEM 0
 

@@ -7,21 +7,12 @@
 [submodule "3rdparty/json-c"]
 	path = 3rdparty/json-c
 	url = https://github.com/json-c/json-c.git
-[submodule "3rdparty/PDCurses"]
-	path = 3rdparty/PDCurses
-	url = https://github.com/Bill-Gray/PDCurses.git
 [submodule "3rdparty/pcre2"]
 	path = 3rdparty/pcre2
 	url = https://github.com/PhilipHazel/pcre2.git
-[submodule "3rdparty/llvm-project"]
-	path = 3rdparty/llvm-project
-	url = https://github.com/llvm/llvm-project.git
 [submodule "3rdparty/mingw-w64"]
 	path = 3rdparty/mingw-w64
 	url = git://git.code.sf.net/p/mingw-w64/mingw-w64
-[submodule "3rdparty/zlib-ng"]
-	path = 3rdparty/zlib-ng
-	url = https://github.com/zlib-ng/zlib-ng.git
 [submodule "3rdparty/openssl"]
 	path = 3rdparty/openssl
 	url = ../openssl.git

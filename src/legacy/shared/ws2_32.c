@@ -1,7 +1,7 @@
 /*
  * Legacy Windows Compatibility Layer
  *
- * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
+ * Copyright (c) 2025-2026 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,41 @@
 
 #include "legacy.h"
 
-DWORD WINAPI GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags)
+// added in rust 1.93
+static int WINAPI GetHostNameW_compat(PWSTR name, int namelen)
 {
-    TRACE("GetFinalPathNameByHandleW(0x%p, 0x%p, %ld, %ld)\n", hFile, lpszFilePath, cchFilePath, dwFlags);
-    fprintf(stderr, "GetFinalPathNameByHandleW: ERROR_CALL_NOT_IMPLEMENTED\n");
-    SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+    if (name == NULL || namelen <= 0)
+    {
+        WSASetLastError(WSAEFAULT);
+        return SOCKET_ERROR;
+    }
+
+    char ansiBuffer[256];
+    if (gethostname(ansiBuffer, sizeof(ansiBuffer)))
+        return SOCKET_ERROR;
+
+    if (!MultiByteToWideChar(CP_ACP, 0, ansiBuffer, -1, name, namelen))
+    {
+        WSASetLastError(WSAEFAULT);
+        return SOCKET_ERROR;
+    }
+
     return 0;
 }
+
+#ifdef __MINGW32__
+#include "dynload.h"
+#include "loadlibrary.h"
+#include "initializer.h"
+
+imp_GetHostNameW pGetHostNameW = GetHostNameW_compat;
+
+INITIALIZER(init_ws2_32)
+{
+    TRACE("Init @ " __FILE__ "\n");
+
+    HMODULE ws2_32 = LoadLibraryFromWin32(TEXT("ws2_32.dll"));
+    if (ws2_32)
+        IMPORT_FUNCTION(ws2_32, GetHostNameW);
+}
+#endif // _GNU_SOURCE

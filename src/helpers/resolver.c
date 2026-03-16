@@ -1,7 +1,7 @@
 /*
  * Legacy Windows Compatibility Layer: Windows 9x DNS Query
  *
- * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
+ * Copyright (c) 2025-2026 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,6 @@
 
 #include "platform.h"
 
-#if _WIN32_WINNT > _WIN32_WINNT_WINXP || defined(_WIN64)
-#include "resolv.c"
-#else
 #include <iphlpapi.h>
 #include <iptypes.h>
 
@@ -38,42 +35,6 @@
 #include "initializer.h"
 
 #define TCPIP_PARAMS "SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters"
-
-#if defined(_MSC_VER) && NTDDI_VERSION < NTDDI_WIN2KSP1
-typedef struct
-{
-    char HostName[MAX_HOSTNAME_LEN + 4];
-    char DomainName[MAX_DOMAIN_NAME_LEN + 4];
-    PIP_ADDR_STRING CurrentDnsServer;
-    IP_ADDR_STRING DnsServerList;
-    UINT NodeType;
-    char ScopeId[MAX_SCOPE_ID_LEN + 4];
-    UINT EnableRouting;
-    UINT EnableProxy;
-    UINT EnableDns;
-} FIXED_INFO, *PFIXED_INFO;
-
-IPHLPAPI_DLL_LINKAGE DWORD WINAPI GetNetworkParams(PFIXED_INFO pFixedInfo, PULONG pOutBufLen);
-#endif
-
-static imp_DnsQuery_A pDnsQuery_A = NULL;
-static imp_DnsRecordListFree pDnsRecordListFree = NULL;
-
-static OSVERSIONINFOW g_osvi = {0};
-
-INITIALIZER(init_resolver)
-{
-    g_osvi.dwOSVersionInfoSize = sizeof(g_osvi);
-    GetVersionExW(&g_osvi);
-
-    // _UNICODE can't be defined here
-    HMODULE dnsapi = LoadLibraryFromWin32("dnsapi.dll");
-    if (dnsapi)
-    {
-        IMPORT_FUNCTION(dnsapi, DnsQuery_A);
-        IMPORT_FUNCTION(dnsapi, DnsRecordListFree);
-    }
-}
 
 int res_init(void)
 {
@@ -271,7 +232,7 @@ int dn_comp(const char *src, unsigned char *dest, int space, const unsigned char
     return dest - dst_start;
 }
 
-static int res_query_compat(const char *dname, int class, int type, unsigned char *answer, int anslen)
+int res_query(const char *dname, int class, int type, unsigned char *answer, int anslen)
 {
     struct hostent *he;
     char *nameserver;
@@ -420,111 +381,3 @@ static int res_query_compat(const char *dname, int class, int type, unsigned cha
 
     return len;
 }
-
-static int res_query_dnsapi(const char *dname, int class, int type, unsigned char *answer, int anslen)
-{
-    DNS_RECORD *rrs, *rr;
-    DNS_STATUS s;
-    HEADER *h = (HEADER *)answer;
-    int ret = -1;
-    int offset = sizeof(HEADER);
-    int qname_len;
-
-    if (anslen <= sizeof(HEADER))
-        return -1;
-
-    DWORD dwOptions = DNS_QUERY_BYPASS_CACHE | DNS_QUERY_DONT_RESET_TTL_VALUES;
-
-    // DNS_QUERY_NO_HOSTS_FILE is not supported under Windows 2000
-    if ((g_osvi.dwMajorVersion > 6) || ((g_osvi.dwMajorVersion == 5) && (g_osvi.dwMinorVersion > 0)))
-        dwOptions += DNS_QUERY_NO_HOSTS_FILE;
-
-    s = pDnsQuery_A(dname, (WORD)type, dwOptions, NULL, &rrs, NULL);
-    if (s)
-    {
-        logg(LOGG_ERROR, "DnsQuery_A failed with %ld\n", s);
-        return -1;
-    }
-
-    h->id = 1;
-    h->qr = 1; /* Reply */
-    h->opcode = 0;
-    h->aa = 0;
-    h->tc = 0;
-    h->rd = 1;
-    h->ra = 1;
-    h->unused = 0;
-    h->rcode = 0;
-    h->qdcount = htons(1);
-    h->ancount = htons(0);
-
-    qname_len = dn_comp(dname, answer + offset, anslen - offset, NULL, NULL);
-    if (qname_len < 0)
-    {
-        pDnsRecordListFree(rrs, DnsFreeRecordList);
-        return -1;
-    }
-    offset += qname_len;
-
-    if (offset + 4 > anslen)
-    {
-        pDnsRecordListFree(rrs, DnsFreeRecordList);
-        return -1;
-    }
-
-    answer[offset++] = (type >> 8) & 0xff;
-    answer[offset++] = type & 0xff;
-    answer[offset++] = (class >> 8) & 0xff;
-    answer[offset++] = class & 0xff;
-
-    for (rr = rrs; rr != NULL; rr = rr->pNext)
-    {
-        if (rr->wType == (WORD)type)
-        {
-            h->ancount = htons(1);
-
-            /* 1. Name: comp using QNAME (offset = sizeof(HEADER)) */
-            if (offset + 2 > anslen)
-                break;
-            answer[offset++] = 0xC0;
-            answer[offset++] = sizeof(HEADER);
-
-            /* 2. TYPE, CLASS, TTL */
-            if (offset + 10 > anslen)
-                break;
-            answer[offset++] = (type >> 8) & 0xff;
-            answer[offset++] = type & 0xff;
-            answer[offset++] = (class >> 8) & 0xff;
-            answer[offset++] = class & 0xff;
-            answer[offset++] = (rr->dwTtl >> 24) & 0xff;
-            answer[offset++] = (rr->dwTtl >> 16) & 0xff;
-            answer[offset++] = (rr->dwTtl >> 8) & 0xff;
-            answer[offset++] = rr->dwTtl & 0xff;
-
-            /* 3. RDATA: record TXT, RDATA = [len] + text */
-            unsigned int txtlen = strlen(rr->Data.TXT.pStringArray[0]);
-            int rdata_len = txtlen + 1;
-            if (offset + 2 + rdata_len > anslen)
-                break;
-            answer[offset++] = (rdata_len >> 8) & 0xff;
-            answer[offset++] = rdata_len & 0xff;
-            answer[offset++] = txtlen;
-            memcpy(answer + offset, rr->Data.TXT.pStringArray[0], txtlen);
-            offset += txtlen;
-
-            ret = offset;
-            break;
-        }
-    }
-
-    pDnsRecordListFree(rrs, DnsFreeRecordList);
-    return ret;
-}
-
-int res_query(const char *dname, int class, int type, unsigned char *answer, int anslen)
-{
-    if (pDnsQuery_A && pDnsRecordListFree)
-        return res_query_dnsapi(dname, class, type, answer, anslen);
-    return res_query_compat(dname, class, type, answer, anslen);
-}
-#endif // _WIN32_WINNT > _WIN32_WINNT_WINXP || defined(_WIN64)

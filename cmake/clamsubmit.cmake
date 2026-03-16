@@ -6,7 +6,6 @@ set(clamsubmit_sources
 
 set(clamsubmit_win32_sources
     ${CLAMWIN_DIR}/src/helpers/cw_main.c
-    ${CLAMWIN_DIR}/src/helpers/crashdump.c
     ${CLAMWIN_DIR}/resources/clamsubmit.rc
 )
 

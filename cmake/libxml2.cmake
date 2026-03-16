@@ -7,21 +7,18 @@ set(LIBXML2_WITH_PROGRAMS OFF)
 set(LIBXML2_WITH_TESTS OFF)
 set(LIBXML2_WITH_DEBUG OFF)
 
+message(STATUS "==== Adding subproject libxml2 ====")
 add_subdirectory(${LIBXML2_DIR} EXCLUDE_FROM_ALL)
 target_compile_options(LibXml2 PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4244 /wd4267>)
 
-if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
-    get_target_property(LIBXML2_LIBS LibXml2 INTERFACE_LINK_LIBRARIES)
-    list(REMOVE_ITEM LIBXML2_LIBS
-        $<LINK_ONLY:ws2_32>
-        $<LINK_ONLY:bcrypt>
-    )
-    set_target_properties(LibXml2 PROPERTIES INTERFACE_LINK_LIBRARIES "${LIBXML2_LIBS}")
-endif()
+get_target_property(LIBXML2_LIBS LibXml2 INTERFACE_LINK_LIBRARIES)
+list(REMOVE_ITEM LIBXML2_LIBS
+    $<LINK_ONLY:ws2_32>
+    $<LINK_ONLY:bcrypt>
+)
+set_target_properties(LibXml2 PROPERTIES INTERFACE_LINK_LIBRARIES "${LIBXML2_LIBS}")
 
-if(NOT CLAMWIN_UNICODE_BUILD)
-    target_compile_definitions(LibXml2 PRIVATE LIBXML_STATIC_FOR_DLL)
-endif()
+target_compile_definitions(LibXml2 PRIVATE LIBXML_STATIC_FOR_DLL)
 
 list(APPEND CLAMWIN_INCLUDES ${LIBXML2_DIR}/include)
 list(APPEND CLAMWIN_LIBRARIES LibXml2)

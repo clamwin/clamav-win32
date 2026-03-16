@@ -22,26 +22,12 @@
 #ifndef _SERVICE_H_
 #define _SERVICE_H_
 
-#include <windows.h>
-#include <stdbool.h>
+#include <stdio.h>
 
-#ifdef _UNICODE
-bool svc_uninstall(const wchar_t *name, bool verbose);
-bool svc_install(const wchar_t *name, const wchar_t *dname, wchar_t *desc);
-void svc_register(wchar_t *name);
-void svc_ready(void);
-int svc_checkpoint(const char *type, const char *name, unsigned int custom, void *context);
-
-#define _QUOTE(quote) L##quote
-#define svc_install(name, dname, desc) svc_install(_QUOTE(name), _QUOTE(dname), _QUOTE(desc))
-#define svc_uninstall(name, verbose) svc_uninstall(_QUOTE(name), verbose)
-#define svc_register(name) svc_register(_QUOTE(name))
-#else
 #define svc_install(...) \
     fprintf(stderr, "Service is not supported on this build\n")
 #define svc_uninstall(...) \
     fprintf(stderr, "Service is not supported on this build\n")
 #define svc_register(name)
 #define svc_ready()
-#endif
 #endif // _SERVICE_H_

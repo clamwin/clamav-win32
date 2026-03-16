@@ -1,7 +1,7 @@
 /*
  * Legacy Windows Compatibility Layer: common
  *
- * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
+ * Copyright (c) 2025-2026 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,26 +30,18 @@
 .global __imp_InitOnceExecuteOnce
 .global __imp__InitOnceExecuteOnce@16
 
+.global GetHostNameW
+.global _GetHostNameW@8
+
 .global __imp__wassert
+.global __imp__freopen_s
+.global __imp__mbstowcs_s
+.global __imp__wcscpy_s
+.global __imp__wcsncpy_s
+.global __imp__wcstombs_s
 
 .section .rdata,"dr"
 
-#ifdef _WIN64
-.align 8
-
-__imp_WakeByAddressAll:
-    .quad WakeByAddressAll
-__imp_WaitOnAddress:
-    .quad WaitOnAddress
-__imp_WakeByAddressSingle:
-    .quad WakeByAddressSingle
-__imp_ProcessPrng:
-    .quad ProcessPrng
-__imp_InitOnceExecuteOnce:
-    .quad InitOnceExecuteOnce
-__imp__wassert:
-    .quad emu__wassert
-#else
 .align 4
 
 __imp_WakeByAddressAll:
@@ -62,4 +54,22 @@ __imp_ProcessPrng:
     .long _ProcessPrng@8
 __imp__InitOnceExecuteOnce@16:
     .long _InitOnceExecuteOnce@16
-#endif
+
+__imp__freopen_s:
+    .long _freopen_s_compat
+__imp__mbstowcs_s:
+    .long _mbstowcs_s_compat
+__imp__wcscpy_s:
+    .long _wcscpy_s_compat
+__imp__wcsncpy_s:
+    .long _wcsncpy_s_compat
+__imp__wcstombs_s:
+    .long _wcstombs_s_compat
+
+.section .text
+
+.align 4
+
+_GetHostNameW@8:
+    jmp *_pGetHostNameW
+

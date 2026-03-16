@@ -1,14 +1,4 @@
-if(MINGW)
-    if(CLAMWIN_UNICODE_BUILD AND CLAMAV_ARCH STREQUAL "x64")
-        set(OPENSSL_ROOT_DIR ${3RDPARTY_DIR}/openssl/lib/mingw/${CLAMAV_ARCH})
-    else()
-        set(OPENSSL_ROOT_DIR ${3RDPARTY_DIR}/openssl/lib/mingw/legacy)
-    endif()
-elseif(MSVC)
-    set(OPENSSL_ROOT_DIR ${3RDPARTY_DIR}/openssl/lib/msvc/${CLAMAV_ARCH})
-else()
-    message(FATAL_ERROR "Unsupported compiler")
-endif()
+set(OPENSSL_ROOT_DIR ${3RDPARTY_DIR}/openssl/lib/mingw/legacy)
 
 find_library(OPENSSL_SSL_LIBRARY
     NAMES ssl libssl

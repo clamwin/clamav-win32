@@ -42,15 +42,7 @@ DIR *opendir(const char *name)
         errno = ENOMEM;
         return NULL;
     }
-#ifdef UNICODE
-    wchar_t *wpath = uncpath(name);
-    if (!wpath)
-        return NULL;
-        wcsncpy(d->entry, wpath, MAX_PATH - 1);
-        free(wpath);
-#else
     strncpy(d->entry, name, MAX_PATH - 1);
-#endif
     d->entry[MAX_PATH - 1] = 0;
     len = _tcsclen(d->entry);
 
@@ -85,13 +77,8 @@ struct dirent *readdir(DIR *dirp)
                 return NULL;
             }
         }
-#ifdef UNICODE
-        if (!WideCharToMultiByte(CP_UTF8, 0, dirp->wfd.cFileName, -1, dirp->ent.d_name, MAX_PATH - 1, NULL, NULL))
-            continue; /* FIXME: WARN HERE ! */
-#else
         dirp->ent.d_name[0] = 0;
         strncpy(dirp->ent.d_name, dirp->wfd.cFileName, MAX_PATH -1);
-#endif
         dirp->ent.d_ino = dirp->wfd.ftCreationTime.dwLowDateTime ^ dirp->wfd.nFileSizeLow;
         if (!dirp->ent.d_ino) dirp->ent.d_ino = 0x1337;
         dirp->ent.d_type = (dirp->wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? DT_DIR : DT_REG;

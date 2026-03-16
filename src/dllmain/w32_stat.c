@@ -1,5 +1,5 @@
 /*
- * Clamav Native Windows Port: dummy functions
+ * Clamav Native Windows Port: w32_stat replacement
  *
  * Copyright (c) 2005-2025 Gianluigi Tiesi <sherpya@gmail.com>
  *
@@ -18,11 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifdef _UNICODE
-#undef UNICODE
-#undef _UNICODE
-#include <w32_stat.c>
-#else
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,7 +30,6 @@
 
 int w32_stat(const char* path, struct stat* buf)
 {
-#if 1
     if ((strlen(path) == 2) && (path[1] == ':'))
     {
         char szDrive[] = "C:\\";
@@ -44,31 +38,6 @@ int w32_stat(const char* path, struct stat* buf)
     }
 
     return stat(path, buf);
-#else
-    char path2[MAX_PATH];
-    size_t len = strlen(path);
-    strncpy(path2, path, MAX_PATH - len);
-    path2[MAX_PATH - len] = 0;
-
-    for (char* p = path2 + len - 1; (*p == '/') || (*p == '\\'); p--)
-        *p = 0;
-
-    WIN32_FIND_DATAA fdata;
-    HANDLE hFile = FindFirstFileA(path2, &fdata);
-
-    if (hFile == INVALID_HANDLE_VALUE)
-    {
-        cw_leerrno();
-        return -1;
-    }
-
-    FindClose(hFile);
-
-    memset(buf, 0, sizeof(struct stat));
-    buf->st_mode = (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? _S_IFDIR : _S_IFREG;
-    buf->st_size = fdata.nFileSizeLow;
-    return 0;
-#endif
 }
 
 int safe_open(const char* path, int flags, ...)
@@ -86,4 +55,3 @@ wchar_t *uncpath(const char *path)
     fprintf(stderr, "uncpath should never be called\n");
     abort();
 }
-#endif // _UNICODE

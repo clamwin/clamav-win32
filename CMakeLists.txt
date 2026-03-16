@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(clamav-win32 VERSION "1.4.3")
+project(clamav-win32 VERSION "1.4.4")
 
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
@@ -10,37 +10,10 @@ set(3RDPARTY_DIR ${CLAMWIN_DIR}/3rdparty)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Do not build shared libraries" FORCE)
 set(BUILD_STATIC_LIBS ON CACHE BOOL "Build static libraries" FORCE)
 
-option(ENABLE_LLVM "Enable JIT using LLVM Engine" OFF)
-set(ENABLE_LEGACY "OFF" CACHE STRING "Enable support for legacy Windows Versions")
-set_property(CACHE ENABLE_LEGACY PROPERTY STRINGS OFF unicode ansi)
+set(CLAMWIN_WINDOWS_VERSION 0x0400)
+set(CLAMWIN_WINNT_VERSION _WIN32_WINNT=_WIN32_WINNT_NT4)
 
-option(ENABLE_TEST_TOOLS "Enable Test Tools" OFF)
-
-if(ENABLE_LEGACY STREQUAL "unicode")
-    set(CLAMWIN_UNICODE_BUILD ON)
-    set(CLAMWIN_WINDOWS_VERSION 0x0501)
-    set(CLAMWIN_WINNT_VERSION _WIN32_WINNT=_WIN32_WINNT_WINXP)
-elseif(ENABLE_LEGACY STREQUAL "ansi")
-    set(CLAMWIN_UNICODE_BUILD OFF)
-    set(CLAMWIN_WINDOWS_VERSION 0x0400)
-    set(CLAMWIN_WINNT_VERSION _WIN32_WINNT=_WIN32_WINNT_NT4)
-elseif(ENABLE_LEGACY STREQUAL "OFF")
-    set(CLAMWIN_UNICODE_BUILD ON)
-    set(CLAMWIN_WINDOWS_VERSION 0x0600)
-    set(CLAMWIN_WINNT_VERSION _WIN32_WINNT=_WIN32_WINNT_VISTA)
-endif()
-
-if(CLAMWIN_UNICODE_BUILD)
-    set(UNICODE_DEFINES UNICODE _UNICODE)
-endif()
-
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(CLAMAV_ARCH x64)
-elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-    set(CLAMAV_ARCH x86)
-else()
-    message(FATAL_ERROR "WTF")
-endif()
+set(CLAMAV_ARCH x86)
 
 include(${CLAMAV_DIR}/cmake/Version.cmake)
 
@@ -154,33 +127,10 @@ include(cmake/freshclam.cmake)
 include(cmake/sigtool.cmake)
 include(cmake/libclamunrar.cmake)
 
-if(CLAMWIN_UNICODE_BUILD)
-    include(cmake/clamd.cmake)
-    include(cmake/clamdscan.cmake)
-    include(cmake/pdcurses.cmake)
-    include(cmake/clamdtop.cmake)
-endif()
-
-if(ENABLE_TEST_TOOLS)
-    include(cmake/tools.cmake)
-endif()
-
-set_source_files_properties(${CLAMWIN_DIR}/src/helpers/cw_main.c
-    PROPERTIES COMPILE_DEFINITIONS "${UNICODE_DEFINES}"
-)
-
 include(${CLAMAV_DIR}/cmake/FindRust.cmake)
 add_subdirectory(${CLAMAV_DIR}/libclamav_rust EXCLUDE_FROM_ALL)
 
-if(NOT ENABLE_LEGACY STREQUAL "OFF")
-    message(STATUS "Legacy support enabled for: ${ENABLE_LEGACY}")
-
-    if(MSVC)
-        message(WARNING "Compatibility layer makes only sense on MinGW")
-    endif()
-
-    include(cmake/legacy.cmake)
-endif()
+include(cmake/legacy.cmake)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT clamscan)
 
@@ -192,9 +142,6 @@ install(TARGETS ${CLAMAV_INSTALL_TARGETS}
 
 set(DIST_FILES README.md freshclam.conf clamav.reg)
 
-if(CLAMWIN_UNICODE_BUILD)
-    list(APPEND DIST_FILES clamd.conf)
-endif()
 
 file(GLOB COPYRIGHT_FILES ${CLAMAV}/COPYING*)
 install(FILES ${COPYRIGHT_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright)

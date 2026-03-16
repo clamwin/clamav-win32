@@ -1,7 +1,7 @@
 /*
  * Legacy Windows Compatibility Layer
  *
- * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
+ * Copyright (c) 2025-2026 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 
-#ifndef _WIN64
 #include "legacy.h"
 #include "dynload.h"
 #include "initializer.h"
@@ -200,26 +199,6 @@ BOOL WINAPI GetFileSizeEx(HANDLE hFile, PLARGE_INTEGER lpFileSize)
     return TRUE;
 }
 
-#ifdef _UNICODE
-DWORD WINAPI GetProcessId(HANDLE Process)
-{
-    PROCESS_BASIC_INFORMATION pbi;
-    NTSTATUS status = NtQueryInformationProcess(Process,
-                                                ProcessBasicInformation,
-                                                &pbi,
-                                                sizeof(PROCESS_BASIC_INFORMATION),
-                                                NULL);
-
-    if (!NT_SUCCESS(status))
-    {
-        TRACE("GetProcessId: NtQueryInformationProcess failed with 0x%08lx\n", status);
-        SetLastError(RtlNtStatusToDosError(status));
-        return 0;
-    }
-
-    return (DWORD)pbi.UniqueProcessId;
-}
-#else
 DWORD WINAPI GetProcessId(HANDLE Process)
 {
     TRACE("GetProcessId(0x%p)\n", Process);
@@ -334,7 +313,6 @@ NTSTATUS NTAPI NtCreateNamedPipeFile(
     fprintf(stderr, "NtCreateNamedPipeFile() is unsupported\n");
     return STATUS_NOT_SUPPORTED;
 }
-#endif // _UNICODE
 
 imp_MultiByteToWideChar pMultiByteToWideChar = NULL;
 imp_RegisterWaitForSingleObject pRegisterWaitForSingleObject = RegisterWaitForSingleObject_compat;
@@ -355,7 +333,6 @@ int WINAPI MultiByteToWideChar_wrapper(UINT CodePage, DWORD dwFlags, LPCCH lpMul
     return pMultiByteToWideChar(CodePage, dwFlags & ~MB_ERR_INVALID_CHARS, lpMultiByteStr, cbMultiByte, lpWideCharStr, cchWideChar);
 }
 
-#ifndef _UNICODE
 imp_CreateThread pCreateThread = NULL;
 // windows 98 does not like CreateThread with NULL lpThreadId
 HANDLE WINAPI CreateThread_wrapper(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize, LPTHREAD_START_ROUTINE lpStartAddress, LPVOID lpParameter, DWORD dwCreationFlags, LPDWORD lpThreadId)
@@ -365,19 +342,15 @@ HANDLE WINAPI CreateThread_wrapper(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZ
         lpThreadId = &ThreadId;
     return pCreateThread(lpThreadAttributes, dwStackSize, lpStartAddress, lpParameter, dwCreationFlags, lpThreadId);
 }
-#endif
 
 INITIALIZER(init_kernel32_4_0)
 {
     TRACE("Init @ " __FILE__ "\n");
     HMODULE kernel32 = GetModuleHandle(TEXT("kernel32"));
     if (!kernel32) // meh
-        return;
+        abort();
 
-#ifndef _UNICODE
     IMPORT_FUNCTION(kernel32, CreateThread);
-#endif
-
     IMPORT_FUNCTION(kernel32, MultiByteToWideChar);
     IMPORT_FUNCTION(kernel32, RegisterWaitForSingleObject);
     IMPORT_FUNCTION(kernel32, UnregisterWait);
@@ -391,4 +364,3 @@ INITIALIZER(init_kernel32_4_0)
     IMPORT_FUNCTION(kernel32, Module32FirstW);
     IMPORT_FUNCTION(kernel32, Module32NextW);
 }
-#endif /* _WIN64 */

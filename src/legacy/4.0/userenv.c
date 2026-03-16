@@ -85,15 +85,6 @@ INITIALIZER(init_userenv_4_0)
 
     osvi.dwOSVersionInfoSize = sizeof(osvi);
     GetVersionEx(&osvi);
-
-#ifdef _UNICODE
-    if (osvi.dwMajorVersion < 5) // win2k or later
-        return;
-
-    HMODULE userenv = LoadLibraryFromWin32(TEXT("userenv.dll"));
-    if (userenv)
-        IMPORT_FUNCTION(userenv, GetUserProfileDirectoryW);
-#endif
 }
 
 #endif // _WIN64

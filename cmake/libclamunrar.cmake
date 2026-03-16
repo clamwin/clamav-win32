@@ -7,18 +7,15 @@ set(UNRAR_DEFINES
     RAR_NOCRYPT
     _FILE_OFFSET_BITS=64
     ${CLAMWIN_WINNT_VERSION}
-    ${UNICODE_DEFINES}
 )
 set(UNRAR_INCLUDES ${UNRAR_DIR} ${CLAMWIN_DIR}/resources)
 
 file(GLOB libclamunrar_headers ${UNRAR_DIR}/*.hpp)
 file(GLOB libclamunrar_win32_sources ${CLAMWIN_DIR}/src/unrar/*.cpp)
-if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
-    list(APPEND libclamunrar_win32_sources
-        ${CLAMWIN_DIR}/src/unrar/forward.S
-        ${CLAMWIN_DIR}/src/unrar/legacy.c
-    )
-endif()
+list(APPEND libclamunrar_win32_sources
+    ${CLAMWIN_DIR}/src/unrar/forward.S
+    ${CLAMWIN_DIR}/src/unrar/legacy.c
+)
 
 set(libclamunrar_sources
     archive.cpp arcread.cpp blake2s.cpp
@@ -50,9 +47,7 @@ set_target_properties(libclamunrar PROPERTIES DEFINE_SYMBOL "" PREFIX "" OUTPUT_
 target_include_directories(libclamunrar PRIVATE ${UNRAR_INCLUDES} ${CLAMWIN_DIR}/include)
 target_compile_definitions(libclamunrar PRIVATE ${UNRAR_DEFINES})
 
-if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
-    target_link_options(libclamunrar PRIVATE $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
-endif()
+target_link_options(libclamunrar PRIVATE $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 
 # libclamunrar_iface
 add_library(libclamunrar_iface SHARED

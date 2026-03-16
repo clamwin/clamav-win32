@@ -1,7 +1,7 @@
 /*
  * Clamav Native Windows Port: dllmain
  *
- * Copyright (c) 2005-2025 Gianluigi Tiesi <sherpya@gmail.com>
+ * Copyright (c) 2005-2026 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -21,34 +21,9 @@
 #include "platform.h"
 
 #include <windows.h>
-#include <winsock2.h>
 #include <stdio.h>
 
-#include "dynload.h"
-#include "loadlibrary.h"
-
-extern imp_GetSystemTimePreciseAsFileTime pGetSystemTimePreciseAsFileTime;
 extern void init_sysinfoapi(void);
-
-extern imp_AttachConsole pAttachConsole;
-extern imp_GetConsoleProcessList pGetConsoleProcessList;
-
-static imp_HeapSetInformation pHeapSetInformation = NULL;
-
-#ifndef _WIN64
-BOOL bIsWow64 = FALSE;
-
-static imp_IsWow64Process pIsWow64Process = NULL;
-static imp_Wow64DisableWow64FsRedirection pWow64DisableWow64FsRedirection = NULL;
-
-LIBCLAMAV_EXPORT BOOL disablefsredir(void)
-{
-    PVOID OldValue = NULL;
-    if (bIsWow64)
-        return pWow64DisableWow64FsRedirection(&OldValue);
-    return TRUE;
-}
-#endif
 
 /* avoid bombing in stupid msvcrt checks - msvcrt8 only */
 #ifdef _MSC_VER
@@ -69,75 +44,14 @@ void clamavInvalidParameterHandler(const wchar_t *expression,
 #define _set_invalid_parameter_handler(x)
 #endif
 
-static void processattach(void)
-{
-    ULONG HeapFragValue = 2;
-    WSADATA wsaData;
-
-    HMODULE kernel32 = GetModuleHandleW(L"kernel32");
-    if (kernel32) // meh
-    {
-        IMPORT_FUNCTION(kernel32, HeapSetInformation);
-        IMPORT_FUNCTION(kernel32, GetSystemTimePreciseAsFileTime);
-        if (!pGetSystemTimePreciseAsFileTime)
-            init_sysinfoapi();
-#ifdef _UNICODE
-        IMPORT_FUNCTION(kernel32, AttachConsole);
-        IMPORT_FUNCTION(kernel32, GetConsoleProcessList);
-#endif
-#ifndef _WIN64
-        IMPORT_FUNCTION(kernel32, IsWow64Process);
-
-        if (pIsWow64Process)
-        {
-            if (!pIsWow64Process(GetCurrentProcess(), &bIsWow64))
-                fprintf(stderr, "[dllmain] IsWow64Process() failed %d\n", GetLastError());
-            else if (bIsWow64)
-                IMPORT_FUNCTION(kernel32, Wow64DisableWow64FsRedirection);
-        }
-#endif
-    }
-
-    if (!IsDebuggerPresent())
-    {
-        if (pHeapSetInformation && !pHeapSetInformation(GetProcessHeap(), HeapCompatibilityInformation, &HeapFragValue, sizeof(HeapFragValue)))
-        {
-            DWORD le = GetLastError();
-            /* ERROR_GEN_FAILURE on wine */
-            if ((le != ERROR_NOT_SUPPORTED) && (le != ERROR_CALL_NOT_IMPLEMENTED) && (le != ERROR_GEN_FAILURE))
-                fprintf(stderr, "[DllMain] Error setting up low-fragmentation heap: le=%ld\n", le);
-        }
-    }
-
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != NO_ERROR)
-        fprintf(stderr, "[DllMain] Error at WSAStartup(): %d\n", WSAGetLastError());
-
-#ifndef _WIN64
-    /* Some of Windows API tries to load dll from system32 and if fs redirection
-       is disabled it will fail because the image loaded is 64bit, so we will preload
-       needed ones (I hope :D) */
-    if (bIsWow64)
-    {
-        LoadLibraryFromWin32(TEXT("mswsock.dll"));
-        LoadLibraryFromWin32(TEXT("winrnr.dll"));
-        LoadLibraryFromWin32(TEXT("wshtcpip.dll"));
-        LoadLibraryFromWin32(TEXT("iphlpapi.dll"));
-        LoadLibraryFromWin32(TEXT("rsaenh.dll"));
-    }
-#endif
-}
-
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
 {
     switch (reason)
     {
     case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(hModule);
-        processattach();
+        init_sysinfoapi();
         _set_invalid_parameter_handler(clamavInvalidParameterHandler);
-        break;
-    case DLL_PROCESS_DETACH:
-        WSACleanup();
         break;
     }
     return TRUE;

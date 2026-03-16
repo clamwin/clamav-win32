@@ -69,4 +69,6 @@ typedef VOID(WINAPI *imp_DnsRecordListFree)(PDNS_RECORD pRecordList, DNS_FREE_TY
 typedef BOOLEAN(WINAPI *imp_SystemFunction036)(PVOID RandomBuffer, ULONG RandomBufferLength);
 
 typedef BOOL(WINAPI *imp_GetUserProfileDirectoryW)(HANDLE hToken, LPWSTR lpProfileDir, LPDWORD lpcchSize);
+
+typedef int(WINAPI *imp_GetHostNameW)(PWSTR name, int namelen);
 #endif /* _DYNLOAD_H_ */

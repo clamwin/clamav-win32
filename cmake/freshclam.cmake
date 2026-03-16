@@ -47,7 +47,6 @@ file(GLOB freshclam_sources ${CLAMAV_DIR}/freshclam/*.c)
 
 set(freshclam_win32_sources
     ${CLAMWIN_DIR}/src/helpers/cw_main.c
-    ${CLAMWIN_DIR}/src/helpers/crashdump.c
     ${CLAMWIN_DIR}/resources/freshclam.rc
 )
 
@@ -57,11 +56,6 @@ add_executable(freshclam
     ${freshclam_headers}
     ${freshclam_sources}
     ${freshclam_win32_sources}
-)
-
-set_source_files_properties(
-    ${CLAMAV_DIR}/freshclam/freshclam.c
-    PROPERTIES COMPILE_DEFINITIONS "${UNICODE_DEFINES}"
 )
 
 target_include_directories(freshclam PRIVATE ${CLAMWIN_INCLUDES} ${CLAMAV_DIR}/libfreshclam)

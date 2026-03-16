@@ -1,6 +1,6 @@
-# ClamAV native win32 port - 1.4.3
+# ClamAV native win32 port - 1.4.4
 
-Copyright (c) 2005-2025 Gianluigi Tiesi <sherpya@gmail.com>
+Copyright (c) 2005-2026 Gianluigi Tiesi <sherpya@gmail.com>
 
 Upstream ClamAV Project:
 Copyright (c) Cisco Systems, Inc. and/or its affiliates. All rights reserved.
@@ -21,25 +21,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 ## Features
 
 - [**clamav**] small footprint
-- [**clamav**] modern MSVC 64bit port for Windows 7+, legacy 32bit down to NT4, legacy 64bit for WinXP+
-- [**clamav**] support for UNC paths, exotic/long file names
+- [**clamav**] legacy 32bit port for win98
 - [**clamav**] nice icons ;)
 - [**clamscan**] memory scanner (in memory loaded modules are scanned on-disk)
-- [**clamdtop**] curses UI to connect to a running clamd service
-- [**clamd/freshclam**] as Windows Service
 
 ## 3rdparty libraries and versions
 
-- OpenSSL: 3.5.2
+- OpenSSL: 3.5.5
 - bzip2: 1.0.8
-- curl: 8.16.0
+- curl: 8.19.0
 - json-c: 0.18-20240915
-- libxml2: 2.15.0
-- pcre2: 10.46
-- PDCurses: git-6ba6df38
+- libxml2: 2.15.2
+- pcre2: 10.47
 - Winpthreads: from MinGW-W64 v13.0.0
-- zlib-ng: 2.2.5
-- UnRAR: 7.1.10
+- zlib: 1.3.1
+- UnRAR: 7.2.4
 - Opencow (custom build) on Win9x
 
 ## Getting sources
@@ -57,7 +53,7 @@ Clone repository using:
   [Baltimore CyberTrust Root](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt)
   (double click on .crt file and follow the wizard)
 
-  On legacy versions a crt bundle is used instead, if you get a message like:
+  A crt bundle is used instead, if you get a message like:
   `ERROR: Failed to convert system certificate to x509.`
   it's probabily and old bogus cert you can safely remove from windows cert manager,
   on my system `Japan Certification Services, Inc. SecureSign RootCA1, RootCA2 and RootCA3`
@@ -72,6 +68,7 @@ A: <https://docs.clamav.net/faq/faq-troubleshoot.html#how-do-i-know-if-my-ip-add
 
 - import `clamav.reg` file
 - create `C:\ClamAV` and `C:\ClamAV\db`
+- create `C:\ClamAV\certs` and copy `clamav.crt` into it
 - put executables in `C:\ClamAV`
 - create freshclam.conf in `C:\ClamAV`
 - create clamd.conf in `C:\ClamAV`
@@ -83,6 +80,8 @@ freshclam.conf
 ```text
 DatabaseMirror database.clamav.net
 DNSDatabaseInfo current.cvd.clamav.net
+# Optional explicit cert path (recommended for portable/non-default layouts):
+# CVDCertsDirectory "C:\\ClamAV\\certs"
 ```
 
 clamd.conf

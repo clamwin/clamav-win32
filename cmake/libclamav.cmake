@@ -23,9 +23,6 @@ endif()
 source_group(TREE ${CLAMAV_DIR}/libclamav PREFIX "Source Files" FILES ${libclamav_sources})
 
 file(GLOB libclamav_win32_sources ${CLAMWIN_DIR}/src/dllmain/*.c)
-set_source_files_properties(${libclamav_win32_sources}
-    PROPERTIES COMPILE_DEFINITIONS "${UNICODE_DEFINES}"
-)
 
 list(APPEND libclamav_win32_sources
     ${CLAMAV_DIR}/win32/compat/libgen.c

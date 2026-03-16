@@ -1,7 +1,7 @@
 /*
  * Legacy Windows Compatibility Layer: unrar
  *
- * Copyright (c) 2025 Gianluigi Tiesi <sherpya@gmail.com>
+ * Copyright (c) 2025-2026 Gianluigi Tiesi <sherpya@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,17 +22,11 @@
  * SOFTWARE.
  */
 
-#ifndef _WIN64
 .global __imp__GetLongPathNameW@12
 .global __imp__TzSpecificLocalTimeToSystemTime@12
 
 .section .text
 .align 4
-
-#ifdef _UNICODE
-thunk_pGetLongPathNameW@12:
-    jmp *_pGetLongPathNameW
-#endif
 
 thunk_pTzSpecificLocalTimeToSystemTime@12:
     jmp *_pTzSpecificLocalTimeToSystemTime
@@ -40,11 +34,5 @@ thunk_pTzSpecificLocalTimeToSystemTime@12:
 .section .rdata,"dr"
 .align 4
 
-#ifdef _UNICODE
-__imp__GetLongPathNameW@12:
-    .long thunk_pGetLongPathNameW@12
-#endif
-
 __imp__TzSpecificLocalTimeToSystemTime@12:
     .long thunk_pTzSpecificLocalTimeToSystemTime@12
-#endif

@@ -90,8 +90,6 @@ fc_update_databases
 ; cw
 cw_perror
 cw_strerror
-cw_sigcheck
-EnsureElevated
 
 ; openssl
 ASN1_STRING_get0_data                      @1003 NONAME
