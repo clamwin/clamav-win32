@@ -442,8 +442,8 @@ static int res_query_dnsapi(const char *dname, int class, int type, unsigned cha
     s = pDnsQuery_A(dname, (WORD)type, dwOptions, NULL, &rrs, NULL);
     if (s)
     {
-        logg(LOGG_ERROR, "DnsQuery_A failed with %ld\n", s);
-        return -1;
+        logg(LOGG_ERROR, "DnsQuery_A failed with %ld, falling back to compat resolver\n", s);
+        return res_query_compat(dname, class, type, answer, anslen);
     }
 
     h->id = 1;
