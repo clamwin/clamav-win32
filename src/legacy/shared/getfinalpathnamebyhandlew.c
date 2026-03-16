@@ -367,6 +367,20 @@ static BOOL BasepGetVolumeDosLetterNameFromNTName(const wchar_t *Src, wchar_t **
     if (wcsnicmp(Src, L"\\Device\\Mup", 11) == 0)
         return UncPath(VolumeName);
 
+    // Wine returns NT symlink paths like \??\Z: instead of \Device\...
+    if (wcsnicmp(Src, L"\\??\\", 4) == 0 && wcslen(Src) == 6 && Src[5] == L':' && iswalpha(Src[4]))
+    {
+        if ((*VolumeName = RtlAllocateHeap(GetProcessHeap(), 0, 7 * sizeof(wchar_t))))
+        {
+            StringCchCopyW(*VolumeName, 7, L"\\\\?\\X:");
+            (*VolumeName)[4] = Src[4];
+            TRACE("BasepGetVolumeDosLetterNameFromNTName (\\?\\? symlink) -> [%ls]\n", *VolumeName);
+            return TRUE;
+        }
+        SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+        return FALSE;
+    }
+
     if (osvi.dwMajorVersion < 5)
     {
         SetLastError(ERROR_NOT_SUPPORTED);
