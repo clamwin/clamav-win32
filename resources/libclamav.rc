@@ -1,2 +1,5 @@
 #define __MODULE__	"libclamav.dll"
 #include "clamav.rc"
+
+#define IDR_CLAMAV_CRT 101
+IDR_CLAMAV_CRT RCDATA "../clamav/certs/clamav.crt"
