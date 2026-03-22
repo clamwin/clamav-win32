@@ -73,7 +73,7 @@ A: <https://docs.clamav.net/faq/faq-troubleshoot.html#how-do-i-know-if-my-ip-add
 
 - import `clamav.reg` file
 - create `C:\ClamAV` and `C:\ClamAV\db`
-- create `C:\ClamAV\certs` and copy `clamav.crt` into it
+- create `C:\ClamAV\certs` and copy `clamav.crt` into it (optional)
 - put executables in `C:\ClamAV`
 - create freshclam.conf in `C:\ClamAV`
 - create clamd.conf in `C:\ClamAV`
