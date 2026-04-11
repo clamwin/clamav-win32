@@ -1,4 +1,8 @@
-enable_language(C CXX ASM ASM_MASM)
+if(MSVC)
+    enable_language(C CXX ASM_MASM)
+else()
+    enable_language(C CXX ASM)
+endif()
 
 file(GLOB libclamav_sources
     ${CLAMAV_DIR}/libclamav/*.c
