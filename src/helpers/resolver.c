@@ -24,9 +24,6 @@
 
 #include "platform.h"
 
-#if _WIN32_WINNT > _WIN32_WINNT_WINXP || defined(_WIN64)
-#include "resolv.c"
-#else
 #include <iphlpapi.h>
 #include <iptypes.h>
 
@@ -442,6 +439,8 @@ static int res_query_dnsapi(const char *dname, int class, int type, unsigned cha
     s = pDnsQuery_A(dname, (WORD)type, dwOptions, NULL, &rrs, NULL);
     if (s)
     {
+        // Wine's DnsQuery_A implementation is incomplete and may return
+        // ERROR_NOT_ENOUGH_MEMORY (8) for otherwise valid queries
         logg(LOGG_ERROR, "DnsQuery_A failed with %ld, falling back to compat resolver\n", s);
         return res_query_compat(dname, class, type, answer, anslen);
     }
@@ -527,4 +526,3 @@ int res_query(const char *dname, int class, int type, unsigned char *answer, int
         return res_query_dnsapi(dname, class, type, answer, anslen);
     return res_query_compat(dname, class, type, answer, anslen);
 }
-#endif // _WIN32_WINNT > _WIN32_WINNT_WINXP || defined(_WIN64)
