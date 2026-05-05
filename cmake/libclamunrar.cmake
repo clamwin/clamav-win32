@@ -51,7 +51,10 @@ target_include_directories(libclamunrar PRIVATE ${UNRAR_INCLUDES} ${CLAMWIN_DIR}
 target_compile_definitions(libclamunrar PRIVATE ${UNRAR_DEFINES})
 
 if(CLAMWIN_WINDOWS_VERSION LESS_EQUAL 0x0501)
-    target_link_options(libclamunrar PRIVATE $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
+    target_link_options(libclamunrar PRIVATE
+        $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>
+        $<$<C_COMPILER_ID:GNU>:-Wl,--allow-multiple-definition>
+    )
 endif()
 
 # libclamunrar_iface
