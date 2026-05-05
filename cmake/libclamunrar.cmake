@@ -47,7 +47,10 @@ set_target_properties(libclamunrar PROPERTIES DEFINE_SYMBOL "" PREFIX "" OUTPUT_
 target_include_directories(libclamunrar PRIVATE ${UNRAR_INCLUDES} ${CLAMWIN_DIR}/include)
 target_compile_definitions(libclamunrar PRIVATE ${UNRAR_DEFINES})
 
-target_link_options(libclamunrar PRIVATE $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
+target_link_options(libclamunrar PRIVATE
+    $<$<C_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>
+    $<$<C_COMPILER_ID:GNU>:-Wl,--allow-multiple-definition>
+)
 
 # libclamunrar_iface
 add_library(libclamunrar_iface SHARED
