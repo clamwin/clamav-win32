@@ -75,9 +75,11 @@ EVP_PKEY_get0_type_name
 EVP_PKEY_get1_RSA
 EVP_PKEY_get_bits
 EVP_PKEY_get_bn_param
+EVP_PKEY_get_default_digest_name
 EVP_PKEY_get_group_name
 EVP_PKEY_get_id
 EVP_PKEY_get_security_bits
+EVP_PKEY_is_a
 EVP_sha1
 EVP_sha256
 EVP_sha512_256
@@ -251,6 +253,7 @@ X509_get_ext_d2i
 X509_get_issuer_name
 X509_get_pubkey
 X509_get_serialNumber
+X509_get_signature_info
 X509_get_signature_nid
 X509_get_subject_name
 X509_get_version

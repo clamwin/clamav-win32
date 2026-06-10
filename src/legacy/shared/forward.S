@@ -35,6 +35,7 @@
 
 .global __imp_ReOpenFile
 .global __imp_GetTimeZoneInformationForYear
+.global __imp__InitializeCriticalSectionEx@12
 
 .global __imp__wassert
 .global __imp__freopen_s
@@ -81,3 +82,7 @@ __imp_ReOpenFile:
 
 __imp_GetTimeZoneInformationForYear:
     .long _GetTimeZoneInformationForYear@12
+
+_InitializeCriticalSectionEx:
+__imp__InitializeCriticalSectionEx@12:
+    .long _InitializeCriticalSectionEx

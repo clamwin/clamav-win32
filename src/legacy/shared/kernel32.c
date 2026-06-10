@@ -212,3 +212,9 @@ HANDLE WINAPI CreateWaitableTimerExW(LPSECURITY_ATTRIBUTES lpTimerAttributes, LP
 
     return hTimer;
 }
+
+BOOL WINAPI InitializeCriticalSectionEx(LPCRITICAL_SECTION lpCriticalSection, DWORD dwSpinCount, DWORD Flags)
+{
+    (void)Flags;
+    return InitializeCriticalSectionAndSpinCount(lpCriticalSection, dwSpinCount);
+}
