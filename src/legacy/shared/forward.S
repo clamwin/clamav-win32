@@ -33,6 +33,9 @@
 .global GetHostNameW
 .global _GetHostNameW@8
 
+.global __imp_ReOpenFile
+.global __imp_GetTimeZoneInformationForYear
+
 .global __imp__wassert
 .global __imp__freopen_s
 .global __imp__mbstowcs_s
@@ -73,3 +76,8 @@ __imp__wcstombs_s:
 _GetHostNameW@8:
     jmp *_pGetHostNameW
 
+__imp_ReOpenFile:
+    .long _ReOpenFile@16
+
+__imp_GetTimeZoneInformationForYear:
+    .long _GetTimeZoneInformationForYear@12
