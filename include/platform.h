@@ -133,8 +133,9 @@ extern void w32_srand(unsigned int seed);
 #if defined(_MSC_VER)
 #define fseeko _fseeki64
 #elif defined(__GNUC__)
+#ifndef fseeko
 #define fseeko fseeko64
-extern int __cdecl fseeko64(FILE *stream, off64_t offset, int whence);
+#endif
 #else
 #undef HAVE_FSEEKO
 #endif
