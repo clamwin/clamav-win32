@@ -71,4 +71,6 @@ typedef BOOLEAN(WINAPI *imp_SystemFunction036)(PVOID RandomBuffer, ULONG RandomB
 typedef BOOL(WINAPI *imp_GetUserProfileDirectoryW)(HANDLE hToken, LPWSTR lpProfileDir, LPDWORD lpcchSize);
 
 typedef int(WINAPI *imp_GetHostNameW)(PWSTR name, int namelen);
+
+typedef BOOL(WINAPI *imp_InitializeCriticalSectionEx)(LPCRITICAL_SECTION lpCriticalSection, DWORD dwSpinCount, DWORD Flags);
 #endif /* _DYNLOAD_H_ */

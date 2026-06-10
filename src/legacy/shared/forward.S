@@ -43,6 +43,9 @@
 .global GetHostNameW
 .global _GetHostNameW@8
 
+.global __imp_InitializeCriticalSectionEx
+.global __imp__InitializeCriticalSectionEx@12
+
 // crt
 .global __imp___wsopen_s
 .global __imp__wsopen_s
@@ -81,6 +84,9 @@ __imp_ReOpenFile:
 __imp_SetFileInformationByHandle:
     .quad SetFileInformationByHandle
 
+__imp_InitializeCriticalSectionEx:
+    .quad InitializeCriticalSectionEx
+
 __imp__wsopen_s:
     .quad _wsopen_s_compat
 __imp__wfreopen_s:
@@ -112,6 +118,9 @@ __imp_GetTimeZoneInformationForYear:
 __imp_ReOpenFile:
     .long _ReOpenFile@16
 
+__imp__InitializeCriticalSectionEx@12:
+    .long _InitializeCriticalSectionEx@12
+
 __imp___wsopen_s:
     .long __wsopen_s_compat
 __imp___wfreopen_s:
@@ -136,6 +145,9 @@ FindFirstFileExW:
 GetHostNameW:
     jmp *pGetHostNameW(%rip)
 
+InitializeCriticalSectionEx:
+    jmp *pInitializeCriticalSectionEx(%rip)
+
 #else
 .align 4
 
@@ -144,5 +156,8 @@ _FindFirstFileExW@24:
 
 _GetHostNameW@8:
     jmp *_pGetHostNameW
+
+_InitializeCriticalSectionEx@12:
+    jmp *_pInitializeCriticalSectionEx
 
 #endif

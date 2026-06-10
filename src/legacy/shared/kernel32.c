@@ -217,6 +217,14 @@ HANDLE WINAPI FindFirstFileExW_wrapper(LPCWSTR lpFileName, FINDEX_INFO_LEVELS fI
     return pFindFirstFileExW(lpFileName, FindExInfoStandard, lpFindFileData, fSearchOp, lpSearchFilter, dwAdditionalFlags);
 }
 
+BOOL WINAPI InitializeCriticalSectionEx_compat(LPCRITICAL_SECTION lpCriticalSection, DWORD dwSpinCount, DWORD Flags)
+{
+    (void)Flags;
+    return InitializeCriticalSectionAndSpinCount(lpCriticalSection, dwSpinCount);
+}
+
+imp_InitializeCriticalSectionEx pInitializeCriticalSectionEx = InitializeCriticalSectionEx_compat;
+
 INITIALIZER(init_kernel32_shared)
 {
     TRACE("Init @ " __FILE__ "\n");
@@ -225,4 +233,5 @@ INITIALIZER(init_kernel32_shared)
         return;
 
     IMPORT_FUNCTION(kernel32, FindFirstFileExW);
+    IMPORT_FUNCTION(kernel32, InitializeCriticalSectionEx);
 }
