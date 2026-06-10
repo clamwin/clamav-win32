@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 ## 3rdparty libraries and versions
 
-- OpenSSL: 3.5.6
+- OpenSSL: 3.5.7
 - bzip2: 1.0.8
 - curl: 8.20.0
 - json-c: 0.18-20240915
