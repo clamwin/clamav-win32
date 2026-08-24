@@ -523,3 +523,4 @@ cli_cvdverify                              @1424 NONAME
 codesign_verifier_free                     @1425 NONAME
 codesign_verifier_new                      @1426 NONAME
 glob_rm                                    @1427 NONAME
+cli_get_filepath_from_handle               @1428 NONAME

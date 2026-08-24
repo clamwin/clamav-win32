@@ -137,3 +137,6 @@ cli_cvdverify
 codesign_verifier_free
 codesign_verifier_new
 glob_rm
+
+; freshclam @ 1.5.4
+cli_get_filepath_from_handle

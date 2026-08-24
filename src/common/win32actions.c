@@ -29,6 +29,11 @@
 #endif
 
 #include <libgen.h>
+#include <string.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <io.h>
+#include <stdbool.h>
 
 // libclamav
 #include "clamav.h"
@@ -36,14 +41,168 @@
 #include "optparser.h"
 #include "misc.h"
 #include "output.h"
+#include "actions.h"
 
 #define traverse_unlink cli_unlink
 
-void (*action)(const char *) = NULL;
+void (*action)(const action_source_t *) = NULL;
 unsigned int notmoved = 0, notremoved = 0;
 
 static char *actarget;
 static int targlen;
+
+void action_source_init(action_source_t *source)
+{
+    if (NULL == source)
+        return;
+
+    memset(source, 0, sizeof(*source));
+    source->scan_fd = -1;
+#ifdef _WIN32
+    source->handle = INVALID_HANDLE_VALUE;
+#endif
+}
+
+void action_source_close(action_source_t *source);
+
+static cl_error_t action_source_set_paths(action_source_t *source, const char *display_path, const char *action_path)
+{
+    source->display_path = strdup(display_path);
+    if (NULL == source->display_path)
+        return CL_EMEM;
+
+    if (NULL != action_path) {
+        source->action_path = strdup(action_path);
+        if (NULL == source->action_path)
+            return CL_EMEM;
+    }
+
+    return CL_SUCCESS;
+}
+
+static cl_error_t action_source_attach_fd(action_source_t *source, int fd)
+{
+    HANDLE handle     = INVALID_HANDLE_VALUE;
+    HANDLE dup_handle = INVALID_HANDLE_VALUE;
+
+    if (0 != FSTAT(fd, &source->statbuf))
+        return CL_EOPEN;
+    source->has_stat = true;
+
+    if (!S_ISREG(source->statbuf.st_mode))
+        return CL_EOPEN;
+
+    handle = (HANDLE)_get_osfhandle(fd);
+    if (INVALID_HANDLE_VALUE == handle)
+        return CL_EOPEN;
+
+    if (!DuplicateHandle(GetCurrentProcess(), handle, GetCurrentProcess(), &dup_handle, 0, FALSE, DUPLICATE_SAME_ACCESS))
+        return CL_EOPEN;
+
+    source->scan_fd           = fd;
+    source->handle            = dup_handle;
+    source->handle_can_delete = false;
+    return CL_SUCCESS;
+}
+
+cl_error_t action_source_open_path(const char *display_path, const char *open_path, action_source_t *source)
+{
+    int fd            = -1;
+    cl_error_t status = CL_EARG;
+
+    if ((NULL == display_path) || (NULL == open_path) || (NULL == source))
+        return CL_EARG;
+
+    action_source_init(source);
+
+    status = action_source_set_paths(source, display_path, open_path);
+    if (CL_SUCCESS != status)
+        goto done;
+
+    fd = safe_open(open_path, O_RDONLY | O_BINARY);
+    if (fd < 0) {
+        status = CL_EOPEN;
+        goto done;
+    }
+
+    status = action_source_attach_fd(source, fd);
+    if (CL_SUCCESS != status)
+        goto done;
+    fd = -1;
+
+done:
+    if (fd >= 0)
+        close(fd);
+    if (CL_SUCCESS != status)
+        action_source_close(source);
+    return status;
+}
+
+cl_error_t action_source_open(const char *display_path, action_source_t *source)
+{
+    return action_source_open_path(display_path, display_path, source);
+}
+
+cl_error_t action_source_from_fd(const char *display_path, int fd, action_source_t *source)
+{
+    int dup_fd        = -1;
+    cl_error_t status = CL_EARG;
+
+    if ((NULL == display_path) || (fd < 0) || (NULL == source))
+        return CL_EARG;
+
+    action_source_init(source);
+
+    status = action_source_set_paths(source, display_path, display_path);
+    if (CL_SUCCESS != status)
+        goto done;
+
+    dup_fd = _dup(fd);
+    if (dup_fd < 0) {
+        status = CL_EOPEN;
+        goto done;
+    }
+
+    status = action_source_attach_fd(source, dup_fd);
+    if (CL_SUCCESS != status)
+        goto done;
+    dup_fd = -1;
+
+done:
+    if (dup_fd >= 0)
+        close(dup_fd);
+    if (CL_SUCCESS != status)
+        action_source_close(source);
+    return status;
+}
+
+void action_source_close(action_source_t *source)
+{
+    if (NULL == source)
+        return;
+
+    if (-1 != source->scan_fd)
+        close(source->scan_fd);
+#ifdef _WIN32
+    if ((NULL != source->handle) && (INVALID_HANDLE_VALUE != source->handle))
+        CloseHandle((HANDLE)source->handle);
+#endif
+    if (NULL != source->display_path)
+        free(source->display_path);
+    if (NULL != source->action_path)
+        free(source->action_path);
+
+    action_source_init(source);
+}
+
+static const char *action_source_filename(const action_source_t *source)
+{
+    if (NULL == source)
+        return NULL;
+    if ((NULL != source->action_path) && ('\0' != source->action_path[0]))
+        return source->action_path;
+    return source->display_path;
+}
 
 static int getdest(const char *fullpath, char **newname)
 {
@@ -77,12 +236,13 @@ static int getdest(const char *fullpath, char **newname)
     return -1;
 }
 
-static void action_move(const char *filename)
+static void action_move(const action_source_t *source)
 {
-    char *nuname        = NULL;
-    char *real_filename = NULL;
-    int fd              = -1;
-    int copied          = 0;
+    const char *filename = action_source_filename(source);
+    char *nuname         = NULL;
+    char *real_filename  = NULL;
+    int fd               = -1;
+    int copied           = 0;
 
     if (NULL == filename) {
         goto done;
@@ -108,10 +268,18 @@ done:
     return;
 }
 
-static void action_copy(const char *filename)
+static void action_copy(const action_source_t *source)
 {
-    char *nuname;
-    int fd = getdest(filename, &nuname);
+    const char *filename = action_source_filename(source);
+    char *nuname         = NULL;
+    int fd               = -1;
+
+    if (NULL == filename) {
+        notmoved++;
+        return;
+    }
+
+    fd = getdest(filename, &nuname);
 
     if (fd < 0 || filecopy(filename, nuname)) {
         logg(LOGG_ERROR, "Can't copy file '%s'\n", filename);
@@ -124,9 +292,10 @@ static void action_copy(const char *filename)
     if (nuname) free(nuname);
 }
 
-static void action_remove(const char *filename)
+static void action_remove(const action_source_t *source)
 {
-    char *real_filename = NULL;
+    const char *filename = action_source_filename(source);
+    char *real_filename  = NULL;
 
     if (NULL == filename) {
         goto done;
