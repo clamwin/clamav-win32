@@ -40,7 +40,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 - Winpthreads: from MinGW-W64 v13.0.0
 - zlib: 1.3.1
 - zlib-ng: 2.3.3
-- UnRAR: 7.2.6
+- UnRAR: 7.2.7
 - Opencow (custom build) on Win9x
 
 ## Getting sources
