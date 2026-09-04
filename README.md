@@ -32,7 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 - curl: 8.22.0
 - json-c: 0.18-20240915
 - libxml2: 2.15.2
-- pcre2: 10.47
+- pcre2: 10.48
 - Winpthreads: from MinGW-W64 v13.0.0
 - zlib: 1.3.1
 - UnRAR: 7.2.7
