@@ -6,8 +6,8 @@ index 273258fea..77af54b5a 100644
    }
  #endif
  
--#ifndef SOCK_NONBLOCK
-+#if 0 //ndef SOCK_NONBLOCK
+-#ifndef CURL_USE_SOCK_NONBLOCK
++#if 0 //ndef CURL_USE_SOCK_NONBLOCK
    /* Set socket non-blocking, must be a non-blocking socket for
     * a non-blocking connect. */
    error = curlx_nonblock(ctx->sock, TRUE);
