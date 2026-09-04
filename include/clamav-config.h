@@ -103,6 +103,9 @@
 /* use "Cache-Control: no-cache" in freshclam */
 /* #undef FRESHCLAM_NO_CACHE */
 
+/* Have funlinkat */
+/* #undef HAVE_FUNLINKAT */
+
 #ifdef __GNUC__
 /* attrib aligned */
 #define HAVE_ATTRIB_ALIGNED 1
@@ -506,7 +509,7 @@
 /* #undef LLVM_VERSION */
 
 /* Version number of package */
-#define VERSION "1.5.2"
+#define VERSION "1.5.4"
 
 /* Version suffix for package */
 #define VERSION_SUFFIX ""

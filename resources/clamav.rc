@@ -3,8 +3,8 @@
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 VS_VERSION_INFO VERSIONINFO
-	FILEVERSION 1,5,2,0
-	PRODUCTVERSION 1,5,2,0
+	FILEVERSION 1,5,4,0
+	PRODUCTVERSION 1,5,4,0
 	FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
 	FILEFLAGS 0x1L
@@ -20,12 +20,12 @@ BEGIN
 		BLOCK "00000409"
 		BEGIN
 			VALUE "FileDescription", "ClamAV Antivirus"
-			VALUE "FileVersion", "1, 5, 2, 0"
+			VALUE "FileVersion", "1, 5, 4, 0"
 			VALUE "InternalName", __MODULE__
 			VALUE "LegalCopyright", "Copyright (C) 2005-2026 Cisco Systems, Inc. / Gianluigi Tiesi <sherpya@gmail.com>"
 			VALUE "OriginalFilename", __MODULE__
 			VALUE "ProductName", "ClamAV Antivirus"
-			VALUE "ProductVersion", "1, 5, 2, 0"
+			VALUE "ProductVersion", "1, 5, 4, 0"
 		END
 	END
 	BLOCK "VarFileInfo"
