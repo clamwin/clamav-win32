@@ -61,6 +61,7 @@ typedef BOOL(WINAPI *imp_UnregisterWait)(HANDLE WaitHandle);
 typedef BOOL(WINAPI *imp_UnregisterWaitEx)(HANDLE WaitHandle, HANDLE CompletionEvent);
 typedef BOOL(WINAPI *imp_HeapSetInformation)(HANDLE HeapHandle, HEAP_INFORMATION_CLASS HeapInformationClass, PVOID HeapInformation, SIZE_T HeapInformationLength);
 typedef int(WINAPI *imp_MultiByteToWideChar)(UINT CodePage, DWORD dwFlags, LPCCH lpMultiByteStr, int cbMultiByte, LPWSTR lpWideCharStr, int cchWideChar);
+typedef BOOL(WINAPI *imp_GetModuleHandleExW)(DWORD dwFlags, LPCWSTR lpModuleName, HMODULE *phModule);
 typedef HANDLE(WINAPI *imp_FindFirstFileExW)(LPCWSTR lpFileName, FINDEX_INFO_LEVELS fInfoLevelId, LPVOID lpFindFileData, FINDEX_SEARCH_OPS fSearchOp, LPVOID lpSearchFilter, DWORD dwAdditionalFlags);
 
 typedef DNS_STATUS(WINAPI *imp_DnsQuery_A)(PCSTR pszName, WORD wType, DWORD Options, PIP4_ARRAY aipServers, PDNS_RECORD *ppQueryResults, PVOID *pReserved);

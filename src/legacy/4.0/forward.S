@@ -52,6 +52,9 @@ missing_module32next:
 .global __imp__MultiByteToWideChar@24
 .global _MultiByteToWideChar@24
 
+.global __imp__GetModuleHandleExW@12
+.global _GetModuleHandleExW@12
+
 .global _GetUserProfileDirectoryW@12
 
 __imp__RegisterWaitForSingleObject@24:
@@ -63,12 +66,18 @@ __imp__UnregisterWaitEx@8:
 
 __imp__MultiByteToWideChar@24:
     .long _MultiByteToWideChar_wrapper@24
+__imp__GetModuleHandleExW@12:
+    .long thunk_pGetModuleHandleExW@12
 
 .section .text
 .align 4
 
 _MultiByteToWideChar@24:
     jmp _MultiByteToWideChar_wrapper@24
+
+_GetModuleHandleExW@12:
+thunk_pGetModuleHandleExW@12:
+    jmp *_pGetModuleHandleExW
 
 _GetUserProfileDirectoryW@12:
     jmp *_pGetUserProfileDirectoryW

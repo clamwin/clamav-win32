@@ -166,6 +166,43 @@ BOOL WINAPI UnregisterWait_compat(HANDLE hWaitObject)
     return UnregisterWaitEx_compat(hWaitObject, NULL);
 }
 
+static BOOL WINAPI GetModuleHandleExW_compat(DWORD dwFlags,
+                                             LPCWSTR lpModuleName,
+                                             HMODULE *phModule)
+{
+    MEMORY_BASIC_INFORMATION memory;
+
+    TRACE("GetModuleHandleExW(%#lx, %p, %p)\n", dwFlags, lpModuleName, phModule);
+
+    if (!lpModuleName || !phModule)
+    {
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return FALSE;
+    }
+
+    /*
+     * Rust std uses this exact combination to find the image containing its
+     * FLS cleanup callback.  With UNCHANGED_REFCOUNT, AllocationBase is the
+     * required module handle and no loader reference needs to be acquired.
+     */
+    if (dwFlags != (GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                    GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT))
+    {
+        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        return FALSE;
+    }
+
+    if (!VirtualQuery(lpModuleName, &memory, sizeof(memory)) ||
+        memory.Type != MEM_IMAGE || !memory.AllocationBase)
+    {
+        SetLastError(ERROR_MOD_NOT_FOUND);
+        return FALSE;
+    }
+
+    *phModule = (HMODULE)memory.AllocationBase;
+    return TRUE;
+}
+
 /* windows 2k has this function, but whatever... */
 BOOL WINAPI SetFilePointerEx(HANDLE hFile, LARGE_INTEGER liDistanceToMove, PLARGE_INTEGER lpNewFilePointer, DWORD dwMoveMethod)
 {
@@ -220,6 +257,7 @@ DWORD WINAPI GetProcessId(HANDLE Process)
 }
 
 imp_MultiByteToWideChar pMultiByteToWideChar = NULL;
+imp_GetModuleHandleExW pGetModuleHandleExW = GetModuleHandleExW_compat;
 imp_RegisterWaitForSingleObject pRegisterWaitForSingleObject = RegisterWaitForSingleObject_compat;
 imp_UnregisterWait pUnregisterWait = UnregisterWait_compat;
 imp_UnregisterWaitEx pUnregisterWaitEx = UnregisterWaitEx_compat;
@@ -246,6 +284,7 @@ INITIALIZER(init_kernel32_4_0)
         return;
 
     IMPORT_FUNCTION(kernel32, MultiByteToWideChar);
+    IMPORT_FUNCTION(kernel32, GetModuleHandleExW);
     IMPORT_FUNCTION(kernel32, RegisterWaitForSingleObject);
     IMPORT_FUNCTION(kernel32, UnregisterWait);
     IMPORT_FUNCTION(kernel32, UnregisterWaitEx);
