@@ -50,6 +50,17 @@ DH_get0_key
 DH_get0_pqg
 DSA_get0_key
 DSA_get0_pqg
+ENGINE_by_id
+ENGINE_ctrl
+ENGINE_ctrl_cmd
+ENGINE_finish
+ENGINE_free
+ENGINE_get_first
+ENGINE_get_id
+ENGINE_get_next
+ENGINE_init
+ENGINE_load_private_key
+ENGINE_set_default
 ERR_clear_error
 ERR_error_string
 ERR_error_string_n
