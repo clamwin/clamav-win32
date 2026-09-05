@@ -13,6 +13,8 @@ list(APPEND clamav_compat_headers
 
 file(GLOB clamav_compat_sources
     ${CLAMWIN_DIR}/src/legacy/shared/*.c
+    ${CLAMWIN_DIR}/src/legacy/shared/conditionvariable_forward.S
+    ${CLAMWIN_DIR}/src/legacy/shared/fibersapi_forward.S
     ${CLAMWIN_DIR}/src/legacy/shared/forward.S
 )
 
@@ -33,6 +35,10 @@ set(LEGACY_INCLUDES
     ${CLAMWIN_DIR}/src/legacy/shared
     ${CLAMWIN_DIR}/include
 )
+
+if(WITH_WINPTHREADS)
+    list(APPEND LEGACY_INCLUDES ${WINPTHREADS_DIR}/include)
+endif()
 
 target_include_directories(clamav_compat PRIVATE ${LEGACY_INCLUDES})
 target_compile_definitions(clamav_compat PRIVATE ${LEGACY_DEFINES})
