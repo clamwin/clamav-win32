@@ -30,6 +30,10 @@
 extern imp_GetSystemTimePreciseAsFileTime pGetSystemTimePreciseAsFileTime;
 extern void init_sysinfoapi(void);
 
+#ifdef _MSC_VER
+extern imp_GetHostNameW pGetHostNameW;
+#endif
+
 extern imp_AttachConsole pAttachConsole;
 extern imp_GetConsoleProcessList pGetConsoleProcessList;
 
@@ -110,8 +114,16 @@ static void processattach(void)
         }
     }
 
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != NO_ERROR)
-        fprintf(stderr, "[DllMain] Error at WSAStartup(): %d\n", WSAGetLastError());
+#ifdef _MSC_VER
+    // Winsock is a normal dependency; only GetHostNameW needs a fallback.
+    HMODULE ws2_32 = GetModuleHandleW(L"ws2_32.dll");
+    if (ws2_32)
+        IMPORT_FUNCTION(ws2_32, GetHostNameW);
+#endif
+
+    int wsaError = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (wsaError != NO_ERROR)
+        fprintf(stderr, "[DllMain] Error at WSAStartup(): %d\n", wsaError);
 
 #ifndef _WIN64
     /* Some of Windows API tries to load dll from system32 and if fs redirection

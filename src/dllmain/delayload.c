@@ -33,7 +33,6 @@ BOOL WINAPI ProcessPrng_compat(void *buffer, size_t size)
 #define NO_FUNCTION_REDEFINITION
 #define WRAP_SUFFIX _compat
 #include "../legacy/shared/synchapi.c"
-#include "../legacy/shared/ws2_32.c"
 
 FARPROC WINAPI MyDelayLoadFailureHook(unsigned dliNotify, PDelayLoadInfo pdli)
 {
@@ -51,10 +50,6 @@ FARPROC WINAPI MyDelayLoadFailureHook(unsigned dliNotify, PDelayLoadInfo pdli)
 
     if (strcmp(pdli->dlp.szProcName, "WakeByAddressAll") == 0)
         return (FARPROC)WakeByAddressAll_compat;
-
-    // added in rust 1.93
-    if (strcmp(pdli->dlp.szProcName, "GetHostNameW") == 0)
-        return (FARPROC)GetHostNameW_compat;
 
     MessageBoxA(NULL, pdli->dlp.szProcName, "Missing symbol", MB_OK | MB_ICONERROR);
     abort();

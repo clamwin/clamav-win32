@@ -29,13 +29,19 @@ ifdef rax
 
 public __imp_GetSystemTimePreciseAsFileTime
 extern pGetSystemTimePreciseAsFileTime:PROC
+public __imp_GetHostNameW
+public GetHostNameW
+extern pGetHostNameW:QWORD
 
 .data
 __imp_GetSystemTimePreciseAsFileTime dq OFFSET thunk_GetSystemTimePreciseAsFileTime
+__imp_GetHostNameW dq OFFSET GetHostNameW
 
 .code
 thunk_GetSystemTimePreciseAsFileTime:
 	jmp qword ptr [pGetSystemTimePreciseAsFileTime]
+GetHostNameW:
+	jmp qword ptr [pGetHostNameW]
 
 else
 
@@ -43,13 +49,19 @@ else
 
 public _imp__GetSystemTimePreciseAsFileTime@4
 extern pGetSystemTimePreciseAsFileTime:PROC
+public _imp__GetHostNameW@8
+public GetHostNameW@8
+extern pGetHostNameW:DWORD
 
 .data
 _imp__GetSystemTimePreciseAsFileTime@4 dd OFFSET thunk_GetSystemTimePreciseAsFileTime@4
+_imp__GetHostNameW@8 dd OFFSET GetHostNameW@8
 
 .code
 thunk_GetSystemTimePreciseAsFileTime@4:
 	jmp dword ptr [pGetSystemTimePreciseAsFileTime]
+GetHostNameW@8:
+	jmp dword ptr [pGetHostNameW]
 
 endif
 
