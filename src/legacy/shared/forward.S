@@ -70,19 +70,18 @@ __imp__wcsncpy_s:
 __imp__wcstombs_s:
     .long _wcstombs_s_compat
 
-.section .text
-
-.align 4
-
-_GetHostNameW@8:
-    jmp *_pGetHostNameW
-
 __imp_ReOpenFile:
     .long _ReOpenFile@16
 
 __imp_GetTimeZoneInformationForYear:
     .long _GetTimeZoneInformationForYear@12
 
-_InitializeCriticalSectionEx:
 __imp__InitializeCriticalSectionEx@12:
-    .long _InitializeCriticalSectionEx
+    .long _InitializeCriticalSectionEx@12
+
+.section .text
+
+.align 4
+
+_GetHostNameW@8:
+    jmp *_pGetHostNameW
