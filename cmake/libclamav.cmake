@@ -40,6 +40,7 @@ list(APPEND libclamav_win32_sources
 )
 
 if(MSVC)
+    set_source_files_properties(${CLAMWIN_DIR}/src/dllmain/forward.asm PROPERTIES LANGUAGE ASM_MASM)
     list(APPEND libclamav_win32_sources ${CLAMWIN_DIR}/src/dllmain/forward.asm)
 else()
     list(APPEND libclamav_win32_sources ${CLAMWIN_DIR}/src/dllmain/forward.S)

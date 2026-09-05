@@ -74,13 +74,14 @@ static void processattach(void)
     ULONG HeapFragValue = 2;
     WSADATA wsaData;
 
+    // The fallback pointer is already non-NULL when the native API is unavailable.
+    init_sysinfoapi();
+
     HMODULE kernel32 = GetModuleHandleW(L"kernel32");
     if (kernel32) // meh
     {
         IMPORT_FUNCTION(kernel32, HeapSetInformation);
         IMPORT_FUNCTION(kernel32, GetSystemTimePreciseAsFileTime);
-        if (!pGetSystemTimePreciseAsFileTime)
-            init_sysinfoapi();
 
         IMPORT_FUNCTION(kernel32, AttachConsole);
         IMPORT_FUNCTION(kernel32, GetConsoleProcessList);
