@@ -129,6 +129,8 @@ add_custom_command(
 )
 
 add_custom_target(filter_clamav_rust DEPENDS "${RUST_FILTERED_ARCHIVE}" JOB_POOL single)
+# The archive is generated in a subdirectory; order its producer before filtering.
+add_dependencies(filter_clamav_rust clamav_rust_target)
 set_target_properties(clamav_rust PROPERTIES IMPORTED_LOCATION "${RUST_FILTERED_ARCHIVE}")
 add_dependencies(libclamav filter_clamav_rust clamav_rust)
 add_dependencies(libfreshclam filter_clamav_rust clamav_rust)
