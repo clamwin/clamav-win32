@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(clamav-win32 VERSION "1.4.4")
+project(clamav-win32 VERSION "1.4.6")
 
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 

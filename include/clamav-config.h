@@ -103,6 +103,9 @@
 /* use "Cache-Control: no-cache" in freshclam */
 /* #undef FRESHCLAM_NO_CACHE */
 
+/* Have funlinkat */
+/* #undef HAVE_FUNLINKAT */
+
 #ifdef __GNUC__
 /* attrib aligned */
 #define HAVE_ATTRIB_ALIGNED 1
@@ -373,6 +376,9 @@
 /* yara sources are compiled in */
 #define HAVE_YARA 1
 
+/* For internal use only - DO NOT DEFINE */
+/* #undef HAVE__INTERNAL__SHA_COLLECT */
+
 /* Define as const if the declaration of iconv() needs const. */
 /* #undef ICONV_CONST */
 
@@ -506,7 +512,7 @@
 /* #undef LLVM_VERSION */
 
 /* Version number of package */
-#define VERSION "1.4.4"
+#define VERSION "1.4.6"
 
 /* Version suffix for package */
 #define VERSION_SUFFIX ""
