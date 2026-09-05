@@ -13,6 +13,7 @@ list(APPEND clamav_compat_headers
 
 file(GLOB clamav_compat_sources
     ${CLAMWIN_DIR}/src/legacy/shared/*.c
+    ${CLAMWIN_DIR}/src/legacy/shared/conditionvariable_forward.S
     ${CLAMWIN_DIR}/src/legacy/shared/forward.S
 )
 

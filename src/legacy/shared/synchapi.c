@@ -41,10 +41,25 @@ struct futex_queue
 
 static struct futex_queue futex_queues[256];
 
+struct condvar_entry
+{
+    struct list entry;
+    const CONDITION_VARIABLE *address;
+    HANDLE event;
+};
+
+static struct futex_queue condvar_queues[256];
+
 static struct futex_queue *get_futex_queue(const void *addr)
 {
     ULONG_PTR val = (ULONG_PTR)addr;
     return &futex_queues[(val >> 4) % ARRAYSIZE(futex_queues)];
+}
+
+static struct futex_queue *get_condvar_queue(const void *addr)
+{
+    ULONG_PTR val = (ULONG_PTR)addr;
+    return &condvar_queues[(val >> 4) % ARRAYSIZE(condvar_queues)];
 }
 
 static void spin_lock(LONG *lock)
@@ -250,4 +265,101 @@ void WINAPI WRAP(ReleaseSRWLockExclusive)(PSRWLOCK SRWLock)
 {
     if (InterlockedExchangePointer(&SRWLock->Ptr, NULL) == (void *)2)
         WRAP(WakeByAddressSingle)(&SRWLock->Ptr);
+}
+
+BOOL WINAPI WRAP(SleepConditionVariableCS)(PCONDITION_VARIABLE ConditionVariable,
+                                           PCRITICAL_SECTION CriticalSection,
+                                           DWORD dwMilliseconds)
+{
+    struct futex_queue *queue;
+    struct condvar_entry waiter;
+    DWORD result;
+    DWORD error = ERROR_SUCCESS;
+    BOOL dequeued;
+
+    TRACE("SleepConditionVariableCS(%p, %p, %lu)\n",
+          ConditionVariable, CriticalSection, dwMilliseconds);
+
+    if (!ConditionVariable || !CriticalSection)
+    {
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return FALSE;
+    }
+
+    waiter.event = CreateEvent(NULL, FALSE, FALSE, NULL);
+    if (!waiter.event)
+        return FALSE;
+
+    waiter.address = ConditionVariable;
+    queue = get_condvar_queue(ConditionVariable);
+
+    /* Enqueue before dropping the caller's lock to avoid a lost wake-up. */
+    spin_lock(&queue->lock);
+    if (!queue->queue.next)
+        list_init(&queue->queue);
+    list_add_tail(&queue->queue, &waiter.entry);
+    LeaveCriticalSection(CriticalSection);
+    spin_unlock(&queue->lock);
+
+    result = WaitForSingleObject(waiter.event, dwMilliseconds);
+    if (result == WAIT_FAILED)
+        error = GetLastError();
+
+    spin_lock(&queue->lock);
+    dequeued = waiter.address == NULL;
+    if (!dequeued)
+    {
+        waiter.address = NULL;
+        list_remove(&waiter.entry);
+    }
+    spin_unlock(&queue->lock);
+
+    /* A wake may win the queue race just as the timed wait expires. */
+    if (dequeued && result != WAIT_OBJECT_0)
+    {
+        WaitForSingleObject(waiter.event, INFINITE);
+        result = WAIT_OBJECT_0;
+    }
+
+    CloseHandle(waiter.event);
+    EnterCriticalSection(CriticalSection);
+
+    if (result == WAIT_OBJECT_0)
+        return TRUE;
+
+    if (result == WAIT_TIMEOUT)
+        SetLastError(ERROR_TIMEOUT);
+    else
+        SetLastError(error);
+    return FALSE;
+}
+
+VOID WINAPI WRAP(WakeConditionVariable)(PCONDITION_VARIABLE ConditionVariable)
+{
+    struct futex_queue *queue;
+    struct condvar_entry *waiter;
+
+    TRACE("WakeConditionVariable(%p)\n", ConditionVariable);
+
+    if (!ConditionVariable)
+        return;
+
+    queue = get_condvar_queue(ConditionVariable);
+    spin_lock(&queue->lock);
+
+    if (!queue->queue.next)
+        list_init(&queue->queue);
+
+    LIST_FOR_EACH_ENTRY(waiter, &queue->queue, struct condvar_entry, entry)
+    {
+        if (waiter->address == ConditionVariable)
+        {
+            waiter->address = NULL;
+            list_remove(&waiter->entry);
+            SetEvent(waiter->event);
+            break;
+        }
+    }
+
+    spin_unlock(&queue->lock);
 }
