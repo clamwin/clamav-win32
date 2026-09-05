@@ -28,6 +28,7 @@
 
 #include <assert.h>
 #include <process.h>
+#include <tlhelp32.h>
 
 typedef struct _WAIT_CONTEXT
 {
@@ -163,6 +164,92 @@ BOOL WINAPI UnregisterWait_compat(HANDLE hWaitObject)
 {
     TRACE("UnregisterWait(0x%p)\n", hWaitObject);
     return UnregisterWaitEx_compat(hWaitObject, NULL);
+}
+
+static BOOL WINAPI GetModuleHandleExW_compat(DWORD dwFlags,
+                                             LPCWSTR lpModuleName,
+                                             HMODULE *phModule)
+{
+    MEMORY_BASIC_INFORMATION memory;
+
+    TRACE("GetModuleHandleExW(%#lx, %p, %p)\n", dwFlags, lpModuleName, phModule);
+
+    if (!phModule)
+    {
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return FALSE;
+    }
+    *phModule = NULL;
+    if (!lpModuleName)
+    {
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return FALSE;
+    }
+
+    /*
+     * Rust std uses this exact combination to find the image containing its
+     * FLS cleanup callback. With UNCHANGED_REFCOUNT, AllocationBase is the
+     * required module handle and no loader reference needs to be acquired.
+     */
+    if (dwFlags != (GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                    GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT))
+    {
+        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        return FALSE;
+    }
+
+    if (VirtualQuery(lpModuleName, &memory, sizeof(memory)) &&
+        memory.Type == MEM_IMAGE && memory.AllocationBase)
+    {
+        *phModule = (HMODULE)memory.AllocationBase;
+        return TRUE;
+    }
+
+    /* Win9x may not describe loaded modules as MEM_IMAGE. Use the ANSI
+     * ToolHelp exports, resolving them dynamically to retain NT4 support.
+     * The struct tag explicitly selects the ANSI layout even with UNICODE.
+     */
+    typedef BOOL(WINAPI *module_enum_fn)(HANDLE, struct tagMODULEENTRY32 *);
+    HMODULE kernel32 = GetModuleHandleA("kernel32.dll");
+    imp_CreateToolhelp32Snapshot snapshot_fn =
+        (imp_CreateToolhelp32Snapshot)GetProcAddress(kernel32, "CreateToolhelp32Snapshot");
+    module_enum_fn first_fn = (module_enum_fn)GetProcAddress(kernel32, "Module32First");
+    module_enum_fn next_fn = (module_enum_fn)GetProcAddress(kernel32, "Module32Next");
+    if (!snapshot_fn || !first_fn || !next_fn)
+    {
+        SetLastError(ERROR_MOD_NOT_FOUND);
+        return FALSE;
+    }
+
+    HANDLE snapshot;
+    do
+    {
+        snapshot = snapshot_fn(TH32CS_SNAPMODULE, GetCurrentProcessId());
+    } while (snapshot == INVALID_HANDLE_VALUE && GetLastError() == ERROR_BAD_LENGTH);
+    if (snapshot == INVALID_HANDLE_VALUE)
+        return FALSE;
+
+    struct tagMODULEENTRY32 module = {0};
+    module.dwSize = sizeof(module);
+    BOOL found = FALSE;
+    BOOL have_module = first_fn(snapshot, &module);
+    while (have_module)
+    {
+        ULONG_PTR address = (ULONG_PTR)lpModuleName;
+        ULONG_PTR base = (ULONG_PTR)module.modBaseAddr;
+        if (address >= base && address - base < module.modBaseSize)
+        {
+            *phModule = module.hModule;
+            found = TRUE;
+            break;
+        }
+        have_module = next_fn(snapshot, &module);
+    }
+    DWORD error = found ? ERROR_SUCCESS : GetLastError();
+    CloseHandle(snapshot);
+    if (!found)
+        SetLastError(error == ERROR_NO_MORE_FILES ? ERROR_MOD_NOT_FOUND : error);
+    return found;
 }
 
 /* windows 2k has this function, but whatever... */
@@ -315,6 +402,7 @@ NTSTATUS NTAPI NtCreateNamedPipeFile(
 }
 
 imp_MultiByteToWideChar pMultiByteToWideChar = NULL;
+imp_GetModuleHandleExW pGetModuleHandleExW = GetModuleHandleExW_compat;
 imp_RegisterWaitForSingleObject pRegisterWaitForSingleObject = RegisterWaitForSingleObject_compat;
 imp_UnregisterWait pUnregisterWait = UnregisterWait_compat;
 imp_UnregisterWaitEx pUnregisterWaitEx = UnregisterWaitEx_compat;
@@ -352,6 +440,7 @@ INITIALIZER(init_kernel32_4_0)
 
     IMPORT_FUNCTION(kernel32, CreateThread);
     IMPORT_FUNCTION(kernel32, MultiByteToWideChar);
+    IMPORT_FUNCTION(kernel32, GetModuleHandleExW);
     IMPORT_FUNCTION(kernel32, RegisterWaitForSingleObject);
     IMPORT_FUNCTION(kernel32, UnregisterWait);
     IMPORT_FUNCTION(kernel32, UnregisterWaitEx);

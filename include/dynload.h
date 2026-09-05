@@ -62,6 +62,7 @@ typedef BOOL(WINAPI *imp_UnregisterWaitEx)(HANDLE WaitHandle, HANDLE CompletionE
 typedef BOOL(WINAPI *imp_HeapSetInformation)(HANDLE HeapHandle, HEAP_INFORMATION_CLASS HeapInformationClass, PVOID HeapInformation, SIZE_T HeapInformationLength);
 typedef int(WINAPI *imp_MultiByteToWideChar)(UINT CodePage, DWORD dwFlags, LPCCH lpMultiByteStr, int cbMultiByte, LPWSTR lpWideCharStr, int cchWideChar);
 typedef HANDLE(WINAPI *imp_CreateThread)(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize, LPTHREAD_START_ROUTINE lpStartAddress, LPVOID lpParameter, DWORD dwCreationFlags, LPDWORD lpThreadId);
+typedef BOOL(WINAPI *imp_GetModuleHandleExW)(DWORD dwFlags, LPCWSTR lpModuleName, HMODULE *phModule);
 
 typedef DNS_STATUS(WINAPI *imp_DnsQuery_A)(PCSTR pszName, WORD wType, DWORD Options, PIP4_ARRAY aipServers, PDNS_RECORD *ppQueryResults, PVOID *pReserved);
 typedef VOID(WINAPI *imp_DnsRecordListFree)(PDNS_RECORD pRecordList, DNS_FREE_TYPE FreeType);
