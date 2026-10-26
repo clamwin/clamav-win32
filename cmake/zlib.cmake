@@ -14,6 +14,8 @@ if(CLAMAV_ARCH STREQUAL "x86" AND NOT USE_ZLIB_NG_ON_X86)
 
     message(STATUS "==== Adding subproject zlib ====")
     add_library(zlibstatic STATIC ${zlib_headers} ${zlib_sources})
+    # Keep zlib's offset ABI aligned with ClamAV's 32-bit off_t.
+    target_compile_definitions(zlibstatic PUBLIC z_off_t=long)
     target_compile_options(zlibstatic PRIVATE $<$<C_COMPILER_ID:MSVC>:/wd4267>)
     install(FILES ${ZLIB_DIR}/LICENSE DESTINATION ${CMAKE_INSTALL_PREFIX}/copyright RENAME zlib.txt)
 else()
