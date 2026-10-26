@@ -34,7 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 - libxml2: 2.15.3
 - pcre2: 10.48
 - Winpthreads: from MinGW-W64 v13.0.0
-- zlib: 1.3.1
+- zlib: 1.3.2
 - UnRAR: 7.2.7
 - Opencow (custom build) on Win9x
 
