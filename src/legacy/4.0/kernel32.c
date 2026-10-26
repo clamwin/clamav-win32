@@ -305,6 +305,25 @@ NTSTATUS NTAPI NtOpenFile(
     return STATUS_NOT_SUPPORTED;
 }
 
+/* Rust std retains the unused handle-relative Dir::rename implementation. */
+NTSTATUS NTAPI NtSetInformationFile(
+    HANDLE FileHandle,
+    PIO_STATUS_BLOCK IoStatusBlock,
+    PVOID FileInformation,
+    ULONG Length,
+    FILE_INFORMATION_CLASS FileInformationClass)
+{
+    fprintf(stderr, "NtSetInformationFile is not supported!\n");
+    assert(0 && "NtSetInformationFile should not be called");
+
+    if (IoStatusBlock)
+    {
+        IoStatusBlock->Status = STATUS_NOT_SUPPORTED;
+        IoStatusBlock->Information = 0;
+    }
+    return STATUS_NOT_SUPPORTED;
+}
+
 NTSTATUS NTAPI NtReadFile(
     HANDLE FileHandle,
     HANDLE Event,
