@@ -54,6 +54,14 @@
 #define NtCurrentProcess() ((HANDLE)(LONG_PTR) - 1)
 #define NtCurrentThread() ((HANDLE)(LONG_PTR) - 2)
 
+/* Preserve Win32 errors in the NTWIN32 facility for RtlNtStatusToDosError. */
+static inline NTSTATUS ntstatus_from_win32(DWORD error)
+{
+    return (NTSTATUS)error <= 0
+        ? (NTSTATUS)error
+        : (NTSTATUS)(0xC0070000UL | (error & 0xFFFF));
+}
+
 #ifdef _MSC_VER
 typedef BOOL WINBOOL;
 typedef void *LPVOID;

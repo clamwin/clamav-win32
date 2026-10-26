@@ -355,7 +355,7 @@ NTSTATUS NTAPI NtReadFile(
     }
     else
     {
-        IoStatusBlock->Status = GetLastError();
+        IoStatusBlock->Status = ntstatus_from_win32(GetLastError());
         IoStatusBlock->Information = 0;
     }
 
@@ -393,7 +393,7 @@ NTSTATUS NTAPI NtWriteFile(
     }
     else
     {
-        IoStatusBlock->Status = GetLastError();
+        IoStatusBlock->Status = ntstatus_from_win32(GetLastError());
         IoStatusBlock->Information = 0;
     }
 
