@@ -97,7 +97,7 @@ HANDLE WINAPI ReOpenFile(
 
     if ((dwFlagsAndAttributes & VALID_FLAGS) != 0)
     {
-        SetLastError(STATUS_INVALID_PARAMETER);
+        SetLastError(ERROR_INVALID_PARAMETER);
         return INVALID_HANDLE_VALUE;
     }
 

@@ -54,7 +54,7 @@ WINBOOL WINAPI InitOnceBeginInitialize(PINIT_ONCE pInitOnce, DWORD dwFlags, PBOO
 
         if ((val & INIT_ONCE_MASK) != RTLP_RUN_ONCE_COMPLETE)
         {
-            RtlNtStatusToDosError(STATUS_UNSUCCESSFUL);
+            SetLastError(RtlNtStatusToDosError(STATUS_UNSUCCESSFUL));
             return FALSE;
         }
 
@@ -170,7 +170,7 @@ WINBOOL WINAPI InitOnceComplete(PINIT_ONCE pInitOnce, DWORD dwFlags, LPVOID lpCo
             return TRUE;
 
         default:
-            RtlNtStatusToDosError(STATUS_UNSUCCESSFUL);
+            SetLastError(RtlNtStatusToDosError(STATUS_UNSUCCESSFUL));
             return FALSE;
         }
     }
